@@ -1,17 +1,6 @@
 class Stats {
     constructor() {
-        this.life = 0;       // Points de Vie
-        this.strength = 0;   // Force
-        this.wisdom = 0;     // Sagesse
-        this.resistance = 0; // Résistance
-        this.agility = 0;    // Agilité
-        this.science = 0;    // Science
-        this.magic = 0;      // Magie
-        this.frequency = 0;  // Fréquence
-        this.cores = 0;      // Coeurs
-        this.ram = 0;        // RAM
-        this.tp = 0;         // PT (Points de Tour)
-        this.mp = 0;         // PM (Points de Mouvement)
+        this.reset();
     }
 
     // Set all stats at once

@@ -8,8 +8,8 @@
 }
 
 .tier-dot {
-    width: 6px;
-    height: 6px;
+    width: 1px;
+    height: 16px;
     border-radius: 50%;
     background: color-mix(in srgb, var(--stat-color) 20%, var(--border-default));
     flex-shrink: 0;

@@ -70,8 +70,8 @@ function renderEquippedWeapons(leek) {
     const countEl = document.querySelector('.weapons-count');
     const maxEl = document.querySelector('.weapons-max');
     const counterEl = document.querySelector('.weapons-counter');
-    countEl.textContent = count;
-    maxEl.textContent = maxWeapons;
+    countEl.textContent = count.toString();
+    maxEl.textContent = maxWeapons.toString();
     counterEl.classList.toggle('overflow', count > maxWeapons);
 
     let html = '';

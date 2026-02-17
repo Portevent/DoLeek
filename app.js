@@ -81,7 +81,7 @@ function initResizer() {
 
     let isResizing = false;
 
-    resizer.addEventListener('mousedown', (e) => {
+    resizer.addEventListener('mousedown', (_) => {
         isResizing = true;
         resizer.classList.add('active');
         document.body.style.cursor = 'col-resize';

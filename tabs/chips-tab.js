@@ -50,7 +50,7 @@ function renderEquippedChips(leek) {
     const countEl = document.querySelector('.chips-count');
     const maxEl = document.querySelector('.chips-max');
     const counterEl = document.querySelector('.chips-counter');
-    countEl.textContent = count;
+    countEl.textContent = count.toString();
     maxEl.textContent = totalRam;
     counterEl.classList.toggle('overflow', count > totalRam);
 
