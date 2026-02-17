@@ -193,7 +193,7 @@
 }
 
 .weapon-icon {
-    width: 64px;
+    width: 128px;
     height: 64px;
     flex-shrink: 0;
     display: flex;
@@ -278,7 +278,7 @@
 }
 
 .weapon-slot.filled .weapon-icon {
-    width: 48px;
+    width: 96px;
     height: 48px;
     flex-shrink: 0;
 }
