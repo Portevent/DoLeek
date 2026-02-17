@@ -58,20 +58,27 @@ class Leek {
         this.emit('level');
     }
 
-    // Get total stats (base + bonus)
+    // Get total stats (base + bonus + components)
     getTotalStats() {
         const total = this.baseStats.clone();
         total.add(this.bonusStats);
+        for (const component of this.components) {
+            for (const [stat, value] of component.stats) {
+                total[stat] += value;
+            }
+        }
         return total;
     }
 
     // Component management
     addComponent(component) {
         this.components.push(component);
+        this.emit('components');
     }
 
     removeComponent(index) {
         this.components.splice(index, 1);
+        this.emit('components');
     }
 
     // Chip management

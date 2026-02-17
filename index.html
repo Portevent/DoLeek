@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planner</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/layout.css">
+    <link rel="stylesheet" href="styles/stats-tab.css">
+    <link rel="stylesheet" href="styles/components-tab.css">
     <link rel="stylesheet" href="colors.css">
 </head>
 <body>
@@ -65,6 +67,7 @@
         <main class="editor">
             <nav class="tabs">
                 <button class="tab active" data-tab="stats">Stats</button>
+                <button class="tab" data-tab="components">Components</button>
                 <button class="tab" data-tab="chips">Chips</button>
                 <button class="tab" data-tab="weapons">Weapons</button>
                 <button class="tab" data-tab="planner">Planner</button>
@@ -83,6 +86,23 @@
                     </div>
                     <table class="stats-table">
                     </table>
+                </section>
+
+                <section id="components" class="tab-panel">
+                    <h2>Components</h2>
+                    <div class="components-layout">
+                        <div class="equipped-components">
+                            <h3>Equipped</h3>
+                            <div class="equipped-list">
+                            </div>
+                        </div>
+                        <div class="all-components">
+                            <h3>All Components</h3>
+                            <div class="components-filters"></div>
+                            <div class="components-list">
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 <section id="chip" class="tab-panel">

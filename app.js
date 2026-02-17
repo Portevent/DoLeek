@@ -1,6 +1,7 @@
 import Leek from './model/leek.js';
 import { initRecapStats } from './tabs/stats-recap.js';
 import { initStatsTab } from './tabs/stats-tab.js';
+import { initComponentsTab } from './tabs/components-tab.js';
 
 // Global Leek instance for the application
 const leek = new Leek('My Leek');
@@ -10,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initResizer();
     initRecapStats(leek);
     initStatsTab(leek);
+    initComponentsTab(leek);
 });
 
 // Expose leek instance globally for debugging

@@ -1,0 +1,210 @@
+/* Components Tab */
+.components-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.equipped-components h3,
+.all-components h3 {
+    font-size: 14px;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+/* Equipped slots */
+.equipped-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+}
+
+.equipped-slot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: #ecf0f1;
+    border-radius: 6px;
+    min-height: 56px;
+    position: relative;
+}
+
+.equipped-slot.empty {
+    border: 2px dashed #bdc3c7;
+    background: #f9f9f9;
+}
+
+.equipped-slot.filled {
+    border: 2px solid #3498db;
+    background: #eaf2f8;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.equipped-slot.filled:hover {
+    border-color: #e74c3c;
+    background: #fdedec;
+}
+
+.equipped-slot.filled .component-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.equipped-slot.filled .component-name {
+    font-size: 12px;
+}
+
+.equipped-slot.filled .component-stats {
+    gap: 4px;
+}
+
+.equipped-slot.overflow {
+    border-color: #e74c3c;
+    background: #fdedec;
+}
+
+
+.slot-number {
+    font-size: 11px;
+    font-weight: bold;
+    color: #bdc3c7;
+    position: absolute;
+    top: 4px;
+    left: 8px;
+}
+
+.slot-placeholder {
+    color: #bdc3c7;
+    font-size: 12px;
+    margin: auto;
+}
+
+/* All components grid */
+.components-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 8px;
+}
+
+.component-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #f9f9f9;
+    border: 1px solid #ecf0f1;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.component-card:hover {
+    background: #ecf0f1;
+    border-color: #3498db;
+}
+
+.component-card.equipped {
+    border-color: #3498db;
+    background: #eaf2f8;
+}
+
+.component-card.equipped:hover {
+    border-color: #e74c3c;
+    background: #fdedec;
+}
+
+.component-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.component-icon img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.component-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.component-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+    text-transform: capitalize;
+    margin-bottom: 4px;
+}
+
+.component-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.component-stat {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.component-stat img {
+    width: 14px;
+    height: 14px;
+}
+
+/* Stat filters */
+.components-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.stat-filter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 2px solid #dce1e3;
+    border-radius: 6px;
+    background: #f9f9f9;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0.5;
+}
+
+.stat-filter img {
+    width: 20px;
+    height: 20px;
+}
+
+.stat-filter:hover {
+    opacity: 0.8;
+    border-color: #95a5a6;
+}
+
+.stat-filter.active {
+    opacity: 1;
+    border-color: #3498db;
+    background: #eaf2f8;
+}
+
+.component-card.hidden {
+    display: none;
+}

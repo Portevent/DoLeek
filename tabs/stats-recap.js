@@ -1,5 +1,20 @@
 // Updates the recap zone stats display with current leek stats
 
+function updateRecapComponents(leek) {
+    for (let i = 1; i <= 8; i++) {
+        const slot = document.querySelector(`[data-slot="component-${i}"]`);
+        if (!slot) continue;
+        const component = leek.components[i - 1];
+        if (component) {
+            slot.classList.remove('empty');
+            slot.innerHTML = `<img src="public/image/component/${component.name}.png" alt="${component.name}">`;
+        } else {
+            slot.classList.add('empty');
+            slot.innerHTML = '';
+        }
+    }
+}
+
 export function updateRecapStats(leek) {
     const statElements = document.querySelectorAll('.recap-stats .recap-stat');
     const totalStats = leek.getTotalStats();
@@ -33,7 +48,12 @@ export function initRecapStats(leek) {
     // Observe model changes to update recap
     leek.on('stats', () => updateRecapStats(leek));
     leek.on('level', () => updateRecapStats(leek));
+    leek.on('components', () => {
+        updateRecapComponents(leek);
+        updateRecapStats(leek);
+    });
 
     // Initial update
     updateRecapStats(leek);
+    updateRecapComponents(leek);
 }
