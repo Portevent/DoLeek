@@ -59,14 +59,16 @@ const EFFECT_LABELS = {
     57: (v1) => `${v1} heal`,
     58: (v1, v2) => v2 ? `${v1}–${v1 + v2} heal/crit` : `${v1} heal/crit`,
     59: () => 'Add state',
+    60: () => 'Unknow',
+    61: () => 'Steal removed life'
 };
 
 // Stat that boosts each effect (null = no stat boost)
 const EFFECT_STATS = {
     1: "strength",   // Damage
     2: "wisdom",   // Heal
-    3: null,   // +Strength
-    4: null,   // +Agility
+    3: "science",   // +Strength
+    4: "science",   // +Agility
     5: "resistance",   // -% Damage taken (relative shield)
     6: "resistance",   // -Damage taken (absolute shield)
     7: "science",   // +MP
@@ -79,15 +81,15 @@ const EFFECT_STATS = {
     14: null,  // Summon
     15: null,  // Revive
     16: null,  // Kill
-    17: null,  // -MP
-    18: null,  // -TP
-    19: null,  // -Strength
+    17: "magic",  // -MP
+    18: "magic",  // -TP
+    19: "magic",  // -Strength
     20: "agility",  // % Return
-    21: null,  // +Resistance
+    21: "science",  // +Resistance
     22: "science",  // +Wisdom
     23: null,  // Cure poison
     24: null,  // -Magic
-    25: null,  // Aftereffects
+    25: "science",  // Aftereffects
     26: null,  // % Vulnerability
     27: null,  // Absolute vulnerability
     28: null,  // % Life damage
@@ -108,8 +110,8 @@ const EFFECT_STATS = {
     44: null,  // +Wisdom (buff)
     45: "science",  // +Max life
     46: null,  // Attract
-    47: null,  // -Agility
-    48: null,  // -Wisdom
+    47: "magic",  // -Agility
+    48: "magic",  // -Wisdom
     49: null,  // Remove shackles
     50: null,  // MP per move
     51: null,  // Push

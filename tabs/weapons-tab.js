@@ -59,67 +59,69 @@ const EFFECT_LABELS = {
     57: (v1) => `${v1} heal`,
     58: (v1, v2) => v2 ? `${v1}–${v1 + v2} heal/crit` : `${v1} heal/crit`,
     59: () => 'Add state',
+    60: () => 'Unknow',
+    61: () => 'Steal removed life'
 };
 
 // Stat that boosts each effect (null = no stat boost)
 const EFFECT_STATS = {
-    1: "strength",
-    2: "wisdom",
-    3: null,
-    4: null,
-    5: "resistance",
-    6: "resistance",
-    7: "science",
-    8: "science",
-    9: null,
-    10: null,
-    11: null,
-    12: "wisdom",
-    13: "magic",
-    14: null,
-    15: null,
-    16: null,
-    17: null,
-    18: null,
-    19: null,
-    20: "agility",
-    21: null,
-    22: "science",
-    23: null,
-    24: null,
-    25: null,
-    26: null,
-    27: null,
-    28: null,
-    29: null,
-    30: "science",
-    31: null,
-    32: null,
-    33: null,
-    34: null,
-    35: null,
-    36: null,
-    38: null,
-    39: null,
-    40: null,
-    41: null,
-    42: null,
-    43: null,
-    44: null,
-    45: "science",
-    46: null,
-    47: null,
-    48: null,
-    49: null,
-    50: null,
-    51: null,
-    53: null,
-    54: null,
-    55: null,
-    56: null,
-    57: null,
-    58: null,
-    59: null,
+    1: "strength",   // Damage
+    2: "wisdom",   // Heal
+    3: "science",   // +Strength
+    4: "science",   // +Agility
+    5: "resistance",   // -% Damage taken (relative shield)
+    6: "resistance",   // -Damage taken (absolute shield)
+    7: "science",   // +MP
+    8: "science",   // +TP
+    9: null,   // -% Effects
+    10: null,  // Teleport
+    11: null,  // Swap
+    12: "wisdom",  // +Max HP
+    13: "magic",  // Poison
+    14: null,  // Summon
+    15: null,  // Revive
+    16: null,  // Kill
+    17: "magic",  // -MP
+    18: "magic",  // -TP
+    19: "magic",  // -Strength
+    20: "agility",  // % Return
+    21: "science",  // +Resistance
+    22: "science",  // +Wisdom
+    23: null,  // Cure poison
+    24: null,  // -Magic
+    25: "science",  // Aftereffects
+    26: null,  // % Vulnerability
+    27: null,  // Absolute vulnerability
+    28: null,  // % Life damage
+    29: null,  // Give abs shields
+    30: "science",  // Nova damage
+    31: null,  // Give MP
+    32: null,  // Give TP
+    33: null,  // Poison→Science
+    34: null,  // Damage→Shield
+    35: null,  // Damage→Strength
+    36: null,  // Nova→Magic
+    38: null,  // +Strength (buff)
+    39: null,  // +Magic
+    40: null,  // +Science
+    41: null,  // +Agility (buff)
+    42: null,  // +Resistance (buff)
+    43: null,  // Propagate
+    44: null,  // +Wisdom (buff)
+    45: "science",  // +Max life
+    46: null,  // Attract
+    47: "magic",  // -Agility
+    48: "magic",  // -Wisdom
+    49: null,  // Remove shackles
+    50: null,  // MP per move
+    51: null,  // Push
+    53: null,  // Repel
+    54: null,  // % Shield
+    55: null,  // Agility per dead ally
+    56: null,  // TP per kill
+    57: null,  // Heal (fixed)
+    58: null,  // Heal per crit
+    59: null,  // Add state
 };
 
 function getMaxWeapons(level) {
