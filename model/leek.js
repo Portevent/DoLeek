@@ -35,7 +35,7 @@ class Leek {
         this.baseStats.tp = 10;
         this.baseStats.mp = 6;
         this.baseStats.ram = 6;
-        this.baseStats.core = 1;
+        this.baseStats.cores = 1;
     }
 
     on(event, callback) {

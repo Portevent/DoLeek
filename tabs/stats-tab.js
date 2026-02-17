@@ -161,6 +161,21 @@ const STAT_PAIRS = [
     ['science', 'tp'],
 ];
 
+const STAT_LITE = {
+    life: false,
+    strength: false,
+    wisdom: false,
+    agility: false,
+    resistance: false,
+    science: false,
+    magic: false,
+    frequency: false,
+    cores: true,
+    ram: true,
+    tp: true,
+    mp: true,
+};
+
 function buildCostTable(statName) {
     const tiers = COSTS[statName];
     let html = `<table class="cost-table" data-stat="${statName}">
@@ -183,12 +198,12 @@ function buildStatCell(statName) {
             <span class="stat-value color-${statName}" data-stat="${statName}">0</span>
         </div>
         <div class="stat-buttons" data-stat="${statName}">
-            <button data-delta="-100">-100</button>
+            ${STAT_LITE[statName]?'':'<button data-delta=\"-100\">-100</button>'}
             <button data-delta="-10">-10</button>
             <button data-delta="-1">-1</button>
             <button data-delta="1">+1</button>
             <button data-delta="10">+10</button>
-            <button data-delta="100">+100</button>
+            ${STAT_LITE[statName]?'':'<button data-delta=\"100\">100</button>'}
         </div>
         <div class="stat-cost-info">
             <span class="stat-cost-label">Prochain: </span>
