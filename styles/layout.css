@@ -291,11 +291,19 @@ html, body {
     color: #7f8c8d;
     transition: all 0.3s ease;
     border-bottom: 3px solid transparent;
+    display: flex;
+    align-items: center;
 }
 
 .tab:hover {
     background-color: #d5dbdb;
     color: #2c3e50;
+}
+
+
+.tab img {
+    height: 26px;
+    margin: 2px;
 }
 
 .tab.active {
