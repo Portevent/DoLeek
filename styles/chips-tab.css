@@ -8,7 +8,7 @@
 .equipped-chips h3,
 .all-chips h3 {
     font-size: 14px;
-    color: #7f8c8d;
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin: 0;
@@ -23,17 +23,17 @@
 
 .chips-counter {
     font-size: 14px;
-    color: #7f8c8d;
+    color: var(--text-secondary);
     font-weight: 600;
 }
 
 .chips-counter.overflow {
-    color: #e74c3c;
+    color: var(--color-danger);
 }
 
 .chip-slot.overflow {
-    border-color: #e74c3c;
-    background: #fdedec;
+    border-color: var(--color-danger);
+    background: var(--bg-hover-remove);
 }
 
 .chips-header {
@@ -47,24 +47,24 @@
 .chips-sort-toggle {
     padding: 4px 10px;
     font-size: 12px;
-    border: 1px solid #bdc3c7;
-    background: #ecf0f1;
+    border: 1px solid var(--border-default);
+    background: var(--bg-input);
     border-radius: 4px;
     cursor: pointer;
-    color: #7f8c8d;
+    color: var(--text-secondary);
     transition: all 0.2s;
 }
 
 .chips-show-all-toggle:hover,
 .chips-sort-toggle:hover {
-    border-color: #3498db;
-    color: #2c3e50;
+    border-color: var(--color-accent);
+    color: var(--text-primary);
 }
 
 .chips-show-all-toggle.active {
-    border-color: #3498db;
-    background: #eaf2f8;
-    color: #2c3e50;
+    border-color: var(--color-accent);
+    background: var(--bg-equipped);
+    color: var(--text-primary);
 }
 
 .chip-card.over-level {
@@ -89,20 +89,20 @@
 }
 
 .chip-slot.empty {
-    border: 2px dashed #bdc3c7;
-    background: #f9f9f9;
+    border: 2px dashed var(--border-default);
+    background: var(--bg-card);
 }
 
 .chip-slot.filled {
-    border: 2px solid #3498db;
-    background: #eaf2f8;
+    border: 2px solid var(--color-accent);
+    background: var(--bg-equipped);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .chip-slot.filled:hover {
-    border-color: #e74c3c;
-    background: #fdedec;
+    border-color: var(--color-danger);
+    background: var(--bg-hover-remove);
 }
 
 /* All chips grid */
@@ -117,26 +117,26 @@
     align-items: center;
     gap: 10px;
     padding: 8px 12px;
-    background: #f9f9f9;
-    border: 2px solid #bdc3c7;
+    background: var(--bg-card);
+    border: 2px solid var(--border-default);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .chip-card:hover {
-    background: #ecf0f1;
-    border-color: #3498db;
+    background: var(--bg-input);
+    border-color: var(--color-accent);
 }
 
 .chip-card.equipped {
-    border-color: #3498db;
-    background: #eaf2f8;
+    border-color: var(--color-accent);
+    background: var(--bg-equipped);
 }
 
 .chip-card.equipped:hover {
-    border-color: #e74c3c;
-    background: #fdedec;
+    border-color: var(--color-danger);
+    background: var(--bg-hover-remove);
 }
 
 .chip-icon {
@@ -164,13 +164,13 @@
 .chip-name {
     font-size: 13px;
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--text-primary);
     text-transform: capitalize;
 }
 
 .chip-level {
     font-size: 11px;
-    color: #7f8c8d;
+    color: var(--text-secondary);
 }
 
 .chip-meta {
@@ -179,7 +179,7 @@
     gap: 8px;
     margin-top: 2px;
     font-size: 11px;
-    color: #7f8c8d;
+    color: var(--text-secondary);
 }
 
 .chip-cost {
@@ -195,11 +195,11 @@
 }
 
 .chip-cooldown {
-    color: #95a5a6;
+    color: var(--text-muted);
 }
 
 .chip-uses {
-    color: #95a5a6;
+    color: var(--text-muted);
 }
 
 .chip-effects {
@@ -214,7 +214,7 @@
     align-items: center;
     gap: 4px;
     font-size: 11px;
-    color: #2c3e50;
+    color: var(--text-primary);
 }
 
 .effect-stat-icon {
@@ -228,7 +228,7 @@
 }
 
 .chip-slot .slot-placeholder {
-    color: #bdc3c7;
+    color: var(--text-placeholder);
     font-size: 12px;
     margin: auto;
 }

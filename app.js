@@ -9,6 +9,7 @@ import { initWeaponsTab } from './tabs/weapons-tab.js';
 const leek = new Leek('My Leek');
 
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     initTabs();
     initResizer();
     initRecapStats(leek);
@@ -20,6 +21,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Expose leek instance globally for debugging
 window.leek = leek;
+
+function initTheme() {
+    const toggle = document.getElementById('theme-toggle');
+    const saved = localStorage.getItem('doleek-theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = saved || (prefersDark ? 'dark' : 'light');
+
+    applyTheme(theme);
+
+    toggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+        localStorage.setItem('doleek-theme', next);
+    });
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const toggle = document.getElementById('theme-toggle');
+    toggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
 
 function initTabs() {
     const tabs = document.querySelectorAll('.tab');

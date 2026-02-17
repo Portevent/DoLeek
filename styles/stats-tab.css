@@ -1,3 +1,37 @@
+/* Tier indicators */
+.tier-indicators {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+}
+
+.tier-indicator {
+    display: inline-block;
+    padding: 1px 5px;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 3px;
+    background: var(--bg-input);
+    color: var(--text-muted);
+    border: 1px solid var(--border-default);
+    line-height: 1.4;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.tier-indicator.active {
+    background: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
+}
+
+.tier-indicator.passed {
+    background: var(--bg-invested);
+    color: var(--text-secondary);
+    border-color: var(--color-accent);
+    opacity: 0.6;
+}
+
 /* Stats header with capital */
 .stats-header {
     display: flex;
@@ -13,9 +47,9 @@
 .capital-display {
     font-size: 16px;
     padding: 8px 16px;
-    background: #ecf0f1;
+    background: var(--bg-input);
     border-radius: 4px;
-    color: #2c3e50;
+    color: var(--text-primary);
 }
 
 .capital-display span {
@@ -23,11 +57,11 @@
 }
 
 #capital-remaining {
-    color: #27ae60;
+    color: var(--color-success);
 }
 
 #capital-remaining.negative {
-    color: #e74c3c;
+    color: var(--color-danger);
 }
 
 /* Stats Table */
@@ -38,15 +72,15 @@
 
 .stats-table > tbody > tr > td {
     padding: 12px 15px;
-    border-bottom: 1px solid #ecf0f1;
+    border-bottom: 1px solid var(--bg-input);
     border-left: 3px solid transparent;
     width: 50%;
     vertical-align: top;
 }
 
 .stats-table > tbody > tr > td.invested {
-    border-left-color: #3498db;
-    background: #f0f7fd;
+    border-left-color: var(--color-accent);
+    background: var(--bg-invested);
 }
 
 .stats-table > tbody > tr:last-child > td {
@@ -55,9 +89,10 @@
 
 .stat-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 6px;
     margin-bottom: 4px;
+    flex-wrap: wrap;
 }
 
 .stat-label {
@@ -75,6 +110,7 @@
 .stat-value {
     font-size: 20px;
     font-weight: bold;
+    margin-left: auto;
 }
 
 /* Stat increment/decrement buttons */
@@ -88,27 +124,28 @@
     flex: 1;
     padding: 4px 2px;
     font-size: 11px;
-    border: 1px solid #bdc3c7;
-    background: #ecf0f1;
+    border: 1px solid var(--border-default);
+    background: var(--bg-input);
     border-radius: 3px;
     cursor: pointer;
     transition: all 0.2s;
+    color: var(--text-primary);
 }
 
 .stat-buttons button:hover {
-    background: #3498db;
+    background: var(--color-accent);
     color: white;
-    border-color: #3498db;
+    border-color: var(--color-accent);
 }
 
 .stat-buttons button[data-delta^="-"] {
-    color: #e74c3c;
+    color: var(--color-danger);
 }
 
 .stat-buttons button[data-delta^="-"]:hover {
-    background: #e74c3c;
+    background: var(--color-danger);
     color: white;
-    border-color: #e74c3c;
+    border-color: var(--color-danger);
 }
 
 /* Stats header controls */
@@ -121,23 +158,23 @@
 .toggle-cost-btn {
     padding: 6px 12px;
     font-size: 12px;
-    border: 1px solid #bdc3c7;
-    background: #ecf0f1;
+    border: 1px solid var(--border-default);
+    background: var(--bg-input);
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s;
-    color: #7f8c8d;
+    color: var(--text-secondary);
 }
 
 .toggle-cost-btn:hover {
-    border-color: #3498db;
-    color: #2c3e50;
+    border-color: var(--color-accent);
+    color: var(--text-primary);
 }
 
 .toggle-cost-btn.active {
-    background: #3498db;
+    background: var(--color-accent);
     color: white;
-    border-color: #3498db;
+    border-color: var(--color-accent);
 }
 
 /* Cost info hidden by default */
@@ -158,11 +195,11 @@
 .stat-cost-info {
     margin-top: 6px;
     font-size: 11px;
-    color: #7f8c8d;
+    color: var(--text-secondary);
 }
 
 .stat-cost-current {
-    color: #2c3e50;
+    color: var(--text-primary);
     font-weight: bold;
 }
 
@@ -175,17 +212,17 @@
 }
 
 .cost-table th {
-    background: #ecf0f1;
-    color: #7f8c8d;
+    background: var(--bg-input);
+    color: var(--text-secondary);
     padding: 3px 6px;
     text-align: left;
     font-weight: normal;
-    border-bottom: 1px solid #bdc3c7;
+    border-bottom: 1px solid var(--border-default);
 }
 
 .cost-table td {
     padding: 3px 6px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border-table);
     width: auto;
 }
 
@@ -194,10 +231,10 @@
 }
 
 .cost-table tbody tr.active-tier {
-    background: #d4efdf;
+    background: var(--bg-active-tier);
     font-weight: bold;
 }
 
 .cost-table tbody tr.active-tier td {
-    color: #27ae60;
+    color: var(--color-success);
 }

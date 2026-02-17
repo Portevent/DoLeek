@@ -1,3 +1,65 @@
+/* Theme variables */
+:root {
+    --bg-body: #f5f5f5;
+    --bg-recap: #2c3e50;
+    --bg-recap-zone: #34495e;
+    --bg-recap-item: #2c3e50;
+    --bg-editor: #fff;
+    --bg-tabs: #ecf0f1;
+    --bg-card: #f9f9f9;
+    --bg-input: #ecf0f1;
+    --bg-equipped: #eaf2f8;
+    --bg-hover-remove: #fdedec;
+    --bg-active-tier: #d4efdf;
+    --bg-invested: #f0f7fd;
+    --border-default: #bdc3c7;
+    --border-subtle: #dce1e3;
+    --border-table: #f0f0f0;
+    --text-primary: #2c3e50;
+    --text-secondary: #7f8c8d;
+    --text-muted: #95a5a6;
+    --text-placeholder: #bdc3c7;
+    --text-recap: #ecf0f1;
+    --text-color: #2c3e50;
+    --color-accent: #3498db;
+    --color-success: #27ae60;
+    --color-danger: #e74c3c;
+    --resizer-bg: #1a252f;
+    --leek-center-bg: #1a3a4a;
+    --slot-empty-border: #5d6d7e;
+    --slot-hover: #3d566e;
+    --tab-hover: #d5dbdb;
+}
+
+[data-theme="dark"] {
+    --bg-body: #1a1a2e;
+    --bg-recap: #0f1b2d;
+    --bg-recap-zone: #16213e;
+    --bg-recap-item: #0f1b2d;
+    --bg-editor: #1e1e3a;
+    --bg-tabs: #16213e;
+    --bg-card: #22224a;
+    --bg-input: #2a2a5a;
+    --bg-equipped: #1a2a4a;
+    --bg-hover-remove: #3a1a1a;
+    --bg-active-tier: #1a3a2a;
+    --bg-invested: #1a2a4a;
+    --border-default: #3a3a6a;
+    --border-subtle: #2a2a5a;
+    --border-table: #2a2a5a;
+    --text-primary: #e0e0f0;
+    --text-secondary: #a0a0c0;
+    --text-muted: #7878a0;
+    --text-placeholder: #5a5a8a;
+    --text-recap: #e0e0f0;
+    --text-color: #e0e0f0;
+    --resizer-bg: #0a0a1e;
+    --leek-center-bg: #0f1b2d;
+    --slot-empty-border: #3a3a6a;
+    --slot-hover: #2a3a5a;
+    --tab-hover: #2a2a5a;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -7,7 +69,7 @@
 html, body {
     height: 100%;
     font-family: system-ui, -apple-system, sans-serif;
-    background-color: #f5f5f5;
+    background-color: var(--bg-body);
 }
 
 .container {
@@ -19,8 +81,8 @@ html, body {
 .recap {
     width: 33%;
     min-width: 150px;
-    background-color: #2c3e50;
-    color: #ecf0f1;
+    background-color: var(--bg-recap);
+    color: var(--text-recap);
     padding: 20px;
     overflow-y: auto;
     container-type: inline-size;
@@ -33,7 +95,7 @@ html, body {
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 10px;
-    border-bottom: 2px solid #3498db;
+    border-bottom: 2px solid var(--color-accent);
 }
 
 .recap-header h2 {
@@ -48,7 +110,7 @@ html, body {
 
 .level-input label {
     font-size: 14px;
-    color: #bdc3c7;
+    color: var(--text-placeholder);
 }
 
 .level-input input {
@@ -57,13 +119,13 @@ html, body {
     font-size: 14px;
     border: none;
     border-radius: 4px;
-    background: #34495e;
-    color: #ecf0f1;
+    background: var(--bg-recap-zone);
+    color: var(--text-recap);
     text-align: center;
 }
 
 .level-input input:focus {
-    outline: 2px solid #3498db;
+    outline: 2px solid var(--color-accent);
 }
 
 .recap-content {
@@ -78,7 +140,7 @@ html, body {
 }
 
 .recap-zone {
-    background-color: #34495e;
+    background-color: var(--bg-recap-zone);
     border-radius: 6px;
     padding: 15px;
 }
@@ -86,7 +148,7 @@ html, body {
 .recap-zone h3 {
     font-size: 22px;
     margin-bottom: 10px;
-    color: #3498db;
+    color: var(--color-accent);
 }
 
 /* Zone 1 - Always sacred, shares row with Zone 2 */
@@ -104,7 +166,7 @@ html, body {
 
 .leek-slot {
     position: absolute;
-    background-color: #2c3e50;
+    background-color: var(--bg-recap-item);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -119,12 +181,12 @@ html, body {
 }
 
 .leek-slot.component:not(.empty):hover {
-    background-color: #3d566e;
+    background-color: var(--slot-hover);
 }
 
 .leek-slot.empty {
-    background-color: #2c3e50;
-    border: 2px dashed #5d6d7e;
+    background-color: var(--bg-recap-item);
+    border: 2px dashed var(--slot-empty-border);
 }
 
 .leek-slot img {
@@ -140,8 +202,8 @@ html, body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    border-color: #3498db;
-    background-color: #1a3a4a;
+    border-color: var(--color-accent);
+    background-color: var(--leek-center-bg);
     border-radius: 6px;
 }
 
@@ -180,7 +242,7 @@ html, body {
     align-items: center;
     gap: 6px;
     padding: 4px 6px;
-    background-color: #2c3e50;
+    background-color: var(--bg-recap-item);
     border-radius: 3px;
 }
 
@@ -243,7 +305,7 @@ html, body {
 
 .detail-level {
     font-size: 12px;
-    color: #95a5a6;
+    color: var(--text-muted);
 }
 
 .detail-meta {
@@ -251,7 +313,7 @@ html, body {
     align-items: center;
     gap: 10px;
     font-size: 12px;
-    color: #95a5a6;
+    color: var(--text-muted);
 }
 
 .detail-meta-entry {
@@ -303,14 +365,14 @@ html, body {
     align-items: center;
     justify-content: center;
     padding: 4px;
-    background: #2c3e50;
+    background: var(--bg-recap-item);
     border-radius: 4px;
     cursor: pointer;
     transition: background 0.2s;
 }
 
 .recap-item:hover {
-    background: #3d566e;
+    background: var(--slot-hover);
 }
 
 .recap-item img {
@@ -354,14 +416,14 @@ html, body {
 /* Resizer Handle */
 .resizer {
     width: 6px;
-    background-color: #1a252f;
+    background-color: var(--resizer-bg);
     cursor: col-resize;
     transition: background-color 0.2s;
 }
 
 .resizer:hover,
 .resizer.active {
-    background-color: #3498db;
+    background-color: var(--color-accent);
 }
 
 /* Editor Section - Right 2/3 */
@@ -369,15 +431,15 @@ html, body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background-color: #fff;
+    background-color: var(--bg-editor);
     min-width: 200px;
 }
 
 /* Tabs Navigation */
 .tabs {
     display: flex;
-    background-color: #ecf0f1;
-    border-bottom: 2px solid #bdc3c7;
+    background-color: var(--bg-tabs);
+    border-bottom: 2px solid var(--border-default);
 }
 
 .tab {
@@ -386,7 +448,7 @@ html, body {
     background: none;
     cursor: pointer;
     font-size: 16px;
-    color: #7f8c8d;
+    color: var(--text-secondary);
     transition: all 0.3s ease;
     border-bottom: 3px solid transparent;
     display: flex;
@@ -394,8 +456,8 @@ html, body {
 }
 
 .tab:hover {
-    background-color: #d5dbdb;
-    color: #2c3e50;
+    background-color: var(--tab-hover);
+    color: var(--text-primary);
 }
 
 
@@ -405,9 +467,9 @@ html, body {
 }
 
 .tab.active {
-    color: #2c3e50;
-    background-color: #fff;
-    border-bottom: 3px solid #3498db;
+    color: var(--text-primary);
+    background-color: var(--bg-editor);
+    border-bottom: 3px solid var(--color-accent);
 }
 
 /* Tab Content */
@@ -427,5 +489,166 @@ html, body {
 
 .tab-panel h2 {
     margin-bottom: 20px;
-    color: #2c3e50;
+    color: var(--text-primary);
+}
+
+/* Theme toggle */
+.theme-toggle {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    line-height: 1;
+    transition: background 0.2s;
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Mobile layout: recap on top, editor below */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        height: 100vh;
+    }
+
+    .recap {
+        width: 100% !important;
+        min-width: unset;
+        padding: 10px 12px;
+        overflow-y: visible;
+        flex-shrink: 0;
+    }
+
+    .recap-header {
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+    }
+
+    .recap-header h2 {
+        font-size: 18px;
+    }
+
+    .recap-content {
+        padding: 0;
+    }
+
+    .recap-grid {
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 8px;
+        align-items: start;
+    }
+
+    .zone-1 {
+        grid-column: 1;
+        grid-row: 1;
+        padding: 8px;
+    }
+
+    .zone-1 h3 { display: none; }
+
+    .leek-display {
+        width: 80px;
+        height: 80px;
+    }
+
+    .leek-center {
+        width: 60%;
+        height: 60%;
+    }
+
+    .component {
+        width: 22%;
+        height: 22%;
+        padding: 2px;
+        border-radius: 4px;
+    }
+
+    .zone-2 {
+        grid-column: 2;
+        grid-row: 1;
+        padding: 8px;
+    }
+
+    .zone-2 h3 { display: none; }
+
+    .recap-stats {
+        grid-template-columns: repeat(4, 1fr);
+        font-size: 12px;
+        gap: 2px;
+    }
+
+    .recap-stat {
+        padding: 2px 4px;
+        gap: 3px;
+    }
+
+    .recap-stat img {
+        width: 16px;
+        height: 16px;
+    }
+
+    .recap-zone h3 {
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+
+    .zone-3 {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        padding: 8px;
+    }
+
+    .zone-3 h3 { display: none; }
+
+    .recap-items {
+        gap: 4px;
+    }
+
+    .recap-item img {
+        width: 32px;
+        height: 32px;
+    }
+
+    .recap-weapons-list .recap-item img {
+        width: 48px;
+    }
+
+    .zone-4 {
+        grid-column: 1 / -1;
+        grid-row: 3;
+    }
+
+    .resizer {
+        display: none;
+    }
+
+    .editor {
+        flex: 1;
+        min-width: unset;
+        overflow-y: auto;
+    }
+
+    .tabs {
+        flex-shrink: 0;
+    }
+
+    .tab {
+        padding: 10px 12px;
+        font-size: 14px;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .tab img {
+        height: 20px;
+    }
+
+    .tab-content {
+        padding: 12px;
+    }
 }

@@ -8,7 +8,7 @@
 .equipped-components h3,
 .all-components h3 {
     font-size: 14px;
-    color: #7f8c8d;
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin: 0;
@@ -33,27 +33,27 @@
     align-items: center;
     gap: 8px;
     padding: 10px 12px;
-    background: #ecf0f1;
+    background: var(--bg-input);
     border-radius: 6px;
     min-height: 56px;
     position: relative;
 }
 
 .equipped-slot.empty {
-    border: 2px dashed #bdc3c7;
-    background: #f9f9f9;
+    border: 2px dashed var(--border-default);
+    background: var(--bg-card);
 }
 
 .equipped-slot.filled {
-    border: 2px solid #3498db;
-    background: #eaf2f8;
+    border: 2px solid var(--color-accent);
+    background: var(--bg-equipped);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .equipped-slot.filled:hover {
-    border-color: #e74c3c;
-    background: #fdedec;
+    border-color: var(--color-danger);
+    background: var(--bg-hover-remove);
 }
 
 .equipped-slot.filled .component-icon {
@@ -71,22 +71,22 @@
 }
 
 .equipped-slot.overflow {
-    border-color: #e74c3c;
-    background: #fdedec;
+    border-color: var(--color-danger);
+    background: var(--bg-hover-remove);
 }
 
 
 .slot-number {
     font-size: 11px;
     font-weight: bold;
-    color: #bdc3c7;
+    color: var(--text-placeholder);
     position: absolute;
     top: 4px;
     left: 8px;
 }
 
 .slot-placeholder {
-    color: #bdc3c7;
+    color: var(--text-placeholder);
     font-size: 12px;
     margin: auto;
 }
@@ -103,26 +103,26 @@
     align-items: center;
     gap: 10px;
     padding: 8px 12px;
-    background: #f9f9f9;
-    border: 2px solid #bdc3c7;
+    background: var(--bg-card);
+    border: 2px solid var(--border-default);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .component-card:hover {
-    background: #ecf0f1;
-    border-color: #3498db;
+    background: var(--bg-input);
+    border-color: var(--color-accent);
 }
 
 .component-card.equipped {
-    border-color: #3498db;
-    background: #eaf2f8;
+    border-color: var(--color-accent);
+    background: var(--bg-equipped);
 }
 
 .component-card.equipped:hover {
-    border-color: #e74c3c;
-    background: #fdedec;
+    border-color: var(--color-danger);
+    background: var(--bg-hover-remove);
 }
 
 .component-icon {
@@ -149,14 +149,14 @@
     display: block;
     font-size: 13px;
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--text-primary);
     text-transform: capitalize;
 }
 
 .component-level {
     display: block;
     font-size: 11px;
-    color: #7f8c8d;
+    color: var(--text-secondary);
     margin-bottom: 2px;
 }
 
@@ -182,24 +182,24 @@
 .components-show-all-toggle {
     padding: 4px 10px;
     font-size: 12px;
-    border: 1px solid #bdc3c7;
-    background: #ecf0f1;
+    border: 1px solid var(--border-default);
+    background: var(--bg-input);
     border-radius: 4px;
     cursor: pointer;
-    color: #7f8c8d;
+    color: var(--text-secondary);
     transition: all 0.2s;
     margin-left: auto;
 }
 
 .components-show-all-toggle:hover {
-    border-color: #3498db;
-    color: #2c3e50;
+    border-color: var(--color-accent);
+    color: var(--text-primary);
 }
 
 .components-show-all-toggle.active {
-    border-color: #3498db;
-    background: #eaf2f8;
-    color: #2c3e50;
+    border-color: var(--color-accent);
+    background: var(--bg-equipped);
+    color: var(--text-primary);
 }
 
 /* Stat filters */
@@ -216,9 +216,9 @@
     width: 32px;
     height: 32px;
     padding: 0;
-    border: 2px solid #dce1e3;
+    border: 2px solid var(--border-subtle);
     border-radius: 6px;
-    background: #f9f9f9;
+    background: var(--bg-card);
     cursor: pointer;
     transition: all 0.2s;
     opacity: 0.5;
@@ -231,13 +231,13 @@
 
 .stat-filter:hover {
     opacity: 0.8;
-    border-color: #95a5a6;
+    border-color: var(--text-muted);
 }
 
 .stat-filter.active {
     opacity: 1;
-    border-color: #3498db;
-    background: #eaf2f8;
+    border-color: var(--color-accent);
+    background: var(--bg-equipped);
 }
 
 .component-card.hidden,

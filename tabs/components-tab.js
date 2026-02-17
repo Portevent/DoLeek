@@ -66,10 +66,9 @@ function buildComponentCard(component) {
     const statNames = component.stats.map(([stat]) => stat);
     const statsHtml = component.stats
         .map(([stat, value]) => {
-            const sign = value > 0 ? '+' : '';
             return `<span class="component-stat color-${stat}">
                 <img src="public/image/charac/${stat}.png" alt="${stat}">
-                ${sign}${value}
+                ${value}
             </span>`;
         })
         .join('');

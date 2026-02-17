@@ -8,7 +8,7 @@
 .equipped-weapons h3,
 .all-weapons h3 {
     font-size: 14px;
-    color: #7f8c8d;
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin: 0;
@@ -23,17 +23,17 @@
 
 .weapons-counter {
     font-size: 14px;
-    color: #7f8c8d;
+    color: var(--text-secondary);
     font-weight: 600;
 }
 
 .weapons-counter.overflow {
-    color: #e74c3c;
+    color: var(--color-danger);
 }
 
 .weapon-slot.overflow {
-    border-color: #e74c3c;
-    background: #fdedec;
+    border-color: var(--color-danger);
+    background: var(--bg-hover-remove);
 }
 
 .weapons-header {
@@ -54,14 +54,14 @@
     align-items: center;
     gap: 4px;
     padding: 4px 10px;
-    border: 1px solid #bdc3c7;
-    background: #ecf0f1;
+    border: 1px solid var(--border-default);
+    background: var(--bg-input);
     border-radius: 4px;
     cursor: pointer;
     opacity: 0.5;
     transition: all 0.2s;
     font-size: 12px;
-    color: #7f8c8d;
+    color: var(--text-secondary);
 }
 
 .weapon-filter img {
@@ -71,14 +71,14 @@
 
 .weapon-filter:hover {
     opacity: 0.8;
-    border-color: #95a5a6;
+    border-color: var(--text-muted);
 }
 
 .weapon-filter.active {
     opacity: 1;
-    border-color: #3498db;
-    background: #eaf2f8;
-    color: #2c3e50;
+    border-color: var(--color-accent);
+    background: var(--bg-equipped);
+    color: var(--text-primary);
 }
 
 .weapon-card.hidden,
@@ -95,26 +95,26 @@
 .weapons-sort-toggle {
     padding: 4px 10px;
     font-size: 12px;
-    border: 1px solid #bdc3c7;
-    background: #ecf0f1;
+    border: 1px solid var(--border-default);
+    background: var(--bg-input);
     border-radius: 4px;
     cursor: pointer;
-    color: #7f8c8d;
+    color: var(--text-secondary);
     transition: all 0.2s;
 }
 
 .weapons-forgotten-toggle:hover,
 .weapons-show-all-toggle:hover,
 .weapons-sort-toggle:hover {
-    border-color: #3498db;
-    color: #2c3e50;
+    border-color: var(--color-accent);
+    color: var(--text-primary);
 }
 
 .weapons-forgotten-toggle.active,
 .weapons-show-all-toggle.active {
-    border-color: #3498db;
-    background: #eaf2f8;
-    color: #2c3e50;
+    border-color: var(--color-accent);
+    background: var(--bg-equipped);
+    color: var(--text-primary);
 }
 
 /* Equipped weapons */
@@ -129,7 +129,7 @@
     align-items: center;
     gap: 8px;
     padding: 10px 12px;
-    background: #ecf0f1;
+    background: var(--bg-input);
     border-radius: 6px;
     min-height: 56px;
     position: relative;
@@ -138,31 +138,31 @@
 .weapon-slot .slot-number {
     font-size: 11px;
     font-weight: 700;
-    color: #bdc3c7;
+    color: var(--text-placeholder);
     min-width: 14px;
     text-align: center;
 }
 
 .weapon-slot.empty {
-    border: 2px dashed #bdc3c7;
-    background: #f9f9f9;
+    border: 2px dashed var(--border-default);
+    background: var(--bg-card);
 }
 
 .weapon-slot.filled {
-    border: 2px solid #3498db;
-    background: #eaf2f8;
+    border: 2px solid var(--color-accent);
+    background: var(--bg-equipped);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .weapon-slot.filled:hover {
-    border-color: #e74c3c;
-    background: #fdedec;
+    border-color: var(--color-danger);
+    background: var(--bg-hover-remove);
 }
 
 .weapon-slot.overflow {
-    border-color: #e74c3c;
-    background: #fdedec;
+    border-color: var(--color-danger);
+    background: var(--bg-hover-remove);
 }
 
 /* All weapons grid */
@@ -177,26 +177,26 @@
     align-items: center;
     gap: 10px;
     padding: 8px 12px;
-    background: #f9f9f9;
-    border: 2px solid #bdc3c7;
+    background: var(--bg-card);
+    border: 2px solid var(--border-default);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .weapon-card:hover {
-    background: #ecf0f1;
-    border-color: #3498db;
+    background: var(--bg-input);
+    border-color: var(--color-accent);
 }
 
 .weapon-card.equipped {
-    border-color: #3498db;
-    background: #eaf2f8;
+    border-color: var(--color-accent);
+    background: var(--bg-equipped);
 }
 
 .weapon-card.equipped:hover {
-    border-color: #e74c3c;
-    background: #fdedec;
+    border-color: var(--color-danger);
+    background: var(--bg-hover-remove);
 }
 
 .weapon-icon {
@@ -224,13 +224,13 @@
 .weapon-name {
     font-size: 13px;
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--text-primary);
     text-transform: capitalize;
 }
 
 .weapon-level {
     font-size: 11px;
-    color: #7f8c8d;
+    color: var(--text-secondary);
 }
 
 .weapon-meta {
@@ -239,7 +239,7 @@
     gap: 8px;
     margin-top: 2px;
     font-size: 11px;
-    color: #7f8c8d;
+    color: var(--text-secondary);
 }
 
 .weapon-cost {
@@ -255,7 +255,7 @@
 }
 
 .weapon-uses {
-    color: #95a5a6;
+    color: var(--text-muted);
 }
 
 .weapon-effects {
@@ -270,7 +270,7 @@
     align-items: center;
     gap: 4px;
     font-size: 11px;
-    color: #2c3e50;
+    color: var(--text-primary);
 }
 
 .weapon-effect-text {
@@ -278,7 +278,7 @@
 }
 
 .weapon-slot .slot-placeholder {
-    color: #bdc3c7;
+    color: var(--text-placeholder);
     font-size: 12px;
     flex: 1;
     text-align: center;
