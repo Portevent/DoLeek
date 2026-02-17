@@ -23,7 +23,7 @@ function updateRecapWeapons(leek) {
         return;
     }
     list.innerHTML = leek.weapons.map(w =>
-        `<div class="recap-item"><img src="public/image/weapon/${w.name}.png" alt="${w.name}"><span>${w.name.replace(/_/g, ' ')}</span></div>`
+        `<div class="recap-item"><img src="public/image/weapon/${w.name}.png" alt="${w.name}"></div>`
     ).join('');
 }
 
@@ -35,7 +35,7 @@ function updateRecapChips(leek) {
         return;
     }
     list.innerHTML = leek.chips.map(c =>
-        `<div class="recap-item"><img src="public/image/chip/${c.name}.png" alt="${c.name}"><span>${c.name.replace(/_/g, ' ')}</span></div>`
+        `<div class="recap-item"><img src="public/image/chip/${c.name}.png" alt="${c.name}"></div>`
     ).join('');
 }
 
