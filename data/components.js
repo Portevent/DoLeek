@@ -49,6 +49,4 @@ export const COMPONENTS = Object.freeze({
     '48': { id: 48, name: 'switch', stats: [ [ 'life', -100 ], [ 'wisdom', 50 ], [ 'science', 50 ] ], template: 383 },
     '49': { id: 49, name: 'switch2', stats: [ [ 'life', -300 ], [ 'wisdom', 70 ], [ 'science', 70 ], [ 'tp', 1 ] ], template: 384 },
     '50': { id: 50, name: 'rgb', stats: [ [ 'life', 1 ] ], template: 385 },
-    '52': { id: 52, name: 'recovery_core', stats: [ [ 'cores', 19 ] ], template: 406 },
-    '53': { id: 53, name: 'recovery_ram', stats: [ [ 'ram', 14 ] ], template: 407 }
 })

@@ -76,6 +76,13 @@ function removeAtLeast(statName, currentBonus, targetAmount) {
     return Math.max(0, bonus);
 }
 
+function updateInvestedState(statName, bonusValue) {
+    const statsPanel = document.getElementById('stats');
+    if (!statsPanel) return;
+    const td = statsPanel.querySelector(`.stat-buttons[data-stat="${statName}"]`)?.closest('td');
+    if (td) td.classList.toggle('invested', bonusValue > 0);
+}
+
 function updateStatDisplay(statName, leek) {
     const statsPanel = document.getElementById('stats');
     if (!statsPanel) return;
@@ -92,6 +99,7 @@ function updateStatDisplay(statName, leek) {
     }
 
     highlightCurrentTier(statName, leek.bonusStats[statName]);
+    updateInvestedState(statName, leek.bonusStats[statName]);
     updateCapitalDisplay(leek);
     leek.emit('stats');
 }
@@ -312,8 +320,10 @@ export function updateStatsTab(leek) {
     const valueDisplays = statsPanel.querySelectorAll('.stat-value');
     valueDisplays.forEach(el => {
         const statName = el.dataset.stat;
-        el.textContent = leek.bonusStats[statName] || 0;
-        highlightCurrentTier(statName, leek.bonusStats[statName] || 0);
+        const bonus = leek.bonusStats[statName] || 0;
+        el.textContent = bonus;
+        highlightCurrentTier(statName, bonus);
+        updateInvestedState(statName, bonus);
     });
 
     updateCapitalDisplay(leek);

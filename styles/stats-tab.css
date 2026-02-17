@@ -39,8 +39,14 @@
 .stats-table > tbody > tr > td {
     padding: 12px 15px;
     border-bottom: 1px solid #ecf0f1;
+    border-left: 3px solid transparent;
     width: 50%;
     vertical-align: top;
+}
+
+.stats-table > tbody > tr > td.invested {
+    border-left-color: #3498db;
+    background: #f0f7fd;
 }
 
 .stats-table > tbody > tr:last-child > td {
