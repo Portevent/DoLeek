@@ -86,6 +86,11 @@
     display: none;
 }
 
+.weapons-list.only-forgotten .weapon-card:not(.forgotten) {
+    display: none;
+}
+
+.weapons-forgotten-toggle,
 .weapons-show-all-toggle,
 .weapons-sort-toggle {
     padding: 4px 10px;
@@ -98,12 +103,14 @@
     transition: all 0.2s;
 }
 
+.weapons-forgotten-toggle:hover,
 .weapons-show-all-toggle:hover,
 .weapons-sort-toggle:hover {
     border-color: #3498db;
     color: #2c3e50;
 }
 
+.weapons-forgotten-toggle.active,
 .weapons-show-all-toggle.active {
     border-color: #3498db;
     background: #eaf2f8;

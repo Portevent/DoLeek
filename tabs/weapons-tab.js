@@ -214,8 +214,9 @@ function renderEquippedWeapons(leek) {
 }
 
 function buildWeaponCard(weapon) {
+    const forgottenClass = weapon.forgotten ? ' forgotten' : '';
     const effectIds = [...new Set(weapon.effects.map(e => e.id))].join(',');
-    return `<div class="weapon-card" data-id="${weapon.id}" data-effects="${effectIds}" data-level="${weapon.level}">
+    return `<div class="weapon-card${forgottenClass}" data-id="${weapon.id}" data-effects="${effectIds}" data-level="${weapon.level}">
         <div class="weapon-icon">
             <img src="public/image/weapon/${weapon.name}.png" alt="${weapon.name}">
         </div>
@@ -281,11 +282,13 @@ export function initWeaponsTab(leek) {
     const sortToggle = document.querySelector('.weapons-sort-toggle');
     const filtersContainer = document.querySelector('.weapons-filters');
     const showAllToggle = document.querySelector('.weapons-show-all-toggle');
+    const forgottenToggle = document.querySelector('.weapons-forgotten-toggle');
 
     const allWeapons = Object.values(WEAPONS);
     let sortMode = 'level';
     let activeEffects = [];
     let showAll = false;
+    let showForgotten = false;
 
     // Build filter buttons
     filtersContainer.innerHTML = buildFilterButtons();
@@ -301,6 +304,13 @@ export function initWeaponsTab(leek) {
         showAllToggle.classList.toggle('active', showAll);
         showAllToggle.textContent = showAll ? 'All levels' : 'My level';
         applyLevelFilter(leek.level, showAll);
+    });
+
+    // Forgotten toggle
+    forgottenToggle.addEventListener('click', () => {
+        showForgotten = !showForgotten;
+        forgottenToggle.classList.toggle('active', showForgotten);
+        document.querySelector('.weapons-list').classList.toggle('only-forgotten', showForgotten);
     });
 
     // Filter toggle
