@@ -51,6 +51,9 @@ export function updateRecapStats(leek) {
             valueSpan.textContent = totalStats[statName];
         }
     });
+
+    const leekImage = document.getElementById('leek-display');
+    leekImage.src = "public/image/leek/leek" + (1 + Math.floor(leek.level / 32)) + "_front_green.png";
 }
 
 export function initRecapStats(leek) {
