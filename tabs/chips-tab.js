@@ -143,6 +143,16 @@ function buildEffectsHtml(effects) {
     return effects.map(e => buildEffectLine(e)).join('');
 }
 
+function buildChipMeta(chip) {
+    const uses = chip.max_uses > 0 ? `${chip.max_uses}/turn` : '';
+    const cooldown = chip.cooldown > 0 ? `${chip.cooldown}t cd` : '';
+    return `<div class="chip-meta">
+        <span class="chip-cost"><img src="public/image/charac/tp.png" alt="TP">${chip.cost} TP</span>
+        ${cooldown ? `<span class="chip-cooldown">${cooldown}</span>` : ''}
+        ${uses ? `<span class="chip-uses">${uses}</span>` : ''}
+    </div>`;
+}
+
 function buildEquippedChip(chip, index, overflow) {
     const overflowClass = overflow ? ' overflow' : '';
     return `<div class="chip-slot filled${overflowClass}" data-index="${index}">
@@ -152,6 +162,7 @@ function buildEquippedChip(chip, index, overflow) {
         <div class="chip-info">
             <span class="chip-name">${chip.name.replace(/_/g, ' ')}</span>
             <span class="chip-level">Lvl ${chip.level}</span>
+            ${buildChipMeta(chip)}
             <div class="chip-effects">${buildEffectsHtml(chip.effects)}</div>
         </div>
     </div>`;
@@ -185,6 +196,7 @@ function buildChipCard(chip) {
         <div class="chip-info">
             <span class="chip-name">${chip.name.replace(/_/g, ' ')}</span>
             <span class="chip-level">Lvl ${chip.level}</span>
+            ${buildChipMeta(chip)}
             <div class="chip-effects">${buildEffectsHtml(chip.effects)}</div>
         </div>
     </div>`;

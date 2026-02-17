@@ -173,6 +173,35 @@
     color: #7f8c8d;
 }
 
+.chip-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+    font-size: 11px;
+    color: #7f8c8d;
+}
+
+.chip-cost {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-weight: 600;
+}
+
+.chip-cost img {
+    width: 14px;
+    height: 14px;
+}
+
+.chip-cooldown {
+    color: #95a5a6;
+}
+
+.chip-uses {
+    color: #95a5a6;
+}
+
 .chip-effects {
     display: flex;
     flex-direction: column;
