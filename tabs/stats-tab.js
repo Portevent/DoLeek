@@ -109,19 +109,41 @@ function highlightCurrentTier(statName, bonusValue) {
     if (!tiers) return;
 
     const table = document.querySelector(`.cost-table[data-stat="${statName}"]`);
-    if (!table) return;
+    if (table) {
+        const rows = table.querySelectorAll(':scope > tbody > tr');
+        rows.forEach((row, i) => {
+            if (i >= tiers.length) return;
+            const tier = tiers[i];
+            const nextStep = (i + 1 < tiers.length) ? tiers[i + 1].step : Infinity;
+            if (bonusValue >= tier.step && bonusValue < nextStep) {
+                row.classList.add('active-tier');
+            } else {
+                row.classList.remove('active-tier');
+            }
+        });
+    }
 
-    const rows = table.querySelectorAll(':scope > tbody > tr');
-    rows.forEach((row, i) => {
-        if (i >= tiers.length) return;
-        const tier = tiers[i];
-        const nextStep = (i + 1 < tiers.length) ? tiers[i + 1].step : Infinity;
-        if (bonusValue >= tier.step && bonusValue < nextStep) {
-            row.classList.add('active-tier');
-        } else {
-            row.classList.remove('active-tier');
-        }
-    });
+    const indicators = document.querySelector(`.tier-indicators[data-stat="${statName}"]`);
+    if (indicators) {
+        const rects = indicators.querySelectorAll('.tier-indicator');
+        const dots = indicators.querySelectorAll('.tier-dot');
+        rects.forEach((rect, i) => {
+            if (i >= tiers.length) return;
+            const tier = tiers[i];
+            const nextStep = (i + 1 < tiers.length) ? tiers[i + 1].step : Infinity;
+            const inTier = bonusValue >= tier.step && bonusValue < nextStep;
+            const atStep = bonusValue === tier.step;
+            rect.classList.toggle('active', inTier && !atStep);
+            rect.classList.toggle('passed', bonusValue >= nextStep);
+        });
+        dots.forEach((dot, i) => {
+            if (i >= tiers.length) return;
+            const tier = tiers[i];
+            const atStep = bonusValue === tier.step;
+            dot.classList.toggle('active', atStep);
+            dot.classList.toggle('passed', bonusValue > tier.step);
+        });
+    }
 }
 
 export function updateCapitalDisplay(leek) {
@@ -196,6 +218,22 @@ function buildCostTable(statName) {
     return html;
 }
 
+function buildTierIndicators(statName) {
+    const tiers = COSTS[statName];
+    let html = `<div class="tier-indicators color-${statName}" data-stat="${statName}">`;
+    for (let i = 0; i < tiers.length; i++) {
+        const tier = tiers[i];
+        const nextStep = (i + 1 < tiers.length) ? tiers[i + 1].step : '';
+        const range = nextStep ? `${tier.step}-${nextStep - 1}` : `${tier.step}+`;
+        const title = `${range}: ${tier.capital} cap → +${tier.sup}`;
+        const dotActive = i === 0 ? ' active' : '';
+        html += `<span class="tier-dot${dotActive}" title="${tier.step}"></span>`;
+        html += `<span class="tier-indicator" title="${title}">${tier.capital}:${tier.sup}</span>`;
+    }
+    html += `</div>`;
+    return html;
+}
+
 function buildStatCell(statName) {
     const label = STAT_LABELS[statName];
     const tier = getCurrentTier(statName, 0);
@@ -203,6 +241,7 @@ function buildStatCell(statName) {
     return `<td>
         <div class="stat-header">
             <span class="stat-label color-${statName}"><img src="public/image/charac/${statName}.png" alt="" class="stat-icon"> ${label}</span>
+            ${STAT_LITE[statName] ? '' : buildTierIndicators(statName)}
             <span class="stat-value color-${statName}" data-stat="${statName}">0</span>
         </div>
         <div class="stat-buttons" data-stat="${statName}">
