@@ -1,0 +1,36 @@
+
+.color-life { color: red; }
+.color-max-life { color: #00d5b5; }
+.color-strength { color: #833100; }
+.dark .color-strength {	color: #c05415; }
+.color-wisdom {	color: #5ebe00; }
+.color-agility { color: #0080f7; }
+.color-resistance {
+    color: #ff4a01;
+}
+.color-ram {
+    color: #ce00c7;
+}
+.color-cores {
+    color: #878787;
+}
+.color-frequency {
+    color: var(--text-color);
+}
+.color-science { color: #0000a2; }
+.dark .color-science { color: #2a63ff; }
+.color-magic {
+    color: #b800b6;
+}
+.dark .color-magic {
+    color: #d810d5;
+}
+.color-tp {
+    color: #ff7f01;
+}
+.color-mp {
+    color: #00a900;
+}
+.color-poison {
+    color: #fb27ff;
+}

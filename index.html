@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planner</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="colors.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="recap">
+            <div class="recap-header">
+                <h2>DoLeek</h2>
+                <div class="level-input">
+                    <label for="leek-level">Lvl</label>
+                    <input type="number" id="leek-level" min="1" max="301" value="1">
+                </div>
+            </div>
+            <div class="recap-content">
+                <div class="recap-grid">
+                    <div class="recap-zone zone-1">
+                        <h3>Leek</h3>
+                        <!-- Leek display: center is leek image, 8 surrounding slots are components -->
+                        <div class="leek-display">
+                            <!-- Central leek image -->
+                            <div class="leek-slot leek-center" data-slot="leek"><img src="public/image/leek/leek1_front_green.png" alt=""></div>
+                            <!-- Component slots: 2 per side arranged in circle -->
+                            <div class="leek-slot empty component" data-slot="component-1"></div><!-- top-left -->
+                            <div class="leek-slot empty component" data-slot="component-2"></div><!-- top-right -->
+                            <div class="leek-slot empty component" data-slot="component-3"></div><!-- right-top -->
+                            <div class="leek-slot empty component" data-slot="component-4"></div><!-- right-bottom -->
+                            <div class="leek-slot empty component" data-slot="component-5"></div><!-- bottom-right -->
+                            <div class="leek-slot empty component" data-slot="component-6"></div><!-- bottom-left -->
+                            <div class="leek-slot empty component" data-slot="component-7"></div><!-- left-bottom -->
+                            <div class="leek-slot empty component" data-slot="component-8"></div><!-- left-top -->
+                        </div>
+                    </div>
+                    <div class="recap-zone zone-2">
+                        <h3>Stats</h3>
+                        <div class="recap-stats">
+                            <div class="recap-stat color-life" data-stat="life" title="Points de Vie"><img src="public/image/charac/life.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-magic" data-stat="magic" title="Magie"><img src="public/image/charac/magic.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-strength" data-stat="strength" title="Force"><img src="public/image/charac/strength.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-frequency" data-stat="frequency" title="Fréquence"><img src="public/image/charac/frequency.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-wisdom" data-stat="wisdom" title="Sagesse"><img src="public/image/charac/wisdom.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-cores" data-stat="cores" title="Coeurs"><img src="public/image/charac/cores.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-agility" data-stat="agility" title="Agilité"><img src="public/image/charac/agility.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-ram" data-stat="ram" title="RAM"><img src="public/image/charac/ram.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-resistance" data-stat="resistance" title="Résistance"><img src="public/image/charac/resistance.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-mp" data-stat="mp" title="Points de Mouvement"><img src="public/image/charac/mp.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-science" data-stat="science" title="Science"><img src="public/image/charac/science.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-tp" data-stat="tp" title="Points de Tour"><img src="public/image/charac/tp.png" alt=""> <span>0</span></div>
+                        </div>
+                    </div>
+                    <div class="recap-zone zone-3">
+                        <h3>Items</h3>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="resizer" id="resizer"></div>
+
+        <main class="editor">
+            <nav class="tabs">
+                <button class="tab active" data-tab="tasks">Tasks</button>
+                <button class="tab" data-tab="stats">Stats</button>
+                <button class="tab" data-tab="notes">Notes</button>
+            </nav>
+
+            <div class="tab-content">
+                <section id="tasks" class="tab-panel active">
+                    <h2>Tasks</h2>
+                    <!-- Tasks content -->
+                </section>
+
+                <section id="stats" class="tab-panel">
+                    <div class="stats-header">
+                        <h2>Stats</h2>
+                        <div class="stats-header-controls">
+                            <button id="toggle-cost-tables" class="toggle-cost-btn" title="Afficher les paliers">Paliers</button>
+                            <div class="capital-display">
+                                Capital: <span id="capital-remaining">50</span> / <span id="capital-total">50</span>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="stats-table">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="stat-label">Points de Vie</span>
+                                    <div class="stat-control">
+                                        <input type="range" class="stat-slider" data-stat="life" min="0" max="400" value="0">
+                                        <span class="stat-value" data-stat="life">0</span>
+                                    </div>
+                                    <div class="stat-buttons" data-stat="life">
+                                        <button data-delta="-100">-100</button>
+                                        <button data-delta="-10">-10</button>
+                                        <button data-delta="-1">-1</button>
+                                        <button data-delta="1">+1</button>
+                                        <button data-delta="10">+10</button>
+                                        <button data-delta="100">+100</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="stat-label">Magie</span>
+                                    <div class="stat-control">
+                                        <input type="range" class="stat-slider" data-stat="magic" min="0" max="400" value="0">
+                                        <span class="stat-value" data-stat="magic">0</span>
+                                    </div>
+                                    <div class="stat-buttons" data-stat="magic">
+                                        <button data-delta="-100">-100</button>
+                                        <button data-delta="-10">-10</button>
+                                        <button data-delta="-1">-1</button>
+                                        <button data-delta="1">+1</button>
+                                        <button data-delta="10">+10</button>
+                                        <button data-delta="100">+100</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="stat-label">Force</span>
+                                    <div class="stat-control">
+                                        <input type="range" class="stat-slider" data-stat="strength" min="0" max="400" value="0">
+                                        <span class="stat-value" data-stat="strength">0</span>
+                                    </div>
+                                    <div class="stat-buttons" data-stat="strength">
+                                        <button data-delta="-100">-100</button>
+                                        <button data-delta="-10">-10</button>
+                                        <button data-delta="-1">-1</button>
+                                        <button data-delta="1">+1</button>
+                                        <button data-delta="10">+10</button>
+                                        <button data-delta="100">+100</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="stat-label">Fréquence</span>
+                                    <div class="stat-control">
+                                        <input type="range" class="stat-slider" data-stat="frequency" min="0" max="400" value="0">
+                                        <span class="stat-value" data-stat="frequency">0</span>
+                                    </div>
+                                    <div class="stat-buttons" data-stat="frequency">
+                                        <button data-delta="-100">-100</button>
+                                        <button data-delta="-10">-10</button>
+                                        <button data-delta="-1">-1</button>
+                                        <button data-delta="1">+1</button>
+                                        <button data-delta="10">+10</button>
+                                        <button data-delta="100">+100</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="stat-label">Sagesse</span>
+                                    <div class="stat-control">
+                                        <input type="range" class="stat-slider" data-stat="wisdom" min="0" max="400" value="0">
+                                        <span class="stat-value" data-stat="wisdom">0</span>
+                                    </div>
+                                    <div class="stat-buttons" data-stat="wisdom">
+                                        <button data-delta="-100">-100</button>
+                                        <button data-delta="-10">-10</button>
+                                        <button data-delta="-1">-1</button>
+                                        <button data-delta="1">+1</button>
+                                        <button data-delta="10">+10</button>
+                                        <button data-delta="100">+100</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="stat-label">Coeurs</span>
+                                    <div class="stat-control">
+                                        <input type="range" class="stat-slider" data-stat="cores" min="0" max="400" value="0">
+                                        <span class="stat-value" data-stat="cores">0</span>
+                                    </div>
+                                    <div class="stat-buttons" data-stat="cores">
+                                        <button data-delta="-100">-100</button>
+                                        <button data-delta="-10">-10</button>
+                                        <button data-delta="-1">-1</button>
+                                        <button data-delta="1">+1</button>
+                                        <button data-delta="10">+10</button>
+                                        <button data-delta="100">+100</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="stat-label">Agilité</span>
+                                    <div class="stat-control">
+                                        <input type="range" class="stat-slider" data-stat="agility" min="0" max="400" value="0">
+                                        <span class="stat-value" data-stat="agility">0</span>
+                                    </div>
+                                    <div class="stat-buttons" data-stat="agility">
+                                        <button data-delta="-100">-100</button>
+                                        <button data-delta="-10">-10</button>
+                                        <button data-delta="-1">-1</button>
+                                        <button data-delta="1">+1</button>
+                                        <button data-delta="10">+10</button>
+                                        <button data-delta="100">+100</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="stat-label">RAM</span>
+                                    <div class="stat-control">
+                                        <input type="range" class="stat-slider" data-stat="ram" min="0" max="400" value="0">
+                                        <span class="stat-value" data-stat="ram">0</span>
+                                    </div>
+                                    <div class="stat-buttons" data-stat="ram">
+                                        <button data-delta="-100">-100</button>
+                                        <button data-delta="-10">-10</button>
+                                        <button data-delta="-1">-1</button>
+                                        <button data-delta="1">+1</button>
+                                        <button data-delta="10">+10</button>
+                                        <button data-delta="100">+100</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="stat-label">Résistance</span>
+                                    <div class="stat-control">
+                                        <input type="range" class="stat-slider" data-stat="resistance" min="0" max="400" value="0">
+                                        <span class="stat-value" data-stat="resistance">0</span>
+                                    </div>
+                                    <div class="stat-buttons" data-stat="resistance">
+                                        <button data-delta="-100">-100</button>
+                                        <button data-delta="-10">-10</button>
+                                        <button data-delta="-1">-1</button>
+                                        <button data-delta="1">+1</button>
+                                        <button data-delta="10">+10</button>
+                                        <button data-delta="100">+100</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="stat-label">PM</span>
+                                    <div class="stat-control">
+                                        <input type="range" class="stat-slider" data-stat="mp" min="0" max="400" value="0">
+                                        <span class="stat-value" data-stat="mp">0</span>
+                                    </div>
+                                    <div class="stat-buttons" data-stat="mp">
+                                        <button data-delta="-100">-100</button>
+                                        <button data-delta="-10">-10</button>
+                                        <button data-delta="-1">-1</button>
+                                        <button data-delta="1">+1</button>
+                                        <button data-delta="10">+10</button>
+                                        <button data-delta="100">+100</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="stat-label">Science</span>
+                                    <div class="stat-control">
+                                        <input type="range" class="stat-slider" data-stat="science" min="0" max="400" value="0">
+                                        <span class="stat-value" data-stat="science">0</span>
+                                    </div>
+                                    <div class="stat-buttons" data-stat="science">
+                                        <button data-delta="-100">-100</button>
+                                        <button data-delta="-10">-10</button>
+                                        <button data-delta="-1">-1</button>
+                                        <button data-delta="1">+1</button>
+                                        <button data-delta="10">+10</button>
+                                        <button data-delta="100">+100</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="stat-label">PT</span>
+                                    <div class="stat-control">
+                                        <input type="range" class="stat-slider" data-stat="tp" min="0" max="400" value="0">
+                                        <span class="stat-value" data-stat="tp">0</span>
+                                    </div>
+                                    <div class="stat-buttons" data-stat="tp">
+                                        <button data-delta="-100">-100</button>
+                                        <button data-delta="-10">-10</button>
+                                        <button data-delta="-1">-1</button>
+                                        <button data-delta="1">+1</button>
+                                        <button data-delta="10">+10</button>
+                                        <button data-delta="100">+100</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section id="notes" class="tab-panel">
+                    <h2>Notes</h2>
+                    <!-- Notes content -->
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
