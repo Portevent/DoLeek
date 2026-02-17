@@ -127,3 +127,16 @@ export function formatEffect(effect) {
     if (!fn) return `Effect #${effect.id}`;
     return fn(effect.value1, effect.value2);
 }
+
+export function formatComputedEffect(effect, totalStats) {
+    const stat = EFFECT_STATS[effect.id];
+    if (!stat || !totalStats) return formatEffect(effect);
+
+    const multiplier = 1 + (totalStats[stat] || 0) / 100;
+    const v1 = Math.round(effect.value1 * multiplier);
+    const v2 = effect.value2 ? Math.round((effect.value1 + effect.value2) * multiplier) - v1 : 0;
+
+    const fn = EFFECT_LABELS[effect.id];
+    if (!fn) return `Effect #${effect.id}`;
+    return fn(v1, v2);
+}

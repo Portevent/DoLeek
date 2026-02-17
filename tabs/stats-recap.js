@@ -1,5 +1,6 @@
 // Updates the recap zone stats display with current leek stats
-import { formatEffect } from '../data/effects.js';
+import { formatEffect, formatComputedEffect } from '../data/effects.js';
+import { settings } from '../model/settings.js';
 
 function buildDetailForComponent(component) {
     const statsHtml = component.stats.map(([stat, value]) =>
@@ -15,16 +16,17 @@ function buildDetailForComponent(component) {
         <div class="detail-stats">${statsHtml}</div>`;
 }
 
-function buildDetailForItem(item, type) {
+function buildDetailForItem(item, type, totalStats) {
     const imgDir = type === 'weapon' ? 'weapon' : 'chip';
     const meta = [];
     meta.push(`<span class="detail-meta-entry"><img src="public/image/charac/tp.png" alt="TP">${item.cost} TP</span>`);
     if (item.cooldown > 0) meta.push(`<span class="detail-meta-entry">${item.cooldown}t cd</span>`);
     if (item.max_uses > 0) meta.push(`<span class="detail-meta-entry">${item.max_uses}/turn</span>`);
 
-    const effectsHtml = item.effects.map(e =>
-        `<div class="detail-stat"><span>${formatEffect(e)}</span></div>`
-    ).join('');
+    const effectsHtml = item.effects.map(e => {
+        const text = settings.computedMode ? formatComputedEffect(e, totalStats) : formatEffect(e);
+        return `<div class="detail-stat"><span>${text}</span></div>`;
+    }).join('');
 
     return `<div class="detail-header">
             <img class="detail-icon detail-icon-${type}" src="public/image/${imgDir}/${item.name}.png" alt="${item.name}">
@@ -138,10 +140,11 @@ export function initRecapStats(leek) {
         if (!item) return;
         const type = item.dataset.type;
         const index = parseInt(item.dataset.index, 10);
+        const totalStats = leek.getTotalStats();
         if (type === 'weapon' && leek.weapons[index]) {
-            showItemDetail(buildDetailForItem(leek.weapons[index], 'weapon'));
+            showItemDetail(buildDetailForItem(leek.weapons[index], 'weapon', totalStats));
         } else if (type === 'chip' && leek.chips[index]) {
-            showItemDetail(buildDetailForItem(leek.chips[index], 'chip'));
+            showItemDetail(buildDetailForItem(leek.chips[index], 'chip', totalStats));
         }
     });
 

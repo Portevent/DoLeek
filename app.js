@@ -1,4 +1,5 @@
 import Leek from './model/leek.js';
+import { settings } from './model/settings.js';
 import { initRecapStats } from './tabs/stats-recap.js';
 import { initStatsTab } from './tabs/stats-tab.js';
 import { initComponentsTab } from './tabs/components-tab.js';
@@ -10,6 +11,7 @@ const leek = new Leek('My Leek');
 
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
+    initComputedToggle();
     initTabs();
     initResizer();
     initRecapStats(leek);
@@ -42,6 +44,15 @@ function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     const toggle = document.getElementById('theme-toggle');
     toggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+function initComputedToggle() {
+    const toggle = document.getElementById('computed-toggle');
+    toggle.addEventListener('click', () => {
+        settings.computedMode = !settings.computedMode;
+        toggle.classList.toggle('active', settings.computedMode);
+        leek.emit('computed');
+    });
 }
 
 function initTabs() {

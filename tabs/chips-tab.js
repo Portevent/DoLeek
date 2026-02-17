@@ -1,8 +1,9 @@
 import { CHIPS } from '../data/chips.js';
-import { EFFECT_STATS, formatEffect } from '../data/effects.js';
+import { EFFECT_STATS, formatEffect, formatComputedEffect } from '../data/effects.js';
+import { settings } from '../model/settings.js';
 
-function buildEffectLine(effect) {
-    const text = formatEffect(effect);
+function buildEffectLine(effect, totalStats) {
+    const text = settings.computedMode ? formatComputedEffect(effect, totalStats) : formatEffect(effect);
     const stat = EFFECT_STATS[effect.id];
     const statIcon = stat
         ? `<img class="effect-stat-icon" src="public/image/charac/${stat}.png" alt="${stat}">`
@@ -10,8 +11,8 @@ function buildEffectLine(effect) {
     return `<div class="chip-effect-line">${statIcon}<span class="chip-effect-text">${text}</span></div>`;
 }
 
-function buildEffectsHtml(effects) {
-    return effects.map(e => buildEffectLine(e)).join('');
+function buildEffectsHtml(effects, totalStats) {
+    return effects.map(e => buildEffectLine(e, totalStats)).join('');
 }
 
 function buildChipMeta(chip) {
@@ -24,7 +25,7 @@ function buildChipMeta(chip) {
     </div>`;
 }
 
-function buildEquippedChip(chip, index, overflow) {
+function buildEquippedChip(chip, index, overflow, totalStats) {
     const overflowClass = overflow ? ' overflow' : '';
     return `<div class="chip-slot filled${overflowClass}" data-index="${index}">
         <div class="chip-icon">
@@ -34,14 +35,15 @@ function buildEquippedChip(chip, index, overflow) {
             <span class="chip-name">${chip.name.replace(/_/g, ' ')}</span>
             <span class="chip-level">Lvl ${chip.level}</span>
             ${buildChipMeta(chip)}
-            <div class="chip-effects">${buildEffectsHtml(chip.effects)}</div>
+            <div class="chip-effects">${buildEffectsHtml(chip.effects, totalStats)}</div>
         </div>
     </div>`;
 }
 
 function renderEquippedChips(leek) {
     const list = document.querySelector('.equipped-chips-list');
-    const totalRam = leek.getTotalStats().ram;
+    const totalStats = leek.getTotalStats();
+    const totalRam = totalStats.ram;
     const count = leek.chips.length;
 
     // Update counter
@@ -56,10 +58,10 @@ function renderEquippedChips(leek) {
         list.innerHTML = '<div class="chip-slot empty"><span class="slot-placeholder">No chips equipped</span></div>';
         return;
     }
-    list.innerHTML = leek.chips.map((chip, i) => buildEquippedChip(chip, i, i >= totalRam)).join('');
+    list.innerHTML = leek.chips.map((chip, i) => buildEquippedChip(chip, i, i >= totalRam, totalStats)).join('');
 }
 
-function buildChipCard(chip) {
+function buildChipCard(chip, totalStats) {
     return `<div class="chip-card" data-id="${chip.id}" data-type="${chip.type}" data-level="${chip.level}">
         <div class="chip-icon">
             <img src="public/image/chip/${chip.name}.png" alt="${chip.name}">
@@ -68,7 +70,7 @@ function buildChipCard(chip) {
             <span class="chip-name">${chip.name.replace(/_/g, ' ')}</span>
             <span class="chip-level">Lvl ${chip.level}</span>
             ${buildChipMeta(chip)}
-            <div class="chip-effects">${buildEffectsHtml(chip.effects)}</div>
+            <div class="chip-effects">${buildEffectsHtml(chip.effects, totalStats)}</div>
         </div>
     </div>`;
 }
@@ -98,7 +100,8 @@ function sortChips(chips, mode) {
 }
 
 function renderChipsList(chipsList, chips, leek) {
-    chipsList.innerHTML = chips.map(chip => buildChipCard(chip)).join('');
+    const totalStats = leek.getTotalStats();
+    chipsList.innerHTML = chips.map(chip => buildChipCard(chip, totalStats)).join('');
     updateEquippedState(leek);
 }
 
@@ -168,6 +171,17 @@ export function initChipsTab(leek) {
         renderEquippedChips(leek);
         applyLevelFilter(leek.level, showAll);
     });
-    leek.on('stats', () => renderEquippedChips(leek));
-    leek.on('components', () => renderEquippedChips(leek));
+    leek.on('stats', () => {
+        renderEquippedChips(leek);
+        if (settings.computedMode) renderChipsList(chipsList, sortChips(allChips, sortMode), leek);
+    });
+    leek.on('components', () => {
+        renderEquippedChips(leek);
+        if (settings.computedMode) renderChipsList(chipsList, sortChips(allChips, sortMode), leek);
+    });
+    leek.on('computed', () => {
+        renderEquippedChips(leek);
+        renderChipsList(chipsList, sortChips(allChips, sortMode), leek);
+        applyLevelFilter(leek.level, showAll);
+    });
 }

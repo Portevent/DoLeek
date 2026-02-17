@@ -492,6 +492,30 @@ html, body {
     color: var(--text-primary);
 }
 
+/* Computed toggle */
+.computed-toggle {
+    background: none;
+    border: 1px solid var(--slot-empty-border);
+    font-size: 11px;
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: var(--text-recap);
+    transition: all 0.2s;
+    opacity: 0.6;
+}
+
+.computed-toggle:hover {
+    opacity: 0.9;
+}
+
+.computed-toggle.active {
+    opacity: 1;
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: white;
+}
+
 /* Theme toggle */
 .theme-toggle {
     background: none;

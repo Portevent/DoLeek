@@ -1,5 +1,6 @@
 import { WEAPONS } from '../data/weapons.js';
-import { EFFECT_STATS, formatEffect } from '../data/effects.js';
+import { EFFECT_STATS, formatEffect, formatComputedEffect } from '../data/effects.js';
+import { settings } from '../model/settings.js';
 
 function getMaxWeapons(level) {
     if (level >= 200) return 4;
@@ -15,8 +16,8 @@ const WEAPON_FILTERS = [
     { effectId: 30, label: 'Nova', icon: 'science' },
 ];
 
-function buildEffectLine(effect) {
-    const text = formatEffect(effect);
+function buildEffectLine(effect, totalStats) {
+    const text = settings.computedMode ? formatComputedEffect(effect, totalStats) : formatEffect(effect);
     const stat = EFFECT_STATS[effect.id];
     const statIcon = stat
         ? `<img class="effect-stat-icon" src="public/image/charac/${stat}.png" alt="${stat}">`
@@ -24,8 +25,8 @@ function buildEffectLine(effect) {
     return `<div class="weapon-effect-line">${statIcon}<span class="weapon-effect-text">${text}</span></div>`;
 }
 
-function buildEffectsHtml(effects) {
-    return effects.map(e => buildEffectLine(e)).join('');
+function buildEffectsHtml(effects, totalStats) {
+    return effects.map(e => buildEffectLine(e, totalStats)).join('');
 }
 
 function buildWeaponMeta(weapon) {
@@ -36,7 +37,7 @@ function buildWeaponMeta(weapon) {
     </div>`;
 }
 
-function buildEquippedWeapon(weapon, index, maxWeapons) {
+function buildEquippedWeapon(weapon, index, maxWeapons, totalStats) {
     const overflow = index >= maxWeapons ? ' overflow' : '';
     return `<div class="weapon-slot filled${overflow}" data-index="${index}">
         <span class="slot-number">${index + 1}</span>
@@ -47,7 +48,7 @@ function buildEquippedWeapon(weapon, index, maxWeapons) {
             <span class="weapon-name">${weapon.name.replace(/_/g, ' ')}</span>
             <span class="weapon-level">Lvl ${weapon.level}</span>
             ${buildWeaponMeta(weapon)}
-            <div class="weapon-effects">${buildEffectsHtml(weapon.effects)}</div>
+            <div class="weapon-effects">${buildEffectsHtml(weapon.effects, totalStats)}</div>
         </div>
     </div>`;
 }
@@ -63,6 +64,7 @@ function renderEquippedWeapons(leek) {
     const list = document.querySelector('.equipped-weapons-list');
     const count = leek.weapons.length;
     const maxWeapons = getMaxWeapons(leek.level);
+    const totalStats = leek.getTotalStats();
 
     // Update counter
     const countEl = document.querySelector('.weapons-count');
@@ -76,7 +78,7 @@ function renderEquippedWeapons(leek) {
     const slotCount = Math.max(maxWeapons, count);
     for (let i = 0; i < slotCount; i++) {
         if (i < count) {
-            html += buildEquippedWeapon(leek.weapons[i], i, maxWeapons);
+            html += buildEquippedWeapon(leek.weapons[i], i, maxWeapons, totalStats);
         } else {
             html += buildEmptyWeaponSlot(i);
         }
@@ -84,7 +86,7 @@ function renderEquippedWeapons(leek) {
     list.innerHTML = html;
 }
 
-function buildWeaponCard(weapon) {
+function buildWeaponCard(weapon, totalStats) {
     const forgottenClass = weapon.forgotten ? ' forgotten' : '';
     const effectIds = [...new Set(weapon.effects.map(e => e.id))].join(',');
     return `<div class="weapon-card${forgottenClass}" data-id="${weapon.id}" data-effects="${effectIds}" data-level="${weapon.level}">
@@ -95,7 +97,7 @@ function buildWeaponCard(weapon) {
             <span class="weapon-name">${weapon.name.replace(/_/g, ' ')}</span>
             <span class="weapon-level">Lvl ${weapon.level}</span>
             ${buildWeaponMeta(weapon)}
-            <div class="weapon-effects">${buildEffectsHtml(weapon.effects)}</div>
+            <div class="weapon-effects">${buildEffectsHtml(weapon.effects, totalStats)}</div>
         </div>
     </div>`;
 }
@@ -143,7 +145,8 @@ function sortWeapons(weapons, mode) {
 }
 
 function renderWeaponsList(weaponsList, weapons, leek) {
-    weaponsList.innerHTML = weapons.map(weapon => buildWeaponCard(weapon)).join('');
+    const totalStats = leek.getTotalStats();
+    weaponsList.innerHTML = weapons.map(weapon => buildWeaponCard(weapon, totalStats)).join('');
     updateEquippedState(leek);
 }
 
@@ -240,6 +243,28 @@ export function initWeaponsTab(leek) {
     // Re-render slots when level changes (max weapons depends on level)
     leek.on('level', () => {
         renderEquippedWeapons(leek);
+        applyLevelFilter(leek.level, showAll);
+    });
+    leek.on('stats', () => {
+        if (settings.computedMode) {
+            renderEquippedWeapons(leek);
+            renderWeaponsList(weaponsList, sortWeapons(allWeapons, sortMode), leek);
+            applyFilters(activeEffects);
+            applyLevelFilter(leek.level, showAll);
+        }
+    });
+    leek.on('components', () => {
+        if (settings.computedMode) {
+            renderEquippedWeapons(leek);
+            renderWeaponsList(weaponsList, sortWeapons(allWeapons, sortMode), leek);
+            applyFilters(activeEffects);
+            applyLevelFilter(leek.level, showAll);
+        }
+    });
+    leek.on('computed', () => {
+        renderEquippedWeapons(leek);
+        renderWeaponsList(weaponsList, sortWeapons(allWeapons, sortMode), leek);
+        applyFilters(activeEffects);
         applyLevelFilter(leek.level, showAll);
     });
 }
