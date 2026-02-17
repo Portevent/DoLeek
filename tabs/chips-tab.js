@@ -176,7 +176,7 @@ function renderEquippedChips(leek) {
 }
 
 function buildChipCard(chip) {
-    return `<div class="chip-card" data-id="${chip.id}" data-type="${chip.type}">
+    return `<div class="chip-card" data-id="${chip.id}" data-type="${chip.type}" data-level="${chip.level}">
         <div class="chip-icon">
             <img src="public/image/chip/${chip.name}.png" alt="${chip.name}">
         </div>
@@ -186,6 +186,13 @@ function buildChipCard(chip) {
             <div class="chip-effects">${buildEffectsHtml(chip.effects)}</div>
         </div>
     </div>`;
+}
+
+function applyLevelFilter(leekLevel, showAll) {
+    document.querySelectorAll('.chip-card').forEach(card => {
+        const chipLevel = parseInt(card.dataset.level, 10);
+        card.classList.toggle('over-level', !showAll && chipLevel > leekLevel);
+    });
 }
 
 function updateEquippedState(leek) {
@@ -214,19 +221,31 @@ export function initChipsTab(leek) {
     const equippedList = document.querySelector('.equipped-chips-list');
     const chipsList = document.querySelector('.chips-list');
     const sortToggle = document.querySelector('.chips-sort-toggle');
+    const showAllToggle = document.querySelector('.chips-show-all-toggle');
 
     const allChips = Object.values(CHIPS);
     let sortMode = 'type';
+    let showAll = false;
 
     // Initial render
     renderEquippedChips(leek);
     renderChipsList(chipsList, sortChips(allChips, sortMode), leek);
+    applyLevelFilter(leek.level, showAll);
+
+    // Show all toggle
+    showAllToggle.addEventListener('click', () => {
+        showAll = !showAll;
+        showAllToggle.classList.toggle('active', showAll);
+        showAllToggle.textContent = showAll ? 'All levels' : 'My level';
+        applyLevelFilter(leek.level, showAll);
+    });
 
     // Sort toggle
     sortToggle.addEventListener('click', () => {
         sortMode = sortMode === 'level' ? 'type' : 'level';
         sortToggle.textContent = sortMode === 'level' ? 'Sort: Level' : 'Sort: Type';
         renderChipsList(chipsList, sortChips(allChips, sortMode), leek);
+        applyLevelFilter(leek.level, showAll);
     });
 
     // Click a chip card to equip or unequip
@@ -260,7 +279,10 @@ export function initChipsTab(leek) {
     });
 
     // Re-render counter when stats change (RAM may change)
-    leek.on('level', () => renderEquippedChips(leek));
+    leek.on('level', () => {
+        renderEquippedChips(leek);
+        applyLevelFilter(leek.level, showAll);
+    });
     leek.on('stats', () => renderEquippedChips(leek));
     leek.on('components', () => renderEquippedChips(leek));
 }

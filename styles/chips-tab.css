@@ -39,10 +39,11 @@
 .chips-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
     margin-bottom: 12px;
 }
 
+.chips-show-all-toggle,
 .chips-sort-toggle {
     padding: 4px 10px;
     font-size: 12px;
@@ -54,9 +55,20 @@
     transition: all 0.2s;
 }
 
+.chips-show-all-toggle:hover,
 .chips-sort-toggle:hover {
     border-color: #3498db;
     color: #2c3e50;
+}
+
+.chips-show-all-toggle.active {
+    border-color: #3498db;
+    background: #eaf2f8;
+    color: #2c3e50;
+}
+
+.chip-card.over-level {
+    display: none;
 }
 
 /* Equipped chips */

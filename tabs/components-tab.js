@@ -1,4 +1,5 @@
 import { COMPONENTS } from '../data/components.js';
+import { ITEMS } from '../data/items.js';
 
 const MAX_COMPONENTS = 8;
 
@@ -7,7 +8,14 @@ const STAT_NAMES = [
     'magic', 'frequency', 'cores', 'ram', 'tp', 'mp',
 ];
 
+// Build a lookup: component id → level (from items via template)
+function getComponentLevel(component) {
+    const item = ITEMS[String(component.template)];
+    return item ? item.level : 0;
+}
+
 function buildEquippedComponent(component, index) {
+    const level = getComponentLevel(component);
     const statsHtml = component.stats
         .map(([stat, value]) => {
             const sign = value > 0 ? '+' : '';
@@ -26,6 +34,7 @@ function buildEquippedComponent(component, index) {
         </div>
         <div class="component-info">
             <span class="component-name">${component.name.replace(/_/g, ' ')}</span>
+            <span class="component-level">Lvl ${level}</span>
             <div class="component-stats">${statsHtml}</div>
         </div>
     </div>`;
@@ -53,6 +62,7 @@ function renderEquippedList(leek) {
 }
 
 function buildComponentCard(component) {
+    const level = getComponentLevel(component);
     const statNames = component.stats.map(([stat]) => stat);
     const statsHtml = component.stats
         .map(([stat, value]) => {
@@ -64,12 +74,13 @@ function buildComponentCard(component) {
         })
         .join('');
 
-    return `<div class="component-card" data-id="${component.id}" data-stats="${statNames.join(',')}">
+    return `<div class="component-card" data-id="${component.id}" data-stats="${statNames.join(',')}" data-level="${level}">
         <div class="component-icon">
             <img src="public/image/component/${component.name}.png" alt="${component.name}">
         </div>
         <div class="component-info">
             <span class="component-name">${component.name.replace(/_/g, ' ')}</span>
+            <span class="component-level">Lvl ${level}</span>
             <div class="component-stats">${statsHtml}</div>
         </div>
     </div>`;
@@ -100,10 +111,20 @@ function applyFilters(activeStats) {
     });
 }
 
+function applyLevelFilter(leekLevel, showAll) {
+    document.querySelectorAll('.component-card').forEach(card => {
+        const compLevel = parseInt(card.dataset.level, 10);
+        card.classList.toggle('over-level', !showAll && compLevel > leekLevel);
+    });
+}
+
 export function initComponentsTab(leek) {
     const equippedList = document.querySelector('.equipped-list');
     const filtersContainer = document.querySelector('.components-filters');
     const componentsList = document.querySelector('.components-list');
+    const showAllToggle = document.querySelector('.components-show-all-toggle');
+
+    let showAll = false;
 
     // Initial render of equipped slots
     renderEquippedList(leek);
@@ -111,12 +132,21 @@ export function initComponentsTab(leek) {
     // Build stat filters
     filtersContainer.innerHTML = buildStatFilters();
 
-    // Build all components list
-    let allHtml = '';
-    for (const key of Object.keys(COMPONENTS)) {
-        allHtml += buildComponentCard(COMPONENTS[key]);
-    }
-    componentsList.innerHTML = allHtml;
+    // Build all components list sorted by level descending
+    const allComponents = Object.values(COMPONENTS).slice();
+    allComponents.sort((a, b) => getComponentLevel(b) - getComponentLevel(a));
+
+    componentsList.innerHTML = allComponents.map(c => buildComponentCard(c)).join('');
+    updateEquippedState(leek);
+    applyLevelFilter(leek.level, showAll);
+
+    // Show all toggle
+    showAllToggle.addEventListener('click', () => {
+        showAll = !showAll;
+        showAllToggle.classList.toggle('active', showAll);
+        showAllToggle.textContent = showAll ? 'All levels' : 'My level';
+        applyLevelFilter(leek.level, showAll);
+    });
 
     // Click a component card to equip or unequip it
     componentsList.addEventListener('click', (e) => {
@@ -147,6 +177,9 @@ export function initComponentsTab(leek) {
         renderEquippedList(leek);
         updateEquippedState(leek);
     });
+
+    // Re-apply level filter when level changes
+    leek.on('level', () => applyLevelFilter(leek.level, showAll));
 
     // Filter logic
     const activeStats = new Set();

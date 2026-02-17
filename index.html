@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="styles/stats-tab.css">
     <link rel="stylesheet" href="styles/components-tab.css">
     <link rel="stylesheet" href="styles/chips-tab.css">
+    <link rel="stylesheet" href="styles/weapons-tab.css">
     <link rel="stylesheet" href="colors.css">
 </head>
 <body>
@@ -102,8 +103,11 @@
                             </div>
                         </div>
                         <div class="all-components">
-                            <h3>All Components</h3>
-                            <div class="components-filters"></div>
+                            <div class="components-header">
+                                <h3>All Components</h3>
+                                <div class="components-filters"></div>
+                                <button class="components-show-all-toggle">My level</button>
+                            </div>
                             <div class="components-list">
                             </div>
                         </div>
@@ -124,6 +128,7 @@
                         <div class="all-chips">
                             <div class="chips-header">
                                 <h3>All Chips</h3>
+                                <button class="chips-show-all-toggle">My level</button>
                                 <button class="chips-sort-toggle">Sort: Type</button>
                             </div>
                             <div class="chips-list">
@@ -134,7 +139,26 @@
 
                 <section id="weapons" class="tab-panel">
                     <h2>Weapons</h2>
-                    <!-- Weapons content -->
+                    <div class="weapons-layout">
+                        <div class="equipped-weapons">
+                            <div class="weapons-equipped-header">
+                                <h3>Equipped</h3>
+                                <span class="weapons-counter"><span class="weapons-count">0</span> / <span class="weapons-max">4</span></span>
+                            </div>
+                            <div class="equipped-weapons-list">
+                            </div>
+                        </div>
+                        <div class="all-weapons">
+                            <div class="weapons-header">
+                                <h3>All Weapons</h3>
+                                <div class="weapons-filters"></div>
+                                <button class="weapons-show-all-toggle">My level</button>
+                                <button class="weapons-sort-toggle">Sort: Level</button>
+                            </div>
+                            <div class="weapons-list">
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 <section id="planner" class="tab-panel">
