@@ -6,7 +6,7 @@ function buildDetailForComponent(component) {
     const statsHtml = component.stats.map(([stat, value]) =>
         `<div class="detail-stat">
             <img src="public/image/charac/${stat}.png" alt="${stat}">
-            <span>${value > 0 ? '+' : ''}${value} ${stat}</span>
+            <span>${value} ${stat}</span>
         </div>`
     ).join('');
     return `<div class="detail-header">

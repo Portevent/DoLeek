@@ -18,10 +18,9 @@ function buildEquippedComponent(component, index) {
     const level = getComponentLevel(component);
     const statsHtml = component.stats
         .map(([stat, value]) => {
-            const sign = value > 0 ? '+' : '';
             return `<span class="component-stat color-${stat}">
                 <img src="public/image/charac/${stat}.png" alt="${stat}">
-                ${sign}${value}
+                ${value}
             </span>`;
         })
         .join('');
