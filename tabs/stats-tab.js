@@ -76,16 +76,6 @@ function removeAtLeast(statName, currentBonus, targetAmount) {
     return Math.max(0, bonus);
 }
 
-// Get the max bonus stats achievable (last tier step + some range, or sum of all steps for discrete stats)
-function getMaxBonus(statName) {
-    const tiers = COSTS[statName];
-    const lastTier = tiers[tiers.length - 1];
-    if (['cores', 'ram', 'tp', 'mp'].includes(statName)) {
-        return tiers.length;
-    }
-    return lastTier.step + 500;
-}
-
 function updateStatDisplay(statName, leek) {
     const statsPanel = document.getElementById('stats');
     if (!statsPanel) return;
@@ -135,7 +125,7 @@ export function updateCapitalDisplay(leek) {
     const totalEl = document.getElementById('capital-total');
 
     if (remainingEl && totalEl) {
-        remainingEl.textContent = remainingCapital;
+        remainingEl.textContent = remainingCapital.toString();
         totalEl.textContent = totalCapital;
 
         if (remainingCapital < 0) {
@@ -185,7 +175,6 @@ function buildCostTable(statName) {
 
 function buildStatCell(statName) {
     const label = STAT_LABELS[statName];
-    const maxBonus = getMaxBonus(statName);
     const tier = getCurrentTier(statName, 0);
 
     return `<td>
@@ -275,7 +264,6 @@ export function initStatsTab(leek) {
 
     buttonGroups.forEach(group => {
         const statName = group.dataset.stat;
-        const maxBonus = getMaxBonus(statName);
         const buttons = group.querySelectorAll('button');
         console.log('[stats-tab] buttons for', statName, ':', buttons.length);
 
@@ -292,7 +280,6 @@ export function initStatsTab(leek) {
                     newValue = removeAtLeast(statName, currentBonus, Math.abs(delta));
                 }
 
-                newValue = Math.max(0, Math.min(maxBonus, newValue));
                 console.log('[stats-tab] newValue:', newValue);
                 leek.bonusStats[statName] = newValue;
                 updateStatDisplay(statName, leek);

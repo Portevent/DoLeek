@@ -22,7 +22,11 @@ class Leek {
 
     // Capital: 50 at level 1, +5 per level afterward
     getCapital() {
-        return 50 + ((this.level - 1) * 5);
+        return 50 + ((this.level - 1) * 5)
+            + (this.level >= 100 ? 45 : 0)
+            + (this.level >= 200 ? 45 : 0)
+            + (this.level >= 300 ? 45 : 0)
+            + (this.level >= 301 ? 95 : 0);
     }
 
     updateBaseStats() {
