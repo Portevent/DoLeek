@@ -32,8 +32,9 @@ class Leek {
     updateBaseStats() {
         this.baseStats.reset();
         this.baseStats.life = this.getBaseLife();
+        this.baseStats.frequency = 100;
         this.baseStats.tp = 10;
-        this.baseStats.mp = 6;
+        this.baseStats.mp = 3;
         this.baseStats.ram = 6;
         this.baseStats.cores = 1;
     }
