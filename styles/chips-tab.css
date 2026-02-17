@@ -1,0 +1,193 @@
+/* Chips Tab */
+.chips-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.equipped-chips h3,
+.all-chips h3 {
+    font-size: 14px;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+.chips-equipped-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.chips-counter {
+    font-size: 14px;
+    color: #7f8c8d;
+    font-weight: 600;
+}
+
+.chips-counter.overflow {
+    color: #e74c3c;
+}
+
+.chip-slot.overflow {
+    border-color: #e74c3c;
+    background: #fdedec;
+}
+
+.chips-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.chips-sort-toggle {
+    padding: 4px 10px;
+    font-size: 12px;
+    border: 1px solid #bdc3c7;
+    background: #ecf0f1;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #7f8c8d;
+    transition: all 0.2s;
+}
+
+.chips-sort-toggle:hover {
+    border-color: #3498db;
+    color: #2c3e50;
+}
+
+/* Equipped chips */
+.equipped-chips-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chip-slot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    min-height: 48px;
+    position: relative;
+}
+
+.chip-slot.empty {
+    border: 2px dashed #bdc3c7;
+    background: #f9f9f9;
+}
+
+.chip-slot.filled {
+    border: 2px solid #3498db;
+    background: #eaf2f8;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.chip-slot.filled:hover {
+    border-color: #e74c3c;
+    background: #fdedec;
+}
+
+/* All chips grid */
+.chips-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+}
+
+.chip-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #f9f9f9;
+    border: 1px solid #ecf0f1;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.chip-card:hover {
+    background: #ecf0f1;
+    border-color: #3498db;
+}
+
+.chip-card.equipped {
+    border-color: #3498db;
+    background: #eaf2f8;
+}
+
+.chip-card.equipped:hover {
+    border-color: #e74c3c;
+    background: #fdedec;
+}
+
+.chip-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chip-icon img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.chip-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.chip-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+    text-transform: capitalize;
+}
+
+.chip-level {
+    font-size: 11px;
+    color: #7f8c8d;
+}
+
+.chip-effects {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 2px;
+}
+
+.chip-effect-line {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #2c3e50;
+}
+
+.effect-stat-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.chip-effect-text {
+    white-space: nowrap;
+}
+
+.chip-slot .slot-placeholder {
+    color: #bdc3c7;
+    font-size: 12px;
+    margin: auto;
+}

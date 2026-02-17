@@ -196,6 +196,41 @@ html, body {
     grid-row: 2;
 }
 
+/* Recap Items */
+.recap-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.recap-weapons-list,
+.recap-chips-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.recap-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px;
+    background: #2c3e50;
+    border-radius: 3px;
+    font-size: 11px;
+}
+
+.recap-item img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+.recap-item span {
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
 /* When recap is narrow, stack Zone 2 and Zone 3 */
 @container recap (max-width: 400px) {
     .recap-grid {

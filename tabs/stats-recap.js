@@ -15,6 +15,30 @@ function updateRecapComponents(leek) {
     }
 }
 
+function updateRecapWeapons(leek) {
+    const list = document.querySelector('.recap-weapons-list');
+    if (!list) return;
+    if (leek.weapons.length === 0) {
+        list.innerHTML = '';
+        return;
+    }
+    list.innerHTML = leek.weapons.map(w =>
+        `<div class="recap-item"><img src="public/image/weapon/${w.name}.png" alt="${w.name}"><span>${w.name.replace(/_/g, ' ')}</span></div>`
+    ).join('');
+}
+
+function updateRecapChips(leek) {
+    const list = document.querySelector('.recap-chips-list');
+    if (!list) return;
+    if (leek.chips.length === 0) {
+        list.innerHTML = '';
+        return;
+    }
+    list.innerHTML = leek.chips.map(c =>
+        `<div class="recap-item"><img src="public/image/chip/${c.name}.png" alt="${c.name}"><span>${c.name.replace(/_/g, ' ')}</span></div>`
+    ).join('');
+}
+
 export function updateRecapStats(leek) {
     const statElements = document.querySelectorAll('.recap-stats .recap-stat');
     const totalStats = leek.getTotalStats();
@@ -52,8 +76,12 @@ export function initRecapStats(leek) {
         updateRecapComponents(leek);
         updateRecapStats(leek);
     });
+    leek.on('chips', () => updateRecapChips(leek));
+    leek.on('weapons', () => updateRecapWeapons(leek));
 
     // Initial update
     updateRecapStats(leek);
     updateRecapComponents(leek);
+    updateRecapChips(leek);
+    updateRecapWeapons(leek);
 }

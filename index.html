@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles/layout.css">
     <link rel="stylesheet" href="styles/stats-tab.css">
     <link rel="stylesheet" href="styles/components-tab.css">
+    <link rel="stylesheet" href="styles/chips-tab.css">
     <link rel="stylesheet" href="colors.css">
 </head>
 <body>
@@ -57,6 +58,10 @@
                     </div>
                     <div class="recap-zone zone-3">
                         <h3>Items</h3>
+                        <div class="recap-items">
+                            <div class="recap-weapons-list"></div>
+                            <div class="recap-chips-list"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -105,9 +110,26 @@
                     </div>
                 </section>
 
-                <section id="chip" class="tab-panel">
+                <section id="chips" class="tab-panel">
                     <h2>Chips</h2>
-                    <!-- Chips content -->
+                    <div class="chips-layout">
+                        <div class="equipped-chips">
+                            <div class="chips-equipped-header">
+                                <h3>Equipped</h3>
+                                <span class="chips-counter"><span class="chips-count">0</span> / <span class="chips-max">6</span></span>
+                            </div>
+                            <div class="equipped-chips-list">
+                            </div>
+                        </div>
+                        <div class="all-chips">
+                            <div class="chips-header">
+                                <h3>All Chips</h3>
+                                <button class="chips-sort-toggle">Sort: Type</button>
+                            </div>
+                            <div class="chips-list">
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 <section id="weapons" class="tab-panel">

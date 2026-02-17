@@ -84,19 +84,23 @@ class Leek {
     // Chip management
     addChip(chip) {
         this.chips.push(chip);
+        this.emit('chips');
     }
 
     removeChip(index) {
         this.chips.splice(index, 1);
+        this.emit('chips');
     }
 
     // Weapon management
     addWeapon(weapon) {
         this.weapons.push(weapon);
+        this.emit('weapons');
     }
 
     removeWeapon(index) {
         this.weapons.splice(index, 1);
+        this.emit('weapons');
     }
 }
 
