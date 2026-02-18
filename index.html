@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="styles/chips-tab.css">
     <link rel="stylesheet" href="styles/weapons-tab.css">
     <link rel="stylesheet" href="styles/combo-tab.css">
+    <link rel="stylesheet" href="styles/export-tab.css">
     <link rel="stylesheet" href="colors.css">
 </head>
 <body>
@@ -89,6 +90,7 @@
                 <button class="tab" data-tab="chips"><img src="public/image/chip/spark.png" alt="">Chips</button>
                 <button class="tab" data-tab="weapons"><img src="public/image/weapon/pistol.png" alt="">Weapons</button>
                 <button class="tab" data-tab="combo">Combo</button>
+                <button class="tab" data-tab="export">Export</button>
             </nav>
 
             <div class="tab-content">
@@ -196,6 +198,23 @@
                             <h3>Add to combo</h3>
                             <div class="combo-picker-list"></div>
                         </div>
+                    </div>
+                </section>
+
+                <section id="export" class="tab-panel">
+                    <h2>Export / Import</h2>
+                    <div class="export-layout">
+                        <div class="export-section">
+                            <h3>Export</h3>
+                            <button class="export-btn">Export Build</button>
+                            <textarea class="export-textarea" readonly placeholder="Build string will appear here..."></textarea>
+                        </div>
+                        <div class="export-section">
+                            <h3>Import</h3>
+                            <textarea class="import-textarea" placeholder="Paste a build string here..."></textarea>
+                            <button class="import-btn">Import Build</button>
+                        </div>
+                        <div class="export-status"></div>
                     </div>
                 </section>
             </div>

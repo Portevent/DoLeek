@@ -6,6 +6,7 @@ import { initComponentsTab } from './tabs/components-tab.js';
 import { initChipsTab } from './tabs/chips-tab.js';
 import { initWeaponsTab } from './tabs/weapons-tab.js';
 import { initComboTab } from './tabs/combo-tab.js';
+import { initExportTab, importBuild } from './tabs/export-tab.js';
 
 // Global Leek instance for the application
 const leek = new Leek('My Leek');
@@ -22,6 +23,17 @@ document.addEventListener('DOMContentLoaded', () => {
     initChipsTab(leek);
     initWeaponsTab(leek);
     initComboTab(leek);
+    initExportTab(leek);
+
+    // Load build from URL hash if present
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+        try {
+            importBuild(hash, leek);
+        } catch (e) {
+            console.warn('Failed to load build from URL:', e.message);
+        }
+    }
 });
 
 // Expose leek instance globally for debugging
