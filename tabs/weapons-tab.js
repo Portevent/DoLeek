@@ -37,9 +37,10 @@ function buildWeaponMeta(weapon) {
     </div>`;
 }
 
-function buildEquippedWeapon(weapon, index, maxWeapons, totalStats) {
+function buildEquippedWeapon(weapon, index, maxWeapons, totalStats, leekLevel) {
     const overflow = index >= maxWeapons ? ' overflow' : '';
-    return `<div class="weapon-slot filled${overflow}" data-index="${index}">
+    const overLevelClass = weapon.level > leekLevel ? ' over-level' : '';
+    return `<div class="weapon-slot filled${overflow}${overLevelClass}" data-index="${index}">
         <span class="slot-number">${index + 1}</span>
         <div class="weapon-icon">
             <img src="public/image/weapon/${weapon.name}.png" alt="${weapon.name}">
@@ -78,7 +79,7 @@ function renderEquippedWeapons(leek) {
     const slotCount = Math.max(maxWeapons, count);
     for (let i = 0; i < slotCount; i++) {
         if (i < count) {
-            html += buildEquippedWeapon(leek.weapons[i], i, maxWeapons, totalStats);
+            html += buildEquippedWeapon(leek.weapons[i], i, maxWeapons, totalStats, leek.level);
         } else {
             html += buildEmptyWeaponSlot(i);
         }
@@ -105,7 +106,9 @@ function buildWeaponCard(weapon, totalStats) {
 function applyLevelFilter(leekLevel, showAll) {
     document.querySelectorAll('.weapon-card').forEach(card => {
         const weaponLevel = parseInt(card.dataset.level, 10);
-        card.classList.toggle('over-level', !showAll && weaponLevel > leekLevel);
+        const isOverLevel = weaponLevel > leekLevel;
+        card.classList.toggle('over-level', isOverLevel);
+        card.classList.toggle('level-hidden', !showAll && isOverLevel);
     });
 }
 

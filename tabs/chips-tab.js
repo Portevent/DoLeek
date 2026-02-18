@@ -25,9 +25,10 @@ function buildChipMeta(chip) {
     </div>`;
 }
 
-function buildEquippedChip(chip, index, overflow, totalStats) {
+function buildEquippedChip(chip, index, overflow, totalStats, leekLevel) {
     const overflowClass = overflow ? ' overflow' : '';
-    return `<div class="chip-slot filled${overflowClass}" data-index="${index}">
+    const overLevelClass = chip.level > leekLevel ? ' over-level' : '';
+    return `<div class="chip-slot filled${overflowClass}${overLevelClass}" data-index="${index}">
         <div class="chip-icon">
             <img src="public/image/chip/${chip.name}.png" alt="${chip.name}">
         </div>
@@ -58,7 +59,7 @@ function renderEquippedChips(leek) {
         list.innerHTML = '<div class="chip-slot empty"><span class="slot-placeholder">No chips equipped</span></div>';
         return;
     }
-    list.innerHTML = leek.chips.map((chip, i) => buildEquippedChip(chip, i, i >= totalRam, totalStats)).join('');
+    list.innerHTML = leek.chips.map((chip, i) => buildEquippedChip(chip, i, i >= totalRam, totalStats, leek.level)).join('');
 }
 
 function buildChipCard(chip, totalStats) {
@@ -78,7 +79,9 @@ function buildChipCard(chip, totalStats) {
 function applyLevelFilter(leekLevel, showAll) {
     document.querySelectorAll('.chip-card').forEach(card => {
         const chipLevel = parseInt(card.dataset.level, 10);
-        card.classList.toggle('over-level', !showAll && chipLevel > leekLevel);
+        const isOverLevel = chipLevel > leekLevel;
+        card.classList.toggle('over-level', isOverLevel);
+        card.classList.toggle('level-hidden', !showAll && isOverLevel);
     });
 }
 

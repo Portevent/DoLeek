@@ -81,9 +81,32 @@
     color: var(--text-primary);
 }
 
-.weapon-card.hidden,
-.weapon-card.over-level {
+.weapon-card.hidden {
     display: none;
+}
+
+.weapon-card.over-level {
+    border-color: var(--color-danger);
+    opacity: 0.6;
+}
+
+.weapon-card.over-level .weapon-level {
+    color: var(--color-danger);
+    font-weight: bold;
+}
+
+.weapon-card.level-hidden {
+    display: none;
+}
+
+.weapon-slot.over-level {
+    border-color: var(--color-danger);
+    background: var(--bg-hover-remove);
+}
+
+.weapon-slot.over-level .weapon-level {
+    color: var(--color-danger);
+    font-weight: bold;
 }
 
 .weapons-list.only-forgotten .weapon-card:not(.forgotten) {

@@ -14,7 +14,7 @@ function getComponentLevel(component) {
     return item ? item.level : 0;
 }
 
-function buildEquippedComponent(component, index) {
+function buildEquippedComponent(component, index, leekLevel) {
     const level = getComponentLevel(component);
     const statsHtml = component.stats
         .map(([stat, value]) => {
@@ -26,7 +26,8 @@ function buildEquippedComponent(component, index) {
         .join('');
 
     const overflow = index >= MAX_COMPONENTS ? ' overflow' : '';
-    return `<div class="equipped-slot filled${overflow}" data-index="${index}">
+    const overLevelClass = level > leekLevel ? ' over-level' : '';
+    return `<div class="equipped-slot filled${overflow}${overLevelClass}" data-index="${index}">
         <span class="slot-number">${index + 1}</span>
         <div class="component-icon">
             <img src="public/image/component/${component.name}.png" alt="${component.name}">
@@ -52,7 +53,7 @@ function renderEquippedList(leek) {
     const slotCount = Math.max(MAX_COMPONENTS, leek.components.length);
     for (let i = 0; i < slotCount; i++) {
         if (i < leek.components.length) {
-            html += buildEquippedComponent(leek.components[i], i);
+            html += buildEquippedComponent(leek.components[i], i, leek.level);
         } else {
             html += buildEmptySlot(i);
         }
@@ -112,7 +113,9 @@ function applyFilters(activeStats) {
 function applyLevelFilter(leekLevel, showAll) {
     document.querySelectorAll('.component-card').forEach(card => {
         const compLevel = parseInt(card.dataset.level, 10);
-        card.classList.toggle('over-level', !showAll && compLevel > leekLevel);
+        const isOverLevel = compLevel > leekLevel;
+        card.classList.toggle('over-level', isOverLevel);
+        card.classList.toggle('level-hidden', !showAll && isOverLevel);
     });
 }
 
@@ -176,8 +179,11 @@ export function initComponentsTab(leek) {
         updateEquippedState(leek);
     });
 
-    // Re-apply level filter when level changes
-    leek.on('level', () => applyLevelFilter(leek.level, showAll));
+    // Re-apply level filter and re-render equipped list when level changes
+    leek.on('level', () => {
+        renderEquippedList(leek);
+        applyLevelFilter(leek.level, showAll);
+    });
 
     // Filter logic
     const activeStats = new Set();

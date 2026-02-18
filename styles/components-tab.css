@@ -240,7 +240,30 @@
     background: var(--bg-equipped);
 }
 
-.component-card.hidden,
-.component-card.over-level {
+.component-card.hidden {
     display: none;
+}
+
+.component-card.over-level {
+    border-color: var(--color-danger);
+    opacity: 0.6;
+}
+
+.component-card.over-level .component-level {
+    color: var(--color-danger);
+    font-weight: bold;
+}
+
+.component-card.level-hidden {
+    display: none;
+}
+
+.equipped-slot.over-level {
+    border-color: var(--color-danger);
+    background: var(--bg-hover-remove);
+}
+
+.equipped-slot.over-level .component-level {
+    color: var(--color-danger);
+    font-weight: bold;
 }

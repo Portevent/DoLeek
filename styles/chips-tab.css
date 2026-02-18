@@ -68,7 +68,27 @@
 }
 
 .chip-card.over-level {
+    border-color: var(--color-danger);
+    opacity: 0.6;
+}
+
+.chip-card.over-level .chip-level {
+    color: var(--color-danger);
+    font-weight: bold;
+}
+
+.chip-card.level-hidden {
     display: none;
+}
+
+.chip-slot.over-level {
+    border-color: var(--color-danger);
+    background: var(--bg-hover-remove);
+}
+
+.chip-slot.over-level .chip-level {
+    color: var(--color-danger);
+    font-weight: bold;
 }
 
 /* Equipped chips */
