@@ -1,0 +1,369 @@
+/* Combo Tab */
+.combo-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.combo-sequence-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.combo-sequence-header h3 {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+.combo-tp-counter {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.combo-tp-counter img {
+    width: 14px;
+    height: 14px;
+}
+
+.combo-tp-counter.overflow {
+    color: var(--color-danger);
+}
+
+.combo-clear-btn {
+    margin-left: auto;
+    padding: 4px 10px;
+    font-size: 12px;
+    border: 1px solid var(--border-default);
+    background: var(--bg-input);
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+}
+
+.combo-clear-btn:hover {
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+}
+
+/* Combo sequence list */
+.combo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.combo-entry {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: var(--bg-equipped);
+    border: 2px solid var(--color-accent);
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.combo-entry-order {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 20px;
+}
+
+.combo-entry-number {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-placeholder);
+    line-height: 1;
+}
+
+.combo-entry-up,
+.combo-entry-down {
+    background: none;
+    border: none;
+    font-size: 14px;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+
+.combo-entry-up:hover,
+.combo-entry-down:hover {
+    color: var(--color-accent);
+    background: var(--bg-input);
+}
+
+.combo-entry-up.hidden,
+.combo-entry-down.hidden {
+    visibility: hidden;
+}
+
+.combo-entry-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.combo-entry-icon.chip {
+    width: 28px;
+    height: 28px;
+}
+
+.combo-entry-icon.weapon {
+    width: 64px;
+    height: 32px;
+}
+
+.combo-entry-icon img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.combo-entry-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.combo-entry-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: capitalize;
+}
+
+.combo-entry-cost {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.combo-entry-cost img {
+    width: 12px;
+    height: 12px;
+}
+
+.combo-entry-effects {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-top: 2px;
+}
+
+.combo-effect-line {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--text-primary);
+}
+
+.combo-effect-line .effect-stat-icon {
+    width: 12px;
+    height: 12px;
+}
+
+.combo-effect-line.buff {
+    color: var(--color-accent);
+    font-style: italic;
+}
+
+.combo-entry.boosted {
+    border-color: #f39c12;
+    border-style: solid;
+    background: var(--bg-equipped);
+}
+
+.combo-entry-remove {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    transition: all 0.2s;
+}
+
+.combo-entry-remove:hover {
+    color: var(--color-danger);
+    background: var(--bg-hover-remove);
+}
+
+/* Summary */
+.combo-summary h3 {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 8px;
+}
+
+.combo-summary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.combo-summary-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--text-primary);
+}
+
+.combo-summary-line .effect-stat-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.combo-summary-text {
+    flex: 1;
+    font-weight: 600;
+}
+
+.combo-summary-count {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+/* Picker */
+.combo-picker h3 {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 12px;
+}
+
+.combo-picker-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+}
+
+.combo-picker-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--bg-card);
+    border: 2px solid var(--border-default);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.combo-picker-item:hover {
+    background: var(--bg-input);
+    border-color: var(--color-accent);
+}
+
+.combo-picker-item.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.combo-picker-item.disabled:hover {
+    background: var(--bg-card);
+    border-color: var(--border-default);
+}
+
+.combo-picker-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.combo-picker-icon.chip {
+    width: 36px;
+    height: 36px;
+}
+
+.combo-picker-icon.weapon {
+    width: 96px;
+    height: 48px;
+}
+
+.combo-picker-icon img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.combo-picker-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.combo-picker-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: capitalize;
+}
+
+.combo-picker-meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-top: 1px;
+}
+
+.combo-picker-meta img {
+    width: 14px;
+    height: 14px;
+}
+
+.combo-picker-uses {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.combo-picker-effects {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-top: 2px;
+}
+
+.combo-empty {
+    color: var(--text-placeholder);
+    font-size: 13px;
+    text-align: center;
+    padding: 16px;
+    margin: 0;
+}

@@ -9,6 +9,8 @@ class Leek {
         this.components = [];
         this.chips = [];
         this.weapons = [];
+        this.combo = [];
+        this.comboStats = new Stats();
         this._listeners = {};
 
         // Initialize base stats
@@ -102,6 +104,41 @@ class Leek {
     removeWeapon(index) {
         this.weapons.splice(index, 1);
         this.emit('weapons');
+    }
+
+    // Combo management
+    addComboItem(item) {
+        this.combo.push(item);
+        this.updateComboStats();
+        this.emit('combo');
+    }
+
+    removeComboItem(index) {
+        this.combo.splice(index, 1);
+        this.updateComboStats();
+        this.emit('combo');
+    }
+
+    moveComboItem(from, to) {
+        if (from === to) return;
+        const [item] = this.combo.splice(from, 1);
+        this.combo.splice(to, 0, item);
+        this.emit('combo');
+    }
+
+    clearCombo() {
+        this.combo = [];
+        this.comboStats.reset();
+        this.emit('combo');
+    }
+
+    updateComboStats() {
+        this.comboStats.reset();
+        let tp = 0;
+        for (const item of this.combo) {
+            tp += item.cost || 0;
+        }
+        this.comboStats.tp = tp;
     }
 }
 

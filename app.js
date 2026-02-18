@@ -5,6 +5,7 @@ import { initStatsTab } from './tabs/stats-tab.js';
 import { initComponentsTab } from './tabs/components-tab.js';
 import { initChipsTab } from './tabs/chips-tab.js';
 import { initWeaponsTab } from './tabs/weapons-tab.js';
+import { initComboTab } from './tabs/combo-tab.js';
 
 // Global Leek instance for the application
 const leek = new Leek('My Leek');
@@ -20,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initComponentsTab(leek);
     initChipsTab(leek);
     initWeaponsTab(leek);
+    initComboTab(leek);
 });
 
 // Expose leek instance globally for debugging
