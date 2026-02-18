@@ -102,11 +102,12 @@ export function importBuild(base64, leek) {
 }
 
 export function initExportTab(leek) {
-    const exportBtn = document.querySelector('.export-btn');
+    const copyBtn = document.querySelector('.export-btn');
     const importBtn = document.querySelector('.import-btn');
     const exportArea = document.querySelector('.export-textarea');
     const importArea = document.querySelector('.import-textarea');
     const statusMsg = document.querySelector('.export-status');
+    let importing = false;
 
     function showStatus(message, isError) {
         statusMsg.textContent = message;
@@ -118,22 +119,30 @@ export function initExportTab(leek) {
         }, 4000);
     }
 
-    exportBtn.addEventListener('click', () => {
-        try {
-            const str = exportBuild(leek);
-            exportArea.value = str;
-            exportArea.select();
-            // Update URL hash for sharing
-            history.replaceState(null, '', '#' + str);
-            const shareUrl = window.location.href;
-            navigator.clipboard.writeText(shareUrl).then(() => {
-                showStatus('Build URL copied to clipboard.', false);
-            }).catch(() => {
-                showStatus('Build exported. Copy the URL to share.', false);
-            });
-        } catch (e) {
-            showStatus('Export failed: ' + e.message, true);
-        }
+    function refresh() {
+        if (importing) return;
+        const str = exportBuild(leek);
+        exportArea.value = str;
+        history.replaceState(null, '', '#' + str);
+    }
+
+    // Keep export string and URL in sync with every change
+    const events = ['stats', 'components', 'chips', 'weapons', 'combo', 'level'];
+    for (const event of events) {
+        leek.on(event, refresh);
+    }
+
+    // Initial sync
+    refresh();
+
+    // Copy URL button
+    copyBtn.addEventListener('click', () => {
+        exportArea.select();
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            showStatus('Build URL copied to clipboard.', false);
+        }).catch(() => {
+            showStatus('Copy the URL from the address bar to share.', false);
+        });
     });
 
     importBtn.addEventListener('click', () => {
@@ -143,9 +152,13 @@ export function initExportTab(leek) {
             return;
         }
         try {
+            importing = true;
             importBuild(value, leek);
+            importing = false;
+            refresh();
             showStatus('Build imported successfully.', false);
         } catch (e) {
+            importing = false;
             showStatus(e.message, true);
         }
     });
