@@ -1,5 +1,6 @@
 import Leek from './model/leek.js';
 import { settings } from './model/settings.js';
+import { initI18n, t, getLang, setLang } from './model/i18n.js';
 import { initRecapStats } from './tabs/stats-recap.js';
 import { initStatsTab } from './tabs/stats-tab.js';
 import { initComponentsTab } from './tabs/components-tab.js';
@@ -11,10 +12,13 @@ import { initExportTab, importBuild } from './tabs/export-tab.js';
 // Global Leek instance for the application
 const leek = new Leek('My Leek');
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await initI18n();
+    translateStaticHTML();
     initTheme();
     initComputedToggle();
     initRangeToggle();
+    initLangToggle();
     initTabs();
     initResizer();
     initRecapStats(leek);
@@ -52,6 +56,36 @@ function initTheme() {
         const next = current === 'dark' ? 'light' : 'dark';
         applyTheme(next);
         localStorage.setItem('doleek-theme', next);
+    });
+}
+
+function translateStaticHTML() {
+    // data-i18n attribute on elements: sets textContent
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = t(el.dataset.i18n);
+    });
+    // data-i18n-title: sets title attribute
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        el.title = t(el.dataset.i18nTitle);
+    });
+    // data-i18n-placeholder: sets placeholder attribute
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = t(el.dataset.i18nPlaceholder);
+    });
+    // Language toggle label
+    const langBtn = document.getElementById('lang-toggle');
+    if (langBtn) langBtn.textContent = getLang().toUpperCase();
+}
+
+function initLangToggle() {
+    const langBtn = document.getElementById('lang-toggle');
+    if (!langBtn) return;
+    langBtn.textContent = getLang().toUpperCase();
+    langBtn.addEventListener('click', async () => {
+        const next = getLang() === 'fr' ? 'en' : 'fr';
+        await setLang(next);
+        translateStaticHTML();
+        leek.emit('computed'); // trigger re-render of all tabs
     });
 }
 

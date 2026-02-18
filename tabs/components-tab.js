@@ -1,5 +1,6 @@
 import { COMPONENTS } from '../data/components.js';
 import { ITEMS } from '../data/items.js';
+import { t } from '../model/i18n.js';
 
 const MAX_COMPONENTS = 8;
 
@@ -43,7 +44,7 @@ function buildEquippedComponent(component, index, leekLevel) {
 function buildEmptySlot(index) {
     return `<div class="equipped-slot empty" data-index="${index}">
         <span class="slot-number">${index + 1}</span>
-        <span class="slot-placeholder">Empty</span>
+        <span class="slot-placeholder">${t('empty_slot')}</span>
     </div>`;
 }
 
@@ -145,7 +146,7 @@ export function initComponentsTab(leek) {
     showAllToggle.addEventListener('click', () => {
         showAll = !showAll;
         showAllToggle.classList.toggle('active', showAll);
-        showAllToggle.textContent = showAll ? 'All levels' : 'My level';
+        showAllToggle.textContent = showAll ? t('all_levels') : t('my_level');
         applyLevelFilter(leek.level, showAll);
     });
 

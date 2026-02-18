@@ -1,6 +1,7 @@
 import { COMPONENTS } from '../data/components.js';
 import { CHIPS } from '../data/chips.js';
 import { WEAPONS } from '../data/weapons.js';
+import { t } from '../model/i18n.js';
 
 const STAT_KEYS = ['life', 'strength', 'wisdom', 'resistance', 'agility', 'science', 'magic', 'frequency', 'cores', 'ram', 'tp', 'mp'];
 
@@ -150,16 +151,16 @@ export function initExportTab(leek) {
     copyBtn.addEventListener('click', () => {
         exportArea.select();
         navigator.clipboard.writeText(window.location.href).then(() => {
-            showStatus('Build URL copied to clipboard.', false);
+            showStatus(t('export_copied'), false);
         }).catch(() => {
-            showStatus('Copy the URL from the address bar to share.', false);
+            showStatus(t('export_copy_fallback'), false);
         });
     });
 
     importBtn.addEventListener('click', () => {
         const value = importArea.value.trim();
         if (!value) {
-            showStatus('Paste a build string first.', true);
+            showStatus(t('import_empty'), true);
             return;
         }
         try {
@@ -167,7 +168,7 @@ export function initExportTab(leek) {
             importBuild(value, leek);
             importing = false;
             refresh();
-            showStatus('Build imported successfully.', false);
+            showStatus(t('import_success'), false);
         } catch (e) {
             importing = false;
             showStatus(e.message, true);

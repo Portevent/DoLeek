@@ -1,6 +1,7 @@
 // Updates the recap zone stats display with current leek stats
 import { formatEffect, formatComputedEffect } from '../data/effects.js';
 import { settings } from '../model/settings.js';
+import { t } from '../model/i18n.js';
 
 function buildDetailForComponent(component) {
     const statsHtml = component.stats.map(([stat, value]) =>
@@ -21,7 +22,7 @@ function buildDetailForItem(item, type, totalStats) {
     const meta = [];
     meta.push(`<span class="detail-meta-entry"><img src="public/image/charac/tp.png" alt="TP">${item.cost} TP</span>`);
     if (item.cooldown > 0) meta.push(`<span class="detail-meta-entry">${item.cooldown}t cd</span>`);
-    if (item.max_uses > 0) meta.push(`<span class="detail-meta-entry">${item.max_uses}/turn</span>`);
+    if (item.max_uses > 0) meta.push(`<span class="detail-meta-entry">${item.max_uses}${t('per_turn')}</span>`);
 
     const effectsHtml = item.effects.map(e => {
         const text = settings.computedMode ? formatComputedEffect(e, totalStats) : formatEffect(e);

@@ -2,6 +2,7 @@ import { CHIPS } from '../data/chips.js';
 import { EFFECT_STATS, formatEffect, formatComputedEffect } from '../data/effects.js';
 import { buildRangeHtml } from '../data/range.js';
 import { settings } from '../model/settings.js';
+import { t } from '../model/i18n.js';
 
 function buildEffectLine(effect, totalStats) {
     const text = settings.computedMode ? formatComputedEffect(effect, totalStats) : formatEffect(effect);
@@ -17,7 +18,7 @@ function buildEffectsHtml(effects, totalStats) {
 }
 
 function buildChipMeta(chip) {
-    const uses = chip.max_uses > 0 ? `${chip.max_uses}/turn` : '';
+    const uses = chip.max_uses > 0 ? `${chip.max_uses}${t('per_turn')}` : '';
     const cooldown = chip.cooldown > 0 ? `${chip.cooldown}t cd` : '';
     return `<div class="chip-meta">
         <span class="chip-cost"><img src="public/image/charac/tp.png" alt="TP">${chip.cost} TP</span>
@@ -59,7 +60,7 @@ function renderEquippedChips(leek) {
     counterEl.classList.toggle('overflow', count > totalRam);
 
     if (count === 0) {
-        list.innerHTML = '<div class="chip-slot empty"><span class="slot-placeholder">No chips equipped</span></div>';
+        list.innerHTML = `<div class="chip-slot empty"><span class="slot-placeholder">${t('no_chips')}</span></div>`;
         return;
     }
     list.innerHTML = leek.chips.map((chip, i) => buildEquippedChip(chip, i, i >= totalRam, totalStats, leek.level)).join('');
@@ -131,14 +132,14 @@ export function initChipsTab(leek) {
     showAllToggle.addEventListener('click', () => {
         showAll = !showAll;
         showAllToggle.classList.toggle('active', showAll);
-        showAllToggle.textContent = showAll ? 'All levels' : 'My level';
+        showAllToggle.textContent = showAll ? t('all_levels') : t('my_level');
         applyLevelFilter(leek.level, showAll);
     });
 
     // Sort toggle
     sortToggle.addEventListener('click', () => {
         sortMode = sortMode === 'level' ? 'type' : 'level';
-        sortToggle.textContent = sortMode === 'level' ? 'Sort: Level' : 'Sort: Type';
+        sortToggle.textContent = sortMode === 'level' ? t('sort_level') : t('sort_type');
         renderChipsList(chipsList, sortChips(allChips, sortMode), leek);
         applyLevelFilter(leek.level, showAll);
     });

@@ -2,6 +2,7 @@
 // Edits bonus stats only (base stats are calculated from level)
 
 import { COSTS } from '../model/stats.js';
+import { t } from '../model/i18n.js';
 
 // Compute the capital spent for a given bonus stat value using the COSTS table
 function computeStatCapital(statName, bonusValue) {
@@ -166,20 +167,22 @@ export function updateCapitalDisplay(leek) {
     }
 }
 
-const STAT_LABELS = {
-    life: 'Points de Vie',
-    strength: 'Force',
-    wisdom: 'Sagesse',
-    agility: 'Agilité',
-    resistance: 'Résistance',
-    science: 'Science',
-    magic: 'Magie',
-    frequency: 'Fréquence',
-    cores: 'Coeurs',
-    ram: 'RAM',
-    tp: 'PT',
-    mp: 'PM',
-};
+function getStatLabels() {
+    return {
+        life: t('stat_life'),
+        strength: t('stat_strength'),
+        wisdom: t('stat_wisdom'),
+        agility: t('stat_agility'),
+        resistance: t('stat_resistance'),
+        science: t('stat_science'),
+        magic: t('stat_magic'),
+        frequency: t('stat_frequency'),
+        cores: t('stat_cores'),
+        ram: t('stat_ram'),
+        tp: t('stat_tp'),
+        mp: t('stat_mp'),
+    };
+}
 
 // Layout: pairs of stats displayed side by side
 const STAT_PAIRS = [
@@ -209,10 +212,10 @@ const STAT_LITE = {
 function buildCostTable(statName) {
     const tiers = COSTS[statName];
     let html = `<table class="cost-table" data-stat="${statName}">
-        <thead><tr><th>Seuil</th><th>Coût</th><th>Bonus</th></tr></thead>
+        <thead><tr><th>${t('cost_threshold')}</th><th>${t('cost_cost')}</th><th>${t('cost_bonus')}</th></tr></thead>
         <tbody>`;
     for (const tier of tiers) {
-        html += `<tr><td>${tier.step}+</td><td>${tier.capital} cap</td><td>+${tier.sup}</td></tr>`;
+        html += `<tr><td>${tier.step}+</td><td>${tier.capital} ${t('cost_cap')}</td><td>+${tier.sup}</td></tr>`;
     }
     html += `</tbody></table>`;
     return html;
@@ -235,7 +238,7 @@ function buildTierIndicators(statName) {
 }
 
 function buildStatCell(statName) {
-    const label = STAT_LABELS[statName];
+    const label = getStatLabels()[statName];
     const tier = getCurrentTier(statName, 0);
 
     return `<td>
@@ -253,8 +256,8 @@ function buildStatCell(statName) {
             ${STAT_LITE[statName]?'':'<button data-delta=\"100\">100</button>'}
         </div>
         <div class="stat-cost-info">
-            <span class="stat-cost-label">Prochain: </span>
-            <span class="stat-cost-current">${tier.capital} cap → +${tier.sup}</span>
+            <span class="stat-cost-label">${t('cost_next')}</span>
+            <span class="stat-cost-current">${tier.capital} ${t('cost_cap')} → +${tier.sup}</span>
         </div>
         ${buildCostTable(statName)}
     </td>`;

@@ -1,5 +1,6 @@
 import { EFFECT_LABELS, EFFECT_STATS } from '../data/effects.js';
 import { settings } from '../model/settings.js';
+import { t } from '../model/i18n.js';
 
 // Buff effect id → stat they increase on the caster's side
 const BUFF_STAT_MAP = {
@@ -251,12 +252,12 @@ function buildComboEntry(step, index, total, turnIndex) {
         forceCrit ? 'force-crit' : '',
     ].filter(Boolean).join(' ');
     const cooldownBadge = onCooldown
-        ? `<span class="combo-entry-cooldown" title="On cooldown for ${cooldownLeft} more turn${cooldownLeft > 1 ? 's' : ''}">CD ${cooldownLeft}</span>`
+        ? `<span class="combo-entry-cooldown" title="${t('cooldown_title', { n: cooldownLeft })}">CD ${cooldownLeft}</span>`
         : '';
 
     return `<div class="${classes}" data-turn="${turnIndex}" data-index="${index}">
-        <button class="combo-entry-remove" title="Remove">&times;</button>
-        <button class="combo-entry-crit${forceCrit ? ' active' : ''}" title="Toggle forced crit">Crit</button>
+        <button class="combo-entry-remove" title="${t('remove')}">&times;</button>
+        <button class="combo-entry-crit${forceCrit ? ' active' : ''}" title="${t('toggle_crit')}">Crit</button>
         <div class="${iconClass}">
             <img src="${getItemIcon(item)}" alt="${item.name}">
         </div>
@@ -266,9 +267,9 @@ function buildComboEntry(step, index, total, turnIndex) {
             <div class="combo-entry-effects">${effectsHtml}</div>
         </div>
         <div class="combo-entry-order">
-            <button class="combo-entry-up${isFirst ? ' hidden' : ''}" title="Move left">&#9664;</button>
+            <button class="combo-entry-up${isFirst ? ' hidden' : ''}" title="${t('move_left')}">&#9664;</button>
             <span class="combo-entry-number">${index + 1}</span>
-            <button class="combo-entry-down${isLast ? ' hidden' : ''}" title="Move right">&#9654;</button>
+            <button class="combo-entry-down${isLast ? ' hidden' : ''}" title="${t('move_right')}">&#9654;</button>
         </div>
     </div>`;
 }
@@ -333,7 +334,7 @@ function renderPicker(leek) {
     const cooldownMap = computeCooldowns(leek.combo, leek.selectedTurn);
 
     if (items.length === 0) {
-        pickerList.innerHTML = '<p class="combo-empty">Equip weapons or chips first.</p>';
+        pickerList.innerHTML = `<p class="combo-empty">${t('combo_empty_picker')}</p>`;
         return;
     }
 
@@ -346,22 +347,22 @@ function renderTurns(leek, turnResults) {
 
     let html = '';
 
-    for (let t = 0; t < leek.combo.length; t++) {
-        const result = turnResults[t] || { tpUsed: 0, tpTotal: 0, steps: [] };
-        const isSelected = t === leek.selectedTurn;
+    for (let ti = 0; ti < leek.combo.length; ti++) {
+        const result = turnResults[ti] || { tpUsed: 0, tpTotal: 0, steps: [] };
+        const isSelected = ti === leek.selectedTurn;
         const overflow = result.tpUsed > result.tpTotal;
 
         const removeBtn = canRemoveTurn
-            ? `<button class="combo-turn-remove" data-turn="${t}" title="Remove turn">&times;</button>`
+            ? `<button class="combo-turn-remove" data-turn="${ti}" title="${t('remove')}">&times;</button>`
             : '';
 
         const entriesHtml = result.steps.length > 0
-            ? result.steps.map((step, i) => buildComboEntry(step, i, result.steps.length, t)).join('')
-            : '<p class="combo-empty">Click items to add to this turn.</p>';
+            ? result.steps.map((step, i) => buildComboEntry(step, i, result.steps.length, ti)).join('')
+            : `<p class="combo-empty">${t('combo_empty_turn')}</p>`;
 
-        html += `<div class="combo-turn${isSelected ? ' selected' : ''}" data-turn="${t}">
+        html += `<div class="combo-turn${isSelected ? ' selected' : ''}" data-turn="${ti}">
             <div class="combo-turn-header">
-                <span class="combo-turn-label">Turn ${t + 1}</span>
+                <span class="combo-turn-label">${t('turn_n', { n: ti + 1 })}</span>
                 <span class="combo-turn-tp${overflow ? ' overflow' : ''}">
                     <img src="public/image/charac/tp.png" alt="TP">
                     ${result.tpUsed} / ${result.tpTotal} TP
@@ -372,7 +373,7 @@ function renderTurns(leek, turnResults) {
         </div>`;
     }
 
-    html += `<button class="combo-add-turn-btn">+ Add Turn</button>`;
+    html += `<button class="combo-add-turn-btn">${t('add_turn')}</button>`;
 
     container.innerHTML = html;
 }
@@ -391,12 +392,8 @@ function renderSummary(turnResults) {
 }
 
 const CRIT_MODES = ['never', 'average', 'always'];
-const CRIT_LABELS = { never: 'Crit: Off', average: 'Crit: Avg', always: 'Crit: On' };
-const CRIT_TOOLTIPS = {
-    never: 'No critical hits — base damage only',
-    average: 'Average damage based on crit chance (agility / 1000, capped at 100%)',
-    always: 'All attacks critically hit (+30% damage)',
-};
+const CRIT_LABEL_KEYS = { never: 'crit_off', average: 'crit_avg', always: 'crit_on' };
+const CRIT_TOOLTIP_KEYS = { never: 'crit_tooltip_never', average: 'crit_tooltip_average', always: 'crit_tooltip_always' };
 
 export function initComboTab(leek) {
     const container = document.querySelector('.combo-turns-container');
@@ -408,8 +405,8 @@ export function initComboTab(leek) {
     critToggle.addEventListener('click', () => {
         const idx = CRIT_MODES.indexOf(settings.critMode);
         settings.critMode = CRIT_MODES[(idx + 1) % CRIT_MODES.length];
-        critToggle.textContent = CRIT_LABELS[settings.critMode];
-        critToggle.title = CRIT_TOOLTIPS[settings.critMode];
+        critToggle.textContent = t(CRIT_LABEL_KEYS[settings.critMode]);
+        critToggle.title = t(CRIT_TOOLTIP_KEYS[settings.critMode]);
         critToggle.dataset.mode = settings.critMode;
         refresh();
     });

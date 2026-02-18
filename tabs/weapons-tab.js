@@ -2,6 +2,7 @@ import { WEAPONS } from '../data/weapons.js';
 import { EFFECT_STATS, formatEffect, formatComputedEffect } from '../data/effects.js';
 import { buildRangeHtml } from '../data/range.js';
 import { settings } from '../model/settings.js';
+import { t } from '../model/i18n.js';
 
 function getMaxWeapons(level) {
     if (level >= 200) return 4;
@@ -10,12 +11,14 @@ function getMaxWeapons(level) {
 }
 
 // Filter definitions: effect id → label
-const WEAPON_FILTERS = [
-    { effectId: 1, label: 'Damage', icon: 'strength' },
-    { effectId: 13, label: 'Poison', icon: 'magic' },
-    { effectId: 2, label: 'Heal', icon: 'wisdom' },
-    { effectId: 30, label: 'Nova', icon: 'science' },
-];
+function getWeaponFilters() {
+    return [
+        { effectId: 1, label: t('filter_damage'), icon: 'strength' },
+        { effectId: 13, label: t('filter_poison'), icon: 'magic' },
+        { effectId: 2, label: t('filter_heal'), icon: 'wisdom' },
+        { effectId: 30, label: t('filter_nova'), icon: 'science' },
+    ];
+}
 
 function buildEffectLine(effect, totalStats) {
     const text = settings.computedMode ? formatComputedEffect(effect, totalStats) : formatEffect(effect);
@@ -31,7 +34,7 @@ function buildEffectsHtml(effects, totalStats) {
 }
 
 function buildWeaponMeta(weapon) {
-    const uses = weapon.max_uses > 0 ? `${weapon.max_uses}/turn` : '';
+    const uses = weapon.max_uses > 0 ? `${weapon.max_uses}${t('per_turn')}` : '';
     return `<div class="weapon-meta">
         <span class="weapon-cost"><img src="public/image/charac/tp.png" alt="TP">${weapon.cost} TP</span>
         ${uses ? `<span class="weapon-uses">${uses}</span>` : ''}
@@ -60,7 +63,7 @@ function buildEquippedWeapon(weapon, index, maxWeapons, totalStats, leekLevel) {
 function buildEmptyWeaponSlot(index) {
     return `<div class="weapon-slot empty" data-index="${index}">
         <span class="slot-number">${index + 1}</span>
-        <span class="slot-placeholder">Empty</span>
+        <span class="slot-placeholder">${t('empty_slot')}</span>
     </div>`;
 }
 
@@ -124,7 +127,7 @@ function updateEquippedState(leek) {
 }
 
 function buildFilterButtons() {
-    return WEAPON_FILTERS.map(f =>
+    return getWeaponFilters().map(f =>
         `<button class="weapon-filter" data-effect="${f.effectId}">
             <img src="public/image/charac/${f.icon}.png" alt="${f.label}">
             <span>${f.label}</span>
@@ -183,7 +186,7 @@ export function initWeaponsTab(leek) {
     showAllToggle.addEventListener('click', () => {
         showAll = !showAll;
         showAllToggle.classList.toggle('active', showAll);
-        showAllToggle.textContent = showAll ? 'All levels' : 'My level';
+        showAllToggle.textContent = showAll ? t('all_levels') : t('my_level');
         applyLevelFilter(leek.level, showAll);
     });
 
@@ -211,7 +214,7 @@ export function initWeaponsTab(leek) {
     // Sort toggle
     sortToggle.addEventListener('click', () => {
         sortMode = sortMode === 'level' ? 'name' : 'level';
-        sortToggle.textContent = sortMode === 'level' ? 'Sort: Level' : 'Sort: Name';
+        sortToggle.textContent = sortMode === 'level' ? t('sort_level') : t('sort_name');
         renderWeaponsList(weaponsList, sortWeapons(allWeapons, sortMode), leek);
         applyFilters(activeEffects);
         applyLevelFilter(leek.level, showAll);

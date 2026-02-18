@@ -22,19 +22,20 @@
     <div class="container">
         <aside class="recap">
             <div class="recap-header">
-                <h2>DoLeek</h2>
-                <button class="theme-toggle" id="theme-toggle" title="Toggle theme">🌙</button>
-                <button class="computed-toggle" id="computed-toggle" title="Show computed values">Computed</button>
-                <button class="range-toggle" id="range-toggle" title="Show range and area">Range</button>
+                <h2 data-i18n="app_title">DoLeek</h2>
+                <button class="theme-toggle" id="theme-toggle" data-i18n-title="toggle_theme" title="Toggle theme">🌙</button>
+                <button class="computed-toggle" id="computed-toggle" data-i18n="computed" data-i18n-title="show_computed" title="Show computed values">Computed</button>
+                <button class="range-toggle" id="range-toggle" data-i18n="range" data-i18n-title="show_range" title="Show range and area">Range</button>
+                <button class="lang-toggle" id="lang-toggle" title="Language">FR</button>
                 <div class="level-input">
-                    <label for="leek-level">Lvl</label>
+                    <label for="leek-level" data-i18n="level_label">Lvl</label>
                     <input type="number" id="leek-level" min="1" max="301" value="1">
                 </div>
             </div>
             <div class="recap-content">
                 <div class="recap-grid">
                     <div class="recap-zone zone-1">
-                        <h3>Leek</h3>
+                        <h3 data-i18n="recap_leek">Leek</h3>
                         <!-- Leek display: center is leek image, 8 surrounding slots are components -->
                         <div class="leek-display">
                             <!-- Central leek image -->
@@ -51,24 +52,24 @@
                         </div>
                     </div>
                     <div class="recap-zone zone-2">
-                        <h3>Stats</h3>
+                        <h3 data-i18n="recap_stats">Stats</h3>
                         <div class="recap-stats">
-                            <div class="recap-stat color-life" data-stat="life" title="Points de Vie"><img src="public/image/charac/life.png" alt=""> <span>0</span></div>
-                            <div class="recap-stat color-magic" data-stat="magic" title="Magie"><img src="public/image/charac/magic.png" alt=""> <span>0</span></div>
-                            <div class="recap-stat color-strength" data-stat="strength" title="Force"><img src="public/image/charac/strength.png" alt=""> <span>0</span></div>
-                            <div class="recap-stat color-frequency" data-stat="frequency" title="Fréquence"><img src="public/image/charac/frequency.png" alt=""> <span>0</span></div>
-                            <div class="recap-stat color-wisdom" data-stat="wisdom" title="Sagesse"><img src="public/image/charac/wisdom.png" alt=""> <span>0</span></div>
-                            <div class="recap-stat color-cores" data-stat="cores" title="Coeurs"><img src="public/image/charac/cores.png" alt=""> <span>0</span></div>
-                            <div class="recap-stat color-agility" data-stat="agility" title="Agilité"><img src="public/image/charac/agility.png" alt=""> <span>0</span></div>
-                            <div class="recap-stat color-ram" data-stat="ram" title="RAM"><img src="public/image/charac/ram.png" alt=""> <span>0</span></div>
-                            <div class="recap-stat color-resistance" data-stat="resistance" title="Résistance"><img src="public/image/charac/resistance.png" alt=""> <span>0</span></div>
-                            <div class="recap-stat color-mp" data-stat="mp" title="Points de Mouvement"><img src="public/image/charac/mp.png" alt=""> <span>0</span></div>
-                            <div class="recap-stat color-science" data-stat="science" title="Science"><img src="public/image/charac/science.png" alt=""> <span>0</span></div>
-                            <div class="recap-stat color-tp" data-stat="tp" title="Points de Tour"><img src="public/image/charac/tp.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-life" data-stat="life" data-i18n-title="stat_life"><img src="public/image/charac/life.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-magic" data-stat="magic" data-i18n-title="stat_magic"><img src="public/image/charac/magic.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-strength" data-stat="strength" data-i18n-title="stat_strength"><img src="public/image/charac/strength.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-frequency" data-stat="frequency" data-i18n-title="stat_frequency"><img src="public/image/charac/frequency.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-wisdom" data-stat="wisdom" data-i18n-title="stat_wisdom"><img src="public/image/charac/wisdom.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-cores" data-stat="cores" data-i18n-title="stat_cores"><img src="public/image/charac/cores.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-agility" data-stat="agility" data-i18n-title="stat_agility"><img src="public/image/charac/agility.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-ram" data-stat="ram" data-i18n-title="stat_ram"><img src="public/image/charac/ram.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-resistance" data-stat="resistance" data-i18n-title="stat_resistance"><img src="public/image/charac/resistance.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-mp" data-stat="mp" data-i18n-title="stat_mp"><img src="public/image/charac/mp.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-science" data-stat="science" data-i18n-title="stat_science"><img src="public/image/charac/science.png" alt=""> <span>0</span></div>
+                            <div class="recap-stat color-tp" data-stat="tp" data-i18n-title="stat_tp"><img src="public/image/charac/tp.png" alt=""> <span>0</span></div>
                         </div>
                     </div>
                     <div class="recap-zone zone-3">
-                        <h3>Items</h3>
+                        <h3 data-i18n="recap_items">Items</h3>
                         <div class="recap-items">
                             <div class="recap-weapons-list"></div>
                             <div class="recap-chips-list"></div>
@@ -85,22 +86,22 @@
 
         <main class="editor">
             <nav class="tabs">
-                <button class="tab active" data-tab="stats"><img src="public/image/charac/strength.png" alt="">Stats</button>
-                <button class="tab" data-tab="components"><img src="public/image/component/blue_plum.png" alt="">Components</button>
-                <button class="tab" data-tab="chips"><img src="public/image/chip/spark.png" alt="">Chips</button>
-                <button class="tab" data-tab="weapons"><img src="public/image/weapon/pistol.png" alt="">Weapons</button>
-                <button class="tab" data-tab="combo">Combo</button>
-                <button class="tab" data-tab="export">Export</button>
+                <button class="tab active" data-tab="stats"><img src="public/image/charac/strength.png" alt=""><span data-i18n="tab_stats">Stats</span></button>
+                <button class="tab" data-tab="components"><img src="public/image/component/blue_plum.png" alt=""><span data-i18n="tab_components">Components</span></button>
+                <button class="tab" data-tab="chips"><img src="public/image/chip/spark.png" alt=""><span data-i18n="tab_chips">Chips</span></button>
+                <button class="tab" data-tab="weapons"><img src="public/image/weapon/pistol.png" alt=""><span data-i18n="tab_weapons">Weapons</span></button>
+                <button class="tab" data-tab="combo"><span data-i18n="tab_combo">Combo</span></button>
+                <button class="tab" data-tab="export"><span data-i18n="tab_export">Export</span></button>
             </nav>
 
             <div class="tab-content">
                 <section id="stats" class="tab-panel active">
                     <div class="stats-header">
-                        <h2>Stats</h2>
+                        <h2 data-i18n="tab_stats">Stats</h2>
                         <div class="stats-header-controls">
-                            <button id="toggle-cost-tables" class="toggle-cost-btn" title="Afficher les paliers">Paliers</button>
+                            <button id="toggle-cost-tables" class="toggle-cost-btn" data-i18n="tiers">Tiers</button>
                             <div class="capital-display">
-                                Capital: <span id="capital-remaining">50</span> / <span id="capital-total">50</span>
+                                <span data-i18n="capital">Capital</span>: <span id="capital-remaining">50</span> / <span id="capital-total">50</span>
                             </div>
                         </div>
                     </div>
@@ -109,18 +110,18 @@
                 </section>
 
                 <section id="components" class="tab-panel">
-                    <h2>Components</h2>
+                    <h2 data-i18n="tab_components">Components</h2>
                     <div class="components-layout">
                         <div class="equipped-components">
-                            <h3>Equipped</h3>
+                            <h3 data-i18n="equipped">Equipped</h3>
                             <div class="equipped-list">
                             </div>
                         </div>
                         <div class="all-components">
                             <div class="components-header">
-                                <h3>All Components</h3>
+                                <h3 data-i18n="all_components">All Components</h3>
                                 <div class="components-filters"></div>
-                                <button class="components-show-all-toggle">My level</button>
+                                <button class="components-show-all-toggle" data-i18n="my_level">My level</button>
                             </div>
                             <div class="components-list">
                             </div>
@@ -129,11 +130,11 @@
                 </section>
 
                 <section id="chips" class="tab-panel">
-                    <h2>Chips</h2>
+                    <h2 data-i18n="tab_chips">Chips</h2>
                     <div class="chips-layout">
                         <div class="equipped-chips">
                             <div class="chips-equipped-header">
-                                <h3>Equipped</h3>
+                                <h3 data-i18n="equipped">Equipped</h3>
                                 <span class="chips-counter"><span class="chips-count">0</span> / <span class="chips-max">6</span></span>
                             </div>
                             <div class="equipped-chips-list">
@@ -141,9 +142,9 @@
                         </div>
                         <div class="all-chips">
                             <div class="chips-header">
-                                <h3>All Chips</h3>
-                                <button class="chips-show-all-toggle">My level</button>
-                                <button class="chips-sort-toggle">Sort: Type</button>
+                                <h3 data-i18n="all_chips">All Chips</h3>
+                                <button class="chips-show-all-toggle" data-i18n="my_level">My level</button>
+                                <button class="chips-sort-toggle" data-i18n="sort_type">Sort: Type</button>
                             </div>
                             <div class="chips-list">
                             </div>
@@ -152,11 +153,11 @@
                 </section>
 
                 <section id="weapons" class="tab-panel">
-                    <h2>Weapons</h2>
+                    <h2 data-i18n="tab_weapons">Weapons</h2>
                     <div class="weapons-layout">
                         <div class="equipped-weapons">
                             <div class="weapons-equipped-header">
-                                <h3>Equipped</h3>
+                                <h3 data-i18n="equipped">Equipped</h3>
                                 <span class="weapons-counter"><span class="weapons-count">0</span> / <span class="weapons-max">4</span></span>
                             </div>
                             <div class="equipped-weapons-list">
@@ -164,11 +165,11 @@
                         </div>
                         <div class="all-weapons">
                             <div class="weapons-header">
-                                <h3>All Weapons</h3>
+                                <h3 data-i18n="all_weapons">All Weapons</h3>
                                 <div class="weapons-filters"></div>
-                                <button class="weapons-forgotten-toggle">Forgotten</button>
-                                <button class="weapons-show-all-toggle">My level</button>
-                                <button class="weapons-sort-toggle">Sort: Level</button>
+                                <button class="weapons-forgotten-toggle" data-i18n="forgotten">Forgotten</button>
+                                <button class="weapons-show-all-toggle" data-i18n="my_level">My level</button>
+                                <button class="weapons-sort-toggle" data-i18n="sort_level">Sort: Level</button>
                             </div>
                             <div class="weapons-list">
                             </div>
@@ -177,39 +178,39 @@
                 </section>
 
                 <section id="combo" class="tab-panel">
-                    <h2>Combo <span class="wip-badge">WIP</span></h2>
+                    <h2><span data-i18n="tab_combo">Combo</span> <span class="wip-badge" data-i18n="wip">WIP</span></h2>
                     <div class="combo-layout">
                         <div class="combo-sequence">
                             <div class="combo-sequence-header">
-                                <h3>Sequence</h3>
-                                <button class="combo-crit-toggle" data-mode="never" title="No critical hits — base damage only">Crit: Off</button>
-                                <button class="combo-clear-btn">Clear</button>
+                                <h3 data-i18n="sequence">Sequence</h3>
+                                <button class="combo-crit-toggle" data-mode="never" data-i18n="crit_off" data-i18n-title="crit_tooltip_never" title="No critical hits — base damage only">Crit: Off</button>
+                                <button class="combo-clear-btn" data-i18n="clear">Clear</button>
                             </div>
                             <div class="combo-turns-container"></div>
                         </div>
                         <div class="combo-summary">
-                            <h3>Summary</h3>
+                            <h3 data-i18n="summary">Summary</h3>
                             <div class="combo-summary-list"></div>
                         </div>
                         <div class="combo-picker">
-                            <h3>Add to combo</h3>
+                            <h3 data-i18n="add_to_combo">Add to combo</h3>
                             <div class="combo-picker-list"></div>
                         </div>
                     </div>
                 </section>
 
                 <section id="export" class="tab-panel">
-                    <h2>Export / Import</h2>
+                    <h2 data-i18n="export_import">Export / Import</h2>
                     <div class="export-layout">
                         <div class="export-section">
-                            <h3>Export</h3>
-                            <textarea class="export-textarea" readonly placeholder="Build string will appear here..."></textarea>
-                            <button class="export-btn">Copy URL</button>
+                            <h3 data-i18n="export">Export</h3>
+                            <textarea class="export-textarea" readonly data-i18n-placeholder="export_placeholder" placeholder="Build string will appear here..."></textarea>
+                            <button class="export-btn" data-i18n="copy_url">Copy URL</button>
                         </div>
                         <div class="export-section">
-                            <h3>Import</h3>
-                            <textarea class="import-textarea" placeholder="Paste a build string here..."></textarea>
-                            <button class="import-btn">Import Build</button>
+                            <h3 data-i18n="import">Import</h3>
+                            <textarea class="import-textarea" data-i18n-placeholder="import_placeholder" placeholder="Paste a build string here..."></textarea>
+                            <button class="import-btn" data-i18n="import_build">Import Build</button>
                         </div>
                         <div class="export-status"></div>
                     </div>
