@@ -117,7 +117,8 @@
     align-items: center;
     gap: 6px;
     margin-bottom: 4px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    justify-content: space-between;
 }
 
 .stat-label {
