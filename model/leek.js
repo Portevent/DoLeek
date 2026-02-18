@@ -9,7 +9,9 @@ class Leek {
         this.components = [];
         this.chips = [];
         this.weapons = [];
-        this.combo = [];
+        this.combo = [[]];         // array of turns, each turn is array of items
+        this.comboCrits = [[]];    // mirrors combo: per-item forced crit (true/false)
+        this.selectedTurn = 0;
         this.comboStats = new Stats();
         this._listeners = {};
 
@@ -106,39 +108,75 @@ class Leek {
         this.emit('weapons');
     }
 
-    // Combo management
-    addComboItem(item) {
-        this.combo.push(item);
-        this.updateComboStats();
-        this.emit('combo');
+    // Combo management (multi-turn)
+    addComboItem(item, turnIndex = this.selectedTurn) {
+        if (turnIndex >= 0 && turnIndex < this.combo.length) {
+            this.combo[turnIndex].push(item);
+            this.comboCrits[turnIndex].push(false);
+            this.emit('combo');
+        }
     }
 
-    removeComboItem(index) {
-        this.combo.splice(index, 1);
-        this.updateComboStats();
-        this.emit('combo');
+    removeComboItem(turnIndex, itemIndex) {
+        if (turnIndex >= 0 && turnIndex < this.combo.length) {
+            this.combo[turnIndex].splice(itemIndex, 1);
+            this.comboCrits[turnIndex].splice(itemIndex, 1);
+            this.emit('combo');
+        }
     }
 
-    moveComboItem(from, to) {
+    moveComboItem(turnIndex, from, to) {
         if (from === to) return;
-        const [item] = this.combo.splice(from, 1);
-        this.combo.splice(to, 0, item);
+        const turn = this.combo[turnIndex];
+        if (!turn) return;
+        const [item] = turn.splice(from, 1);
+        turn.splice(to, 0, item);
+        const [crit] = this.comboCrits[turnIndex].splice(from, 1);
+        this.comboCrits[turnIndex].splice(to, 0, crit);
         this.emit('combo');
+    }
+
+    toggleComboCrit(turnIndex, itemIndex) {
+        if (turnIndex >= 0 && turnIndex < this.comboCrits.length) {
+            this.comboCrits[turnIndex][itemIndex] = !this.comboCrits[turnIndex][itemIndex];
+            this.emit('combo');
+        }
     }
 
     clearCombo() {
-        this.combo = [];
+        this.combo = [[]];
+        this.comboCrits = [[]];
+        this.selectedTurn = 0;
         this.comboStats.reset();
         this.emit('combo');
+    }
+
+    addTurn() {
+        this.combo.push([]);
+        this.comboCrits.push([]);
+        this.selectedTurn = this.combo.length - 1;
+        this.emit('combo');
+    }
+
+    removeTurn(turnIndex) {
+        if (this.combo.length <= 1) return;
+        this.combo.splice(turnIndex, 1);
+        this.comboCrits.splice(turnIndex, 1);
+        if (this.selectedTurn >= this.combo.length) {
+            this.selectedTurn = this.combo.length - 1;
+        }
+        this.emit('combo');
+    }
+
+    selectTurn(turnIndex) {
+        if (turnIndex >= 0 && turnIndex < this.combo.length) {
+            this.selectedTurn = turnIndex;
+            this.emit('combo');
+        }
     }
 
     updateComboStats() {
         this.comboStats.reset();
-        let tp = 0;
-        for (const item of this.combo) {
-            tp += item.cost || 0;
-        }
-        this.comboStats.tp = tp;
     }
 }
 

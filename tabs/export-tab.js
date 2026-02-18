@@ -11,10 +11,11 @@ export function exportBuild(leek) {
         co: leek.components.map(c => c.id),
         ch: leek.chips.map(c => c.id),
         w: leek.weapons.map(w => w.id),
-        cb: leek.combo.map(item => ({
+        cb: leek.combo.map((turn, t) => turn.map((item, i) => ({
             id: item.id,
-            type: item.item !== undefined ? 'w' : 'c'
-        }))
+            type: item.item !== undefined ? 'w' : 'c',
+            ...(leek.comboCrits[t]?.[i] ? { cr: 1 } : {})
+        })))
     };
     return btoa(JSON.stringify(data));
 }
@@ -65,18 +66,21 @@ export function importBuild(base64, leek) {
         return weapon;
     });
 
-    // Validate combo
-    const combo = (data.cb || []).map(entry => {
+    // Validate combo (backward compat: flat array → wrap in single turn)
+    const rawCb = data.cb || [];
+    const comboTurns = (rawCb.length > 0 && Array.isArray(rawCb[0])) ? rawCb : [rawCb];
+
+    const resolvedTurns = comboTurns.map(turn => turn.map(entry => {
+        let item;
         if (entry.type === 'w') {
-            const weapon = WEAPONS[String(entry.id)];
-            if (!weapon) throw new Error(`Unknown weapon ID in combo: ${entry.id}`);
-            return weapon;
+            item = WEAPONS[String(entry.id)];
+            if (!item) throw new Error(`Unknown weapon ID in combo: ${entry.id}`);
         } else {
-            const chip = CHIPS[String(entry.id)];
-            if (!chip) throw new Error(`Unknown chip ID in combo: ${entry.id}`);
-            return chip;
+            item = CHIPS[String(entry.id)];
+            if (!item) throw new Error(`Unknown chip ID in combo: ${entry.id}`);
         }
-    });
+        return { item, crit: !!entry.cr };
+    }));
 
     // Apply to leek
     leek.setLevel(level);
@@ -96,9 +100,16 @@ export function importBuild(base64, leek) {
     while (leek.weapons.length > 0) leek.removeWeapon(0);
     for (const weapon of weapons) leek.addWeapon(weapon);
 
-    // Clear and re-add combo
+    // Clear and re-add combo turns
     leek.clearCombo();
-    for (const item of combo) leek.addComboItem(item);
+    for (let t = 0; t < resolvedTurns.length; t++) {
+        if (t > 0) leek.addTurn();
+        for (let i = 0; i < resolvedTurns[t].length; i++) {
+            const { item, crit } = resolvedTurns[t][i];
+            leek.addComboItem(item, t);
+            if (crit) leek.comboCrits[t][i] = true;
+        }
+    }
 }
 
 export function initExportTab(leek) {

@@ -17,52 +17,155 @@ const BUFF_STAT_MAP = {
     42: 'resistance',   // +resistance (buff, flat)
     44: 'wisdom',       // +wisdom (buff, flat)
     45: 'life',         // +max life (boosted by science)
+    32: 'tp',           // +TP (flat)
 };
+
+/**
+ * Compute critical hit multiplier based on settings and agility.
+ * critChance = min(agility / 1000, 1). Crit boosts values by 30%.
+ * 'never' → 1.0, 'always' → 1.3, 'average' → 1 + 0.3 * critChance
+ */
+function getCritMultiplier(agility, forceCrit) {
+    if (forceCrit) return 1.3;
+    if (settings.critMode === 'never') return 1;
+    if (settings.critMode === 'always') return 1.3;
+    const critChance = Math.min((agility || 0) / 1000, 1);
+    return 1 + 0.3 * critChance;
+}
 
 /**
  * Compute a single effect's min/max values using running stats.
  * Returns { v1, v2 } where the result range is [v1, v1+v2].
  */
-function computeEffect(effect, runningStats) {
+function computeEffect(effect, runningStats, critMult) {
     const stat = EFFECT_STATS[effect.id];
-    if (!stat) return { v1: effect.value1, v2: effect.value2 };
-    const multiplier = 1 + (runningStats[stat] || 0) / 100;
+    if (!stat) {
+        const v1 = Math.round(effect.value1 * critMult);
+        const v2 = effect.value2 ? Math.round((effect.value1 + effect.value2) * critMult) - v1 : 0;
+        return { v1, v2 };
+    }
+    const multiplier = (1 + (runningStats[stat] || 0) / 100) * critMult;
     const v1 = Math.round(effect.value1 * multiplier);
     const v2 = effect.value2 ? Math.round((effect.value1 + effect.value2) * multiplier) - v1 : 0;
     return { v1, v2 };
 }
 
 /**
- * Simulate the combo sequentially.
- * Returns an array of steps, one per combo item:
- *   { item, effects: [{ id, v1, v2 }], boosted }
- * `boosted` is true if this step benefits from a prior buff.
+ * Simulate the combo across multiple turns.
+ * Returns an array of turn results: { tpUsed, steps: [{ item, effects, boosted }] }
+ * Buffs carry across turns based on their `turns` duration.
  */
-function simulateCombo(combo, baseStats) {
-    const running = { ...baseStats };
-    const steps = [];
-    let hasBuff = false;
+/**
+ * Build a unique key for an item (chip vs weapon may share IDs).
+ */
+function itemKey(item) {
+    return `${getItemType(item)}_${item.id}`;
+}
 
-    for (const item of combo) {
-        const computed = [];
-        for (const effect of item.effects) {
-            const { v1, v2 } = computeEffect(effect, running);
-            computed.push({ id: effect.id, v1, v2 });
+/**
+ * Compute cooldown state at the start of a given turn.
+ * Returns a Map<itemKey, turnsLeft> for items still on cooldown.
+ */
+function computeCooldowns(comboTurns, upToTurn) {
+    // cooldownReady[key] = next turn index where the item can be cast again
+    const cooldownReady = {};
+    for (let t = 0; t < upToTurn; t++) {
+        for (const item of comboTurns[t]) {
+            const cd = item.cooldown || 0;
+            if (cd > 0) {
+                const key = itemKey(item);
+                cooldownReady[key] = t + cd + 1; // available again at this turn index
+            }
+        }
+    }
+    const result = new Map();
+    for (const [key, readyAt] of Object.entries(cooldownReady)) {
+        if (readyAt > upToTurn) {
+            result.set(key, readyAt - upToTurn);
+        }
+    }
+    return result;
+}
+
+function simulateCombo(comboTurns, comboCrits, baseStats) {
+    const activeBuffs = []; // { stat, value, turnsRemaining }
+    const turnResults = [];
+    // cooldownReady[key] = next turn index where the item can be cast again
+    const cooldownReady = {};
+
+    for (let t = 0; t < comboTurns.length; t++) {
+        const turn = comboTurns[t];
+        const turnCrits = comboCrits[t] || [];
+
+        // Build running stats = base + active buffs
+        const running = { ...baseStats };
+        for (const buff of activeBuffs) {
+            running[buff.stat] = (running[buff.stat] || 0) + buff.value;
         }
 
-        steps.push({ item, effects: computed, boosted: hasBuff });
+        const steps = [];
+        let tpUsed = 0;
+        const BOOSTED_STATS = new Set(['strength', 'agility', 'magic']);
+        let hasDamageBuff = activeBuffs.some(b => BOOSTED_STATS.has(b.stat));
 
-        // Apply buff effects to running stats for subsequent steps
-        for (const ce of computed) {
-            const buffStat = BUFF_STAT_MAP[ce.id];
-            if (buffStat) {
-                running[buffStat] = (running[buffStat] || 0) + ce.v1;
-                hasBuff = true;
+        for (let idx = 0; idx < turn.length; idx++) {
+            const item = turn[idx];
+            const forceCrit = turnCrits[idx] || false;
+            const critMult = getCritMultiplier(running.agility, forceCrit);
+            const computed = [];
+            for (const effect of item.effects) {
+                const { v1, v2 } = computeEffect(effect, running, critMult);
+                computed.push({ id: effect.id, v1, v2 });
+            }
+
+            // Check cooldown
+            const key = itemKey(item);
+            const readyAt = cooldownReady[key] || 0;
+            const onCooldown = t < readyAt;
+            const cooldownLeft = onCooldown ? readyAt - t : 0;
+
+            steps.push({ item, effects: computed, boosted: hasDamageBuff, onCooldown, cooldownLeft, forceCrit });
+            tpUsed += item.cost || 0;
+
+            // Register cooldown for this cast
+            const cd = item.cooldown || 0;
+            if (cd > 0) {
+                cooldownReady[key] = t + cd + 1;
+            }
+
+            // Apply buff effects to running stats for subsequent items in this turn
+            for (let i = 0; i < computed.length; i++) {
+                const ce = computed[i];
+                const buffStat = BUFF_STAT_MAP[ce.id];
+                if (buffStat) {
+                    running[buffStat] = (running[buffStat] || 0) + ce.v1;
+                    if (BOOSTED_STATS.has(buffStat)) hasDamageBuff = true;
+
+                    // Also register for cross-turn carry if turns > 0
+                    const effectDef = item.effects[i];
+                    if (effectDef && effectDef.turns > 0) {
+                        activeBuffs.push({
+                            stat: buffStat,
+                            value: ce.v1,
+                            turnsRemaining: effectDef.turns
+                        });
+                    }
+                }
+            }
+        }
+
+        turnResults.push({ tpUsed, tpTotal: running.tp || 0, steps });
+
+        // End of turn: decrement buff durations, remove expired
+        for (let i = activeBuffs.length - 1; i >= 0; i--) {
+            activeBuffs[i].turnsRemaining--;
+            if (activeBuffs[i].turnsRemaining <= 0) {
+                activeBuffs.splice(i, 1);
             }
         }
     }
 
-    return steps;
+    return turnResults;
 }
 
 function formatSimEffect(id, v1, v2) {
@@ -96,23 +199,29 @@ function getItemIcon(item) {
     return `public/image/${type}/${item.name}.png`;
 }
 
-function countInCombo(combo, item) {
-    return combo.filter(c => c.id === item.id && getItemType(c) === getItemType(item)).length;
+function countInTurn(turn, item) {
+    return turn.filter(c => c.id === item.id && getItemType(c) === getItemType(item)).length;
 }
 
-function buildPickerItem(item, combo, totalStats) {
+function buildPickerItem(item, currentTurn, totalStats, cooldownMap) {
     const type = getItemType(item);
-    const used = countInCombo(combo, item);
+    const used = countInTurn(currentTurn, item);
     const max = getMaxUses(item);
     const atMax = used >= max;
+    const cdLeft = cooldownMap.get(itemKey(item)) || 0;
+    const onCooldown = cdLeft > 0;
+    const disabled = atMax || onCooldown;
     const iconClass = type === 'weapon' ? 'combo-picker-icon weapon' : 'combo-picker-icon chip';
 
+    const cdLabel = onCooldown ? `<span class="combo-picker-cooldown">CD ${cdLeft}</span>` : '';
+
+    const critMult = getCritMultiplier(totalStats.agility);
     const effects = item.effects.map(e => {
-        const { v1, v2 } = computeEffect(e, totalStats);
+        const { v1, v2 } = computeEffect(e, totalStats, critMult);
         return buildSimEffectLine({ id: e.id, v1, v2 });
     }).join('');
 
-    return `<div class="combo-picker-item${atMax ? ' disabled' : ''}" data-id="${item.id}" data-item-type="${type}">
+    return `<div class="combo-picker-item${disabled ? ' disabled' : ''}" data-id="${item.id}" data-item-type="${type}">
         <div class="${iconClass}">
             <img src="${getItemIcon(item)}" alt="${item.name}">
         </div>
@@ -121,42 +230,52 @@ function buildPickerItem(item, combo, totalStats) {
             <span class="combo-picker-meta">
                 <img src="public/image/charac/tp.png" alt="TP">${item.cost} TP
                 <span class="combo-picker-uses">${used}/${max}</span>
+                ${cdLabel}
             </span>
             <div class="combo-picker-effects">${effects}</div>
         </div>
     </div>`;
 }
 
-function buildComboEntry(step, index, total) {
-    const { item, effects, boosted } = step;
+function buildComboEntry(step, index, total, turnIndex) {
+    const { item, effects, boosted, onCooldown, cooldownLeft, forceCrit } = step;
     const type = getItemType(item);
     const iconClass = type === 'weapon' ? 'combo-entry-icon weapon' : 'combo-entry-icon chip';
     const effectsHtml = effects.map(ce => buildSimEffectLine(ce)).join('');
     const isFirst = index === 0;
     const isLast = index === total - 1;
-    const boostedClass = boosted ? ' boosted' : '';
+    const classes = [
+        'combo-entry',
+        boosted ? 'boosted' : '',
+        onCooldown ? 'on-cooldown' : '',
+        forceCrit ? 'force-crit' : '',
+    ].filter(Boolean).join(' ');
+    const cooldownBadge = onCooldown
+        ? `<span class="combo-entry-cooldown" title="On cooldown for ${cooldownLeft} more turn${cooldownLeft > 1 ? 's' : ''}">CD ${cooldownLeft}</span>`
+        : '';
 
-    return `<div class="combo-entry${boostedClass}" data-index="${index}">
-        <div class="combo-entry-order">
-            <button class="combo-entry-up${isFirst ? ' hidden' : ''}" title="Move up">&#9650;</button>
-            <span class="combo-entry-number">${index + 1}</span>
-            <button class="combo-entry-down${isLast ? ' hidden' : ''}" title="Move down">&#9660;</button>
-        </div>
+    return `<div class="${classes}" data-turn="${turnIndex}" data-index="${index}">
+        <button class="combo-entry-remove" title="Remove">&times;</button>
+        <button class="combo-entry-crit${forceCrit ? ' active' : ''}" title="Toggle forced crit">Crit</button>
         <div class="${iconClass}">
             <img src="${getItemIcon(item)}" alt="${item.name}">
         </div>
         <div class="combo-entry-info">
             <span class="combo-entry-name">${item.name.replace(/_/g, ' ')}</span>
-            <span class="combo-entry-cost"><img src="public/image/charac/tp.png" alt="TP">${item.cost} TP</span>
+            <span class="combo-entry-cost"><img src="public/image/charac/tp.png" alt="TP">${item.cost} TP${cooldownBadge}</span>
             <div class="combo-entry-effects">${effectsHtml}</div>
         </div>
-        <button class="combo-entry-remove" title="Remove">&times;</button>
+        <div class="combo-entry-order">
+            <button class="combo-entry-up${isFirst ? ' hidden' : ''}" title="Move left">&#9664;</button>
+            <span class="combo-entry-number">${index + 1}</span>
+            <button class="combo-entry-down${isLast ? ' hidden' : ''}" title="Move right">&#9654;</button>
+        </div>
     </div>`;
 }
 
-function aggregateSimulated(steps) {
+function aggregateSimulated(allSteps) {
     const groups = {};
-    for (const step of steps) {
+    for (const step of allSteps) {
         for (const ce of step.effects) {
             if (!groups[ce.id]) {
                 groups[ce.id] = { id: ce.id, value1: 0, value2: 0, count: 0 };
@@ -210,64 +329,102 @@ function renderPicker(leek) {
     const pickerList = document.querySelector('.combo-picker-list');
     const items = getEquippedItems(leek);
     const totalStats = flattenStats(leek.getTotalStats());
+    const currentTurn = leek.combo[leek.selectedTurn] || [];
+    const cooldownMap = computeCooldowns(leek.combo, leek.selectedTurn);
 
     if (items.length === 0) {
         pickerList.innerHTML = '<p class="combo-empty">Equip weapons or chips first.</p>';
         return;
     }
 
-    pickerList.innerHTML = items.map(item => buildPickerItem(item, leek.combo, totalStats)).join('');
+    pickerList.innerHTML = items.map(item => buildPickerItem(item, currentTurn, totalStats, cooldownMap)).join('');
 }
 
-function renderComboList(leek, steps) {
-    const comboList = document.querySelector('.combo-list');
-    const totalStats = leek.getTotalStats();
-    const tpUsed = document.querySelector('.combo-tp-used');
-    const tpTotal = document.querySelector('.combo-tp-total');
+function renderTurns(leek, turnResults) {
+    const container = document.querySelector('.combo-turns-container');
+    const canRemoveTurn = leek.combo.length > 1;
 
-    tpTotal.textContent = totalStats.tp;
-    tpUsed.textContent = leek.comboStats.tp;
+    let html = '';
 
-    const counter = document.querySelector('.combo-tp-counter');
-    counter.classList.toggle('overflow', leek.comboStats.tp > totalStats.tp);
+    for (let t = 0; t < leek.combo.length; t++) {
+        const result = turnResults[t] || { tpUsed: 0, tpTotal: 0, steps: [] };
+        const isSelected = t === leek.selectedTurn;
+        const overflow = result.tpUsed > result.tpTotal;
 
-    if (steps.length === 0) {
-        comboList.innerHTML = '<p class="combo-empty">Click items to build a combo.</p>';
-        return;
+        const removeBtn = canRemoveTurn
+            ? `<button class="combo-turn-remove" data-turn="${t}" title="Remove turn">&times;</button>`
+            : '';
+
+        const entriesHtml = result.steps.length > 0
+            ? result.steps.map((step, i) => buildComboEntry(step, i, result.steps.length, t)).join('')
+            : '<p class="combo-empty">Click items to add to this turn.</p>';
+
+        html += `<div class="combo-turn${isSelected ? ' selected' : ''}" data-turn="${t}">
+            <div class="combo-turn-header">
+                <span class="combo-turn-label">Turn ${t + 1}</span>
+                <span class="combo-turn-tp${overflow ? ' overflow' : ''}">
+                    <img src="public/image/charac/tp.png" alt="TP">
+                    ${result.tpUsed} / ${result.tpTotal} TP
+                </span>
+                ${removeBtn}
+            </div>
+            <div class="combo-turn-items">${entriesHtml}</div>
+        </div>`;
     }
 
-    const total = steps.length;
-    comboList.innerHTML = steps.map((step, i) => buildComboEntry(step, i, total)).join('');
+    html += `<button class="combo-add-turn-btn">+ Add Turn</button>`;
+
+    container.innerHTML = html;
 }
 
-function renderSummary(steps) {
+function renderSummary(turnResults) {
     const summaryList = document.querySelector('.combo-summary-list');
+    const allSteps = turnResults.flatMap(tr => tr.steps);
 
-    if (steps.length === 0) {
+    if (allSteps.length === 0) {
         summaryList.innerHTML = '';
         return;
     }
 
-    const groups = aggregateSimulated(steps);
+    const groups = aggregateSimulated(allSteps);
     summaryList.innerHTML = groups.map(g => buildSummaryLine(g)).join('');
 }
 
+const CRIT_MODES = ['never', 'average', 'always'];
+const CRIT_LABELS = { never: 'Crit: Off', average: 'Crit: Avg', always: 'Crit: On' };
+const CRIT_TOOLTIPS = {
+    never: 'No critical hits — base damage only',
+    average: 'Average damage based on crit chance (agility / 1000, capped at 100%)',
+    always: 'All attacks critically hit (+30% damage)',
+};
+
 export function initComboTab(leek) {
-    const comboList = document.querySelector('.combo-list');
+    const container = document.querySelector('.combo-turns-container');
     const pickerList = document.querySelector('.combo-picker-list');
     const clearBtn = document.querySelector('.combo-clear-btn');
+    const critToggle = document.querySelector('.combo-crit-toggle');
+
+    // Crit toggle: cycles never → average → always → never
+    critToggle.addEventListener('click', () => {
+        const idx = CRIT_MODES.indexOf(settings.critMode);
+        settings.critMode = CRIT_MODES[(idx + 1) % CRIT_MODES.length];
+        critToggle.textContent = CRIT_LABELS[settings.critMode];
+        critToggle.title = CRIT_TOOLTIPS[settings.critMode];
+        critToggle.dataset.mode = settings.critMode;
+        refresh();
+    });
 
     function refresh() {
         const baseStats = flattenStats(leek.getTotalStats());
-        const steps = simulateCombo(leek.combo, baseStats);
-        renderComboList(leek, steps);
-        renderSummary(steps);
+        const turnResults = simulateCombo(leek.combo, leek.comboCrits, baseStats);
+        renderTurns(leek, turnResults);
+        renderSummary(turnResults);
         renderPicker(leek);
     }
 
     refresh();
 
-    // Add item to combo
+    // Add item to combo (goes to selected turn)
     pickerList.addEventListener('click', (e) => {
         const el = e.target.closest('.combo-picker-item');
         if (!el || el.classList.contains('disabled')) return;
@@ -278,18 +435,48 @@ export function initComboTab(leek) {
         if (item) leek.addComboItem(item);
     });
 
-    // Remove or reorder items in combo
-    comboList.addEventListener('click', (e) => {
-        const entry = e.target.closest('.combo-entry');
-        if (!entry) return;
-        const index = parseInt(entry.dataset.index, 10);
+    // Turn selection, entry actions, add/remove turn
+    container.addEventListener('click', (e) => {
+        // Add turn button
+        if (e.target.closest('.combo-add-turn-btn')) {
+            leek.addTurn();
+            return;
+        }
 
-        if (e.target.closest('.combo-entry-remove')) {
-            leek.removeComboItem(index);
-        } else if (e.target.closest('.combo-entry-up')) {
-            leek.moveComboItem(index, index - 1);
-        } else if (e.target.closest('.combo-entry-down')) {
-            leek.moveComboItem(index, index + 1);
+        // Remove turn button
+        const removeTurnBtn = e.target.closest('.combo-turn-remove');
+        if (removeTurnBtn) {
+            const turnIndex = parseInt(removeTurnBtn.dataset.turn, 10);
+            leek.removeTurn(turnIndex);
+            return;
+        }
+
+        // Entry actions (remove, up, down)
+        const entry = e.target.closest('.combo-entry');
+        if (entry) {
+            const turnIndex = parseInt(entry.dataset.turn, 10);
+            const index = parseInt(entry.dataset.index, 10);
+
+            if (e.target.closest('.combo-entry-remove')) {
+                leek.removeComboItem(turnIndex, index);
+                return;
+            } else if (e.target.closest('.combo-entry-crit')) {
+                leek.toggleComboCrit(turnIndex, index);
+                return;
+            } else if (e.target.closest('.combo-entry-up')) {
+                leek.moveComboItem(turnIndex, index, index - 1);
+                return;
+            } else if (e.target.closest('.combo-entry-down')) {
+                leek.moveComboItem(turnIndex, index, index + 1);
+                return;
+            }
+        }
+
+        // Turn selection (click on turn container itself)
+        const turnEl = e.target.closest('.combo-turn');
+        if (turnEl) {
+            const turnIndex = parseInt(turnEl.dataset.turn, 10);
+            leek.selectTurn(turnIndex);
         }
     });
 
