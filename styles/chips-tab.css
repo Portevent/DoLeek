@@ -222,6 +222,30 @@
     color: var(--text-muted);
 }
 
+.chip-meta + .item-range,
+.chip-slot .item-range,
+.chip-card .item-range {
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.chip-slot .launch-type-icon,
+.chip-card .launch-type-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.chip-slot .range-text,
+.chip-card .range-text,
+.chip-slot .area-text,
+.chip-card .area-text {
+    color: var(--text-muted);
+}
+
 .chip-effects {
     display: flex;
     flex-direction: column;

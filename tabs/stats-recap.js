@@ -85,8 +85,11 @@ function updateRecapChips(leek) {
         list.innerHTML = '';
         return;
     }
-    list.innerHTML = leek.chips.map((c, i) =>
-        `<div class="recap-item" data-type="chip" data-index="${i}"><img src="public/image/chip/${c.name}.png" alt="${c.name}"></div>`
+    const sorted = leek.chips
+        .map((c, i) => ({ chip: c, index: i }))
+        .sort((a, b) => a.chip.type - b.chip.type || a.chip.level - b.chip.level);
+    list.innerHTML = sorted.map(({ chip, index }) =>
+        `<div class="recap-item" data-type="chip" data-index="${index}"><img src="public/image/chip/${chip.name}.png" alt="${chip.name}"></div>`
     ).join('');
 }
 

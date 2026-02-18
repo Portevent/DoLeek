@@ -1,5 +1,6 @@
 import { WEAPONS } from '../data/weapons.js';
 import { EFFECT_STATS, formatEffect, formatComputedEffect } from '../data/effects.js';
+import { buildRangeHtml } from '../data/range.js';
 import { settings } from '../model/settings.js';
 
 function getMaxWeapons(level) {
@@ -34,7 +35,8 @@ function buildWeaponMeta(weapon) {
     return `<div class="weapon-meta">
         <span class="weapon-cost"><img src="public/image/charac/tp.png" alt="TP">${weapon.cost} TP</span>
         ${uses ? `<span class="weapon-uses">${uses}</span>` : ''}
-    </div>`;
+    </div>
+    ${buildRangeHtml(weapon)}`;
 }
 
 function buildEquippedWeapon(weapon, index, maxWeapons, totalStats, leekLevel) {
@@ -49,6 +51,7 @@ function buildEquippedWeapon(weapon, index, maxWeapons, totalStats, leekLevel) {
             <span class="weapon-name">${weapon.name.replace(/_/g, ' ')}</span>
             <span class="weapon-level">Lvl ${weapon.level}</span>
             ${buildWeaponMeta(weapon)}
+            <hr class="meta-separator">
             <div class="weapon-effects">${buildEffectsHtml(weapon.effects, totalStats)}</div>
         </div>
     </div>`;
@@ -98,6 +101,7 @@ function buildWeaponCard(weapon, totalStats) {
             <span class="weapon-name">${weapon.name.replace(/_/g, ' ')}</span>
             <span class="weapon-level">Lvl ${weapon.level}</span>
             ${buildWeaponMeta(weapon)}
+            <hr class="meta-separator">
             <div class="weapon-effects">${buildEffectsHtml(weapon.effects, totalStats)}</div>
         </div>
     </div>`;

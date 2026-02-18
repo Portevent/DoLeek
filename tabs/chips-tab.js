@@ -1,5 +1,6 @@
 import { CHIPS } from '../data/chips.js';
 import { EFFECT_STATS, formatEffect, formatComputedEffect } from '../data/effects.js';
+import { buildRangeHtml } from '../data/range.js';
 import { settings } from '../model/settings.js';
 
 function buildEffectLine(effect, totalStats) {
@@ -22,7 +23,8 @@ function buildChipMeta(chip) {
         <span class="chip-cost"><img src="public/image/charac/tp.png" alt="TP">${chip.cost} TP</span>
         ${cooldown ? `<span class="chip-cooldown">${cooldown}</span>` : ''}
         ${uses ? `<span class="chip-uses">${uses}</span>` : ''}
-    </div>`;
+    </div>
+    ${buildRangeHtml(chip)}`;
 }
 
 function buildEquippedChip(chip, index, overflow, totalStats, leekLevel) {
@@ -36,6 +38,7 @@ function buildEquippedChip(chip, index, overflow, totalStats, leekLevel) {
             <span class="chip-name">${chip.name.replace(/_/g, ' ')}</span>
             <span class="chip-level">Lvl ${chip.level}</span>
             ${buildChipMeta(chip)}
+            <hr class="meta-separator">
             <div class="chip-effects">${buildEffectsHtml(chip.effects, totalStats)}</div>
         </div>
     </div>`;
@@ -71,6 +74,7 @@ function buildChipCard(chip, totalStats) {
             <span class="chip-name">${chip.name.replace(/_/g, ' ')}</span>
             <span class="chip-level">Lvl ${chip.level}</span>
             ${buildChipMeta(chip)}
+            <hr class="meta-separator">
             <div class="chip-effects">${buildEffectsHtml(chip.effects, totalStats)}</div>
         </div>
     </div>`;

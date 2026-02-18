@@ -516,6 +516,45 @@ html, body {
     color: white;
 }
 
+/* Range toggle */
+.range-toggle {
+    background: none;
+    border: 1px solid var(--slot-empty-border);
+    font-size: 11px;
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: var(--text-recap);
+    transition: all 0.2s;
+    opacity: 0.6;
+}
+
+.range-toggle:hover {
+    opacity: 0.9;
+}
+
+.range-toggle.active {
+    opacity: 1;
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: white;
+}
+
+.item-range {
+    display: none;
+}
+
+body.show-range .item-range {
+    display: flex;
+}
+
+/* Meta / effects separator */
+.meta-separator {
+    border: none;
+    border-top: 1px solid var(--border-default);
+    margin: 4px 0;
+}
+
 /* Theme toggle */
 .theme-toggle {
     background: none;

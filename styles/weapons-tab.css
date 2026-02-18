@@ -281,6 +281,30 @@
     color: var(--text-muted);
 }
 
+.weapon-meta + .item-range,
+.weapon-slot .item-range,
+.weapon-card .item-range {
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.weapon-slot .launch-type-icon,
+.weapon-card .launch-type-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.weapon-slot .range-text,
+.weapon-card .range-text,
+.weapon-slot .area-text,
+.weapon-card .area-text {
+    color: var(--text-muted);
+}
+
 .weapon-effects {
     display: flex;
     flex-direction: column;

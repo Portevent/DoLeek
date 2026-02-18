@@ -12,6 +12,7 @@ const leek = new Leek('My Leek');
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initComputedToggle();
+    initRangeToggle();
     initTabs();
     initResizer();
     initRecapStats(leek);
@@ -52,6 +53,15 @@ function initComputedToggle() {
         settings.computedMode = !settings.computedMode;
         toggle.classList.toggle('active', settings.computedMode);
         leek.emit('computed');
+    });
+}
+
+function initRangeToggle() {
+    const toggle = document.getElementById('range-toggle');
+    toggle.addEventListener('click', () => {
+        settings.rangeMode = !settings.rangeMode;
+        toggle.classList.toggle('active', settings.rangeMode);
+        document.body.classList.toggle('show-range', settings.rangeMode);
     });
 }
 
