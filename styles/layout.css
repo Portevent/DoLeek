@@ -381,8 +381,16 @@ html, body {
     object-fit: contain;
 }
 
-.recap-weapons-list .recap-item img {
+.recap-weapons-list .recap-item {
     width: 128px;
+    height: 64px;
+}
+
+.recap-weapons-list .recap-item img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
 }
 
 /* When recap is narrow, stack all zones */
@@ -677,8 +685,9 @@ body.show-range .item-range {
         height: 32px;
     }
 
-    .recap-weapons-list .recap-item img {
+    .recap-weapons-list .recap-item {
         width: 48px;
+        height: 32px;
     }
 
     .zone-4 {
