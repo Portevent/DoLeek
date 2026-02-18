@@ -1,0 +1,233 @@
+/* Optimize Tab */
+.optimize-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.optimize-keep-stats h3 {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 10px 0;
+}
+
+/* Stat toggle buttons (same style as components stat-filter) */
+.optimize-stat-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.optimize-stat-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 2px solid var(--border-subtle);
+    border-radius: 6px;
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0.5;
+}
+
+.optimize-stat-toggle img {
+    width: 20px;
+    height: 20px;
+}
+
+.optimize-stat-toggle:hover {
+    opacity: 0.8;
+    border-color: var(--text-muted);
+}
+
+.optimize-stat-toggle.active {
+    opacity: 1;
+    border-color: var(--color-accent);
+    background: var(--bg-equipped);
+}
+
+/* Run button */
+.optimize-run-btn {
+    align-self: flex-start;
+    padding: 8px 20px;
+    background: var(--color-accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.optimize-run-btn:hover {
+    opacity: 0.85;
+}
+
+/* Results area */
+.optimize-results {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.optimize-message {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-style: italic;
+}
+
+.optimize-count {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+/* Result cards */
+.optimize-result-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border-default);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.2s;
+}
+
+.optimize-result-card:hover {
+    border-color: var(--color-accent);
+}
+
+.optimize-result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.optimize-component-names {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.optimize-component-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.optimize-component-icon img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.optimize-equipped-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: capitalize;
+}
+
+.optimize-arrow {
+    font-size: 16px;
+    color: var(--text-muted);
+}
+
+.optimize-candidate-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-accent);
+    text-transform: capitalize;
+}
+
+.optimize-result-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* Net capital badge */
+.optimize-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.optimize-badge.badge-positive {
+    background: var(--bg-active-tier);
+    color: var(--color-success);
+}
+
+.optimize-badge.badge-zero {
+    background: var(--bg-input);
+    color: var(--text-secondary);
+}
+
+/* Apply button */
+.optimize-apply-btn {
+    padding: 4px 12px;
+    background: var(--color-success);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.optimize-apply-btn:hover {
+    opacity: 0.85;
+}
+
+/* Stat deltas */
+.optimize-deltas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.optimize-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--bg-input);
+}
+
+.optimize-delta img {
+    width: 13px;
+    height: 13px;
+}
+
+.optimize-delta.delta-positive {
+    background: var(--bg-active-tier);
+}
+
+.optimize-delta.delta-negative {
+    background: var(--bg-hover-remove);
+}
+
+/* Non-kept stat deltas shown with reduced opacity */
+.optimize-delta.delta-info {
+    opacity: 0.5;
+}

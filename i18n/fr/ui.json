@@ -92,5 +92,16 @@
 	"filter_heal": "Soin",
 	"filter_nova": "Nova",
 
-	"wip": "WIP"
+	"wip": "WIP",
+
+	"tab_optimize": "Optimiser",
+	"optimize_keep_stats": "Stats à conserver",
+	"optimize_run": "Lancer l'optimisation",
+	"optimize_no_results": "Aucune amélioration trouvée.",
+	"optimize_replace": "Remplacer",
+	"optimize_with": "par",
+	"optimize_net_capital": "Capital net",
+	"optimize_apply": "Appliquer",
+	"optimize_no_components": "Aucun composant équipé — rien à optimiser.",
+	"optimize_result_count": "{n} échange(s) trouvé(s)"
 }

@@ -92,5 +92,16 @@
 	"filter_heal": "Heal",
 	"filter_nova": "Nova",
 
-	"wip": "WIP"
+	"wip": "WIP",
+
+	"tab_optimize": "Optimize",
+	"optimize_keep_stats": "Stats to keep",
+	"optimize_run": "Run Optimization",
+	"optimize_no_results": "No improvement found.",
+	"optimize_replace": "Replace",
+	"optimize_with": "with",
+	"optimize_net_capital": "Net capital",
+	"optimize_apply": "Apply",
+	"optimize_no_components": "No components equipped — nothing to optimize.",
+	"optimize_result_count": "{n} swap(s) found"
 }

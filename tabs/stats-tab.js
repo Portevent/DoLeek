@@ -281,6 +281,10 @@ export function initStatsTab(leek) {
         updateStatsTab(leek);
     });
 
+    leek.on('stats', () => {
+        updateStatsTab(leek);
+    });
+
     const statsPanel = document.getElementById('stats');
     console.log('[stats-tab] statsPanel:', statsPanel);
 

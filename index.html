@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="styles/weapons-tab.css">
     <link rel="stylesheet" href="styles/combo-tab.css">
     <link rel="stylesheet" href="styles/export-tab.css">
+    <link rel="stylesheet" href="styles/optimize-tab.css">
     <link rel="stylesheet" href="colors.css">
 </head>
 <body>
@@ -92,6 +93,7 @@
                 <button class="tab" data-tab="weapons"><img src="public/image/weapon/pistol.png" alt=""><span data-i18n="tab_weapons">Weapons</span></button>
                 <button class="tab" data-tab="combo"><span data-i18n="tab_combo">Combo</span></button>
                 <button class="tab" data-tab="export"><span data-i18n="tab_export">Export</span></button>
+                <button class="tab" data-tab="optimize"><span data-i18n="tab_optimize">Optimize</span></button>
             </nav>
 
             <div class="tab-content">
@@ -196,6 +198,18 @@
                             <h3 data-i18n="add_to_combo">Add to combo</h3>
                             <div class="combo-picker-list"></div>
                         </div>
+                    </div>
+                </section>
+
+                <section id="optimize" class="tab-panel">
+                    <h2 data-i18n="tab_optimize">Optimize</h2>
+                    <div class="optimize-layout">
+                        <div class="optimize-keep-stats">
+                            <h3 data-i18n="optimize_keep_stats">Stats to keep</h3>
+                            <div class="optimize-stat-toggles"></div>
+                        </div>
+                        <button class="optimize-run-btn" data-i18n="optimize_run">Run Optimization</button>
+                        <div class="optimize-results"></div>
                     </div>
                 </section>
 

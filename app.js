@@ -8,6 +8,7 @@ import { initChipsTab } from './tabs/chips-tab.js';
 import { initWeaponsTab } from './tabs/weapons-tab.js';
 import { initComboTab } from './tabs/combo-tab.js';
 import { initExportTab, importBuild } from './tabs/export-tab.js';
+import { initOptimizeTab } from './tabs/optimize-tab.js';
 
 // Global Leek instance for the application
 const leek = new Leek('My Leek');
@@ -28,6 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initWeaponsTab(leek);
     initComboTab(leek);
     initExportTab(leek);
+    initOptimizeTab(leek);
 
     // Load build from URL hash if present
     const hash = window.location.hash.slice(1);
