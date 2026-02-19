@@ -103,5 +103,11 @@
 	"optimize_net_capital": "Capital net",
 	"optimize_apply": "Appliquer",
 	"optimize_no_components": "Aucun composant équipé — rien à optimiser.",
-	"optimize_result_count": "{n} échange(s) trouvé(s)"
+	"optimize_result_count": "{n} échange(s) trouvé(s)",
+
+	"search_leek": "Chercher un poireau",
+	"search_leek_placeholder": "Nom du poireau...",
+	"search_leek_searching": "Recherche...",
+	"search_leek_no_results": "Aucun poireau trouvé.",
+	"search_leek_error": "Recherche échouée. Vérifiez votre connexion."
 }

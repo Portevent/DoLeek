@@ -113,6 +113,76 @@ export function importBuild(base64, leek) {
     }
 }
 
+function fixLeekImageUrl(url) {
+    // API returns malformed URLs like 'https:///static//image/...'
+    // Extract the path from 'static/' onward and prepend the correct host.
+    const match = url.match(/static\/.*/);
+    return match ? `https://leekwars.com/${match[0]}` : url;
+}
+
+function initLeekSearch() {
+    const input = document.querySelector('.search-leek-input');
+    const resultsEl = document.querySelector('.search-leek-results');
+    if (!input || !resultsEl) return;
+
+    let debounceTimer = null;
+    let currentController = null;
+
+    input.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        if (currentController) {
+            currentController.abort();
+            currentController = null;
+        }
+
+        const query = input.value.trim();
+        if (query.length < 2) {
+            resultsEl.innerHTML = '';
+            return;
+        }
+
+        resultsEl.innerHTML = `<p class="search-leek-status">${t('search_leek_searching')}</p>`;
+
+        debounceTimer = setTimeout(async () => {
+            currentController = new AbortController();
+            try {
+                const apiUrl = 'https://leekwars.com/api/ranking/search';
+                const response = await fetch('https://corsproxy.io/?url=' + encodeURIComponent(apiUrl), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query, search_leeks: true, search_farmers: false, search_teams: false }),
+                    signal: currentController.signal,
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const data = await response.json();
+                const leeks = (data.results || []).filter(r => r.type === 'leek');
+
+                if (leeks.length === 0) {
+                    resultsEl.innerHTML = `<p class="search-leek-status">${t('search_leek_no_results')}</p>`;
+                    return;
+                }
+
+                resultsEl.innerHTML = leeks.map(leek => {
+                    const imgUrl = fixLeekImageUrl(leek.image || '');
+                    return `<div class="search-leek-result">
+                        <img class="search-leek-img" src="${imgUrl}" alt="" onerror="this.style.display='none'">
+                        <div class="search-leek-info">
+                            <span class="search-leek-name">${leek.name}</span>
+                            <span class="search-leek-level">Lvl ${leek.level}</span>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                if (e.name === 'AbortError') return;
+                resultsEl.innerHTML = `<p class="search-leek-status search-leek-error">${t('search_leek_error')}</p>`;
+            } finally {
+                currentController = null;
+            }
+        }, 400);
+    });
+}
+
 export function initExportTab(leek) {
     const copyBtn = document.querySelector('.export-btn');
     const importBtn = document.querySelector('.import-btn');
@@ -174,4 +244,6 @@ export function initExportTab(leek) {
             showStatus(e.message, true);
         }
     });
+
+    initLeekSearch();
 }

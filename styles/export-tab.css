@@ -73,3 +73,76 @@
 .export-status.error {
     color: var(--color-danger);
 }
+
+/* Leek search */
+.search-leek-input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 13px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.search-leek-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+
+.search-leek-results {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.search-leek-status {
+    font-size: 13px;
+    font-style: italic;
+    color: var(--text-secondary);
+}
+
+.search-leek-error {
+    color: var(--color-danger);
+    font-style: normal;
+}
+
+.search-leek-result {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.search-leek-img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.search-leek-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.search-leek-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.search-leek-level {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
