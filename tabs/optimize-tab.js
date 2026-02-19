@@ -141,8 +141,23 @@ function renderResults(results, leek, keptStats, container) {
             const idx = parseInt(btn.dataset.resultIdx, 10);
             const result = results[idx];
             if (!result) return;
+
+            // Adjust bonus stats so total stats stay equivalent after the swap.
+            // delta[stat] = candidate - equipped:
+            //   delta > 0 → new component covers more → reduce bonus (floor at 0)
+            //   delta < 0 → new component covers less → increase bonus to compensate
+            for (const stat of STAT_NAMES) {
+                const d = result.delta[stat];
+                if (d !== 0) {
+                    leek.bonusStats[stat] = Math.max(0, (leek.bonusStats[stat] || 0) - d);
+                }
+            }
+
             leek.removeComponent(result.equippedIndex);
             leek.addComponent(result.candidate);
+
+            // Refresh stats tab and capital display
+            leek.emit('stats');
         });
     });
 }
