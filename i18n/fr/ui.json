@@ -108,5 +108,6 @@
 	"leek_manager_title": "Mes Poireaux",
 	"leek_add": "Ajouter un Poireau",
 	"leek_delete": "Supprimer",
-	"leek_default_name": "Poireau"
+	"leek_default_name": "Poireau",
+	"critical_toggle": "Critique"
 }

@@ -108,6 +108,7 @@
                             <div class="capital-display">
                                 <span data-i18n="capital">Capital</span>: <span id="capital-remaining">50</span> / <span id="capital-total">50</span>
                             </div>
+                            <button id="critical-toggle" class="toggle-cost-btn" data-i18n="critical_toggle" style="display:none">Critical</button>
                         </div>
                     </div>
                     <table class="stats-table">
@@ -243,7 +244,10 @@
             <button class="leek-modal-close" title="Close">×</button>
         </div>
         <div class="leek-manager-list"></div>
-        <button class="leek-add-btn">+ <span data-i18n="leek_add">Add Leek</span></button>
+        <div class="leek-type-select">
+            <span class="leek-type-select-label" data-i18n="leek_add">Add:</span>
+            <div class="leek-type-buttons"></div>
+        </div>
     </div>
 
     <script type="module" src="app.js"></script>

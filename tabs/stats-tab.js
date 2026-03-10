@@ -157,6 +157,16 @@ export function isCapitalOverflow(leek) {
 }
 
 export function updateCapitalDisplay(leek) {
+    const isBulb = leek.type !== 1;
+
+    const capitalDisplay = document.querySelector('.capital-display');
+    const criticalToggle = document.getElementById('critical-toggle');
+    if (capitalDisplay) capitalDisplay.style.display = isBulb ? 'none' : '';
+    if (criticalToggle) {
+        criticalToggle.style.display = isBulb ? '' : 'none';
+        criticalToggle.classList.toggle('active', leek.critical);
+    }
+
     const totalCapital = leek.getCapital();
     const spentCapital = getSpentCapital(leek);
     const remainingCapital = totalCapital - spentCapital;
@@ -175,7 +185,7 @@ export function updateCapitalDisplay(leek) {
         }
     }
 
-    setTabError('stats', remainingCapital < 0);
+    setTabError('stats', !isBulb && remainingCapital < 0);
 }
 
 function getStatLabels() {
@@ -369,6 +379,15 @@ export function initStatsTab(leek) {
             });
         });
     });
+
+    // Initialize critical toggle
+    const criticalToggle = document.getElementById('critical-toggle');
+    if (criticalToggle) {
+        criticalToggle.addEventListener('click', () => {
+            leek.critical = !leek.critical;
+            leek.emit('stats');
+        });
+    }
 
     // Initialize level input
     if (levelInput) {

@@ -1,6 +1,7 @@
 // Base stats per leek type.
 // Each stat is [value_at_level_1, value_at_level_301].
 // Interpolation between levels is linear.
+// Stat order: life, magic, strength, frequency, wisdom, cores, agility, ram, resistance, mp, science, tp
 export const LEEK_TYPES = {
     1: {
         life:       [100, 1000],
@@ -15,5 +16,160 @@ export const LEEK_TYPES = {
         ram:        [6,   6],
         tp:         [10,  10],
         mp:         [3,   3]
+    },
+    2: { // puny_bulb
+        life:       [50,  300],
+        strength:   [0,   100],
+        wisdom:     [0,   100],
+        resistance: [0,   100],
+        agility:    [0,   100],
+        science:    [0,   100],
+        magic:      [0,   0],
+        frequency:  [0,   0],
+        cores:      [0,   0],
+        ram:        [4,   4],
+        tp:         [4,   7],
+        mp:         [3,   5]
+    },
+    3: { // rocky_bulb
+        life:       [400, 600],
+        strength:   [0,   200],
+        wisdom:     [0,   0],
+        resistance: [0,   200],
+        agility:    [0,   100],
+        science:    [0,   0],
+        magic:      [0,   0],
+        frequency:  [0,   0],
+        cores:      [0,   0],
+        ram:        [4,   4],
+        tp:         [4,   8],
+        mp:         [2,   3]
+    },
+    4: { // iced_bulb
+        life:       [300, 500],
+        strength:   [0,   300],
+        wisdom:     [0,   0],
+        resistance: [0,   0],
+        agility:    [0,   100],
+        science:    [0,   200],
+        magic:      [0,   0],
+        frequency:  [0,   0],
+        cores:      [0,   0],
+        ram:        [4,   4],
+        tp:         [5,   8],
+        mp:         [3,   4]
+    },
+    5: { // healer_bulb
+        life:       [300, 400],
+        strength:   [0,   0],
+        wisdom:     [0,   300],
+        resistance: [0,   0],
+        agility:    [0,   100],
+        science:    [0,   0],
+        magic:      [0,   0],
+        frequency:  [0,   0],
+        cores:      [0,   0],
+        ram:        [4,   4],
+        tp:         [4,   8],
+        mp:         [3,   6]
+    },
+    6: { // fire_bulb
+        life:       [300, 500],
+        strength:   [0,   300],
+        wisdom:     [0,   200],
+        resistance: [0,   0],
+        agility:    [0,   100],
+        science:    [0,   0],
+        magic:      [0,   0],
+        frequency:  [0,   0],
+        cores:      [0,   0],
+        ram:        [4,   4],
+        tp:         [4,   9],
+        mp:         [3,   5]
+    },
+    7: { // wizard_bulb
+        life:       [300, 600],
+        strength:   [0,   0],
+        wisdom:     [0,   0],
+        resistance: [0,   0],
+        agility:    [0,   100],
+        science:    [0,   0],
+        magic:      [0,   240],
+        frequency:  [0,   0],
+        cores:      [0,   0],
+        ram:        [4,   4],
+        tp:         [5,   8],
+        mp:         [4,   7]
+    },
+    8: { // metallic_bulb
+        life:       [800, 1100],
+        strength:   [0,   0],
+        wisdom:     [0,   0],
+        resistance: [0,   300],
+        agility:    [0,   100],
+        science:    [0,   200],
+        magic:      [0,   0],
+        frequency:  [0,   0],
+        cores:      [0,   0],
+        ram:        [4,   4],
+        tp:         [5,   9],
+        mp:         [1,   2]
+    },
+    9: { // savant_bulb
+        life:       [400, 600],
+        strength:   [0,   0],
+        wisdom:     [0,   0],
+        resistance: [0,   0],
+        agility:    [0,   200],
+        science:    [0,   300],
+        magic:      [0,   0],
+        frequency:  [0,   0],
+        cores:      [0,   0],
+        ram:        [4,   4],
+        tp:         [6,   8],
+        mp:         [4,   6]
+    },
+    10: { // tactician_bulb
+        life:       [500, 700],
+        strength:   [0,   0],
+        wisdom:     [0,   0],
+        resistance: [0,   0],
+        agility:    [0,   200],
+        science:    [0,   0],
+        magic:      [0,   0],
+        frequency:  [0,   0],
+        cores:      [0,   0],
+        ram:        [6,   6],
+        tp:         [6,   6],
+        mp:         [6,   6]
+    },
+    11: { // lightning_bulb
+        life:       [400, 600],
+        strength:   [0,   400],
+        wisdom:     [0,   0],
+        resistance: [0,   0],
+        agility:    [0,   100],
+        science:    [0,   200],
+        magic:      [0,   0],
+        frequency:  [0,   0],
+        cores:      [0,   0],
+        ram:        [4,   4],
+        tp:         [6,   10],
+        mp:         [4,   6]
     }
+};
+
+// Display metadata per type: name, image source function, and default chip IDs
+export const LEEK_TYPE_META = {
+    1:  { name: 'Leek',           image: (level) => `public/image/leek/leek${1 + Math.floor(level / 32)}_front_green.png`, defaultChips: [] },
+    2:  { name: 'Puny Bulb',      image: () => 'public/image/bulb/puny_bulb_front.png',      defaultChips: [21, 19, 3, 8] },
+    3:  { name: 'Rocky Bulb',     image: () => 'public/image/bulb/rocky_bulb_front.png',     defaultChips: [19, 7, 32, 21] },
+    4:  { name: 'Iced Bulb',      image: () => 'public/image/bulb/iced_bulb_front.png',      defaultChips: [2, 30, 31, 28] },
+    5:  { name: 'Healer Bulb',    image: () => 'public/image/bulb/healer_bulb_front.png',    defaultChips: [3, 10, 4, 11] },
+    6:  { name: 'Fire Bulb',      image: () => 'public/image/bulb/fire_bulb_front.png',      defaultChips: [18, 5, 36, 85] },
+    7:  { name: 'Wizard Bulb',    image: () => 'public/image/bulb/wizard_bulb_front.png',    defaultChips: [97, 98, 94, 92] },
+    8:  { name: 'Metallic Bulb',  image: () => 'public/image/bulb/metallic_bulb_front.png',  defaultChips: [20, 22, 23, 13] },
+    9:  { name: 'Savant Bulb',    image: () => 'public/image/bulb/savant_bulb_front.png',    defaultChips: [141, 159, 16, 100] },
+    10: { name: 'Tactician Bulb', image: () => 'public/image/bulb/tactician_bulb_front.png', defaultChips: [59, 68, 144, 120, 162, 163] },
+    11: { name: 'Lightning Bulb', image: () => 'public/image/bulb/lightning_bulb_front.png', defaultChips: [1, 6, 33, 25] },
 };

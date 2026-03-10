@@ -9,6 +9,7 @@ class Leek {
     constructor(name = '') {
         this.name = name;
         this.type = 1;
+        this.critical = false;
         this.level = 301;
         this.baseStats = new Stats();
         this.bonusStats = new Stats();
@@ -72,6 +73,11 @@ class Leek {
     // Get total stats (base + bonus + components)
     getTotalStats() {
         const total = this.baseStats.clone();
+        if (this.critical && this.type !== 1) {
+            for (const key of Object.keys(total)) {
+                total[key] = Math.round(total[key] * 1.2);
+            }
+        }
         total.add(this.bonusStats);
         for (const component of this.components) {
             for (const [stat, value] of component.stats) {

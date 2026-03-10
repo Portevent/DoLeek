@@ -3,6 +3,7 @@ import { formatEffect, formatComputedEffect } from '../data/effects.js';
 import { settings } from '../model/settings.js';
 import { t } from '../model/i18n.js';
 import { isCapitalOverflow } from './stats-tab.js';
+import { LEEK_TYPE_META } from '../data/leek-types.js';
 
 const MAX_COMPONENTS = 8;
 
@@ -132,7 +133,8 @@ export function updateRecapStats(leek) {
     });
 
     const leekImage = document.getElementById('leek-display');
-    leekImage.src = "public/image/leek/leek" + (1 + Math.floor(leek.level / 32)) + "_front_green.png";
+    const typeMeta = LEEK_TYPE_META[leek.type] || LEEK_TYPE_META[1];
+    leekImage.src = typeMeta.image(leek.level);
 
     setZoneError('zone-2', isCapitalOverflow(leek));
     updateZone3Error(leek);

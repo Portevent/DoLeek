@@ -1,5 +1,7 @@
 import { exportBuild, importBuild } from './export-tab.js';
 import { t } from '../model/i18n.js';
+import { LEEK_TYPE_META } from '../data/leek-types.js';
+import { CHIPS } from '../data/chips.js';
 
 const STORAGE_KEY = 'doleek-leeks';
 const ACTIVE_KEY = 'doleek-active-leek';
@@ -7,15 +9,17 @@ const ACTIVE_KEY = 'doleek-active-leek';
 let leekSaves = [];
 let activeIndex = 0;
 
-function getLevelFromBuild(build) {
-    if (!build) return 301;
+function getBuildMeta(build) {
+    if (!build) return { level: 301, type: 1 };
     try {
-        return JSON.parse(atob(build)).l || 301;
-    } catch { return 301; }
+        const data = JSON.parse(atob(build));
+        return { level: data.l || 301, type: data.ty || 1 };
+    } catch { return { level: 301, type: 1 }; }
 }
 
-function leekImageSrc(level) {
-    return 'public/image/leek/leek' + (1 + Math.floor(level / 32)) + '_front_green.png';
+function getLeekImageSrc(type, level) {
+    const meta = LEEK_TYPE_META[type] || LEEK_TYPE_META[1];
+    return meta.image(level);
 }
 
 function saveToStorage() {
@@ -33,8 +37,8 @@ function renderModal() {
     if (!list) return;
     const onlyOne = leekSaves.length <= 1;
     list.innerHTML = leekSaves.map((save, i) => {
-        const level = getLevelFromBuild(save.build);
-        const imgSrc = leekImageSrc(level);
+        const { level, type } = getBuildMeta(save.build);
+        const imgSrc = getLeekImageSrc(type, level);
         const isActive = i === activeIndex;
         return `<div class="leek-list-item${isActive ? ' active' : ''}" data-index="${i}">
             <img src="${imgSrc}" alt="" class="leek-list-img">
@@ -44,8 +48,9 @@ function renderModal() {
     }).join('');
 }
 
-function resetLeek(leek) {
-    leek.setType(1);
+function resetLeek(leek, type = 1) {
+    leek.critical = false;
+    leek.setType(type);
     leek.setLevel(301);
     leek.bonusStats.reset();
     leek.emit('stats');
@@ -53,11 +58,17 @@ function resetLeek(leek) {
     while (leek.chips.length > 0) leek.removeChip(0);
     while (leek.weapons.length > 0) leek.removeWeapon(0);
     leek.clearCombo();
+    const defaultChips = LEEK_TYPE_META[type]?.defaultChips || [];
+    for (const chipId of defaultChips) {
+        const chip = CHIPS[String(chipId)];
+        if (chip) leek.addChip(chip);
+    }
 }
 
 function switchTo(idx, leek) {
     if (idx === activeIndex) return;
     leekSaves[activeIndex].build = exportBuild(leek);
+    leek.critical = false;
     activeIndex = idx;
     const save = leekSaves[activeIndex];
     if (save.build) {
@@ -110,8 +121,30 @@ export function initLeekManager(leek) {
     const overlay = document.getElementById('leek-modal-overlay');
     const leekCenter = document.querySelector('.leek-center');
     const list = document.querySelector('.leek-manager-list');
-    const addBtn = document.querySelector('.leek-add-btn');
+    const typeButtons = document.querySelector('.leek-type-buttons');
     const closeBtn = document.querySelector('.leek-modal-close');
+
+    // Render the type selection buttons once
+    if (typeButtons) {
+        typeButtons.innerHTML = Object.entries(LEEK_TYPE_META).map(([type, meta]) =>
+            `<button class="leek-type-btn" data-type="${type}" title="${meta.name}">
+                <img src="${meta.image(1)}" alt="${meta.name}">
+                <span>${meta.name}</span>
+            </button>`
+        ).join('');
+    }
+
+    function addLeekOfType(type) {
+        leekSaves[activeIndex].build = exportBuild(leek);
+        const meta = LEEK_TYPE_META[type] || LEEK_TYPE_META[1];
+        const newName = meta.name + ' ' + (leekSaves.length + 1);
+        leekSaves.push({ name: newName, build: null });
+        activeIndex = leekSaves.length - 1;
+        resetLeek(leek, type);
+        updateActiveLeekName();
+        saveToStorage();
+        renderModal();
+    }
 
     function openModal() {
         leekSaves[activeIndex].build = exportBuild(leek);
@@ -131,6 +164,14 @@ export function initLeekManager(leek) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeModal();
     });
+
+    if (typeButtons) {
+        typeButtons.addEventListener('click', (e) => {
+            const btn = e.target.closest('.leek-type-btn');
+            if (!btn) return;
+            addLeekOfType(parseInt(btn.dataset.type, 10));
+        });
+    }
 
     list.addEventListener('click', (e) => {
         const deleteBtn = e.target.closest('.leek-delete-btn');
@@ -174,16 +215,5 @@ export function initLeekManager(leek) {
         leekSaves[idx].name = input.value;
         if (idx === activeIndex) updateActiveLeekName();
         saveToStorage();
-    });
-
-    addBtn.addEventListener('click', () => {
-        leekSaves[activeIndex].build = exportBuild(leek);
-        const newName = t('leek_default_name') + ' ' + (leekSaves.length + 1);
-        leekSaves.push({ name: newName, build: null });
-        activeIndex = leekSaves.length - 1;
-        resetLeek(leek);
-        updateActiveLeekName();
-        saveToStorage();
-        renderModal();
     });
 }
