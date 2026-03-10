@@ -45,6 +45,11 @@ function buildEquippedChip(chip, index, overflow, totalStats, leekLevel) {
     </div>`;
 }
 
+function setTabError(tabId, hasError) {
+    const tab = document.querySelector(`.tab[data-tab="${tabId}"]`);
+    if (tab) tab.classList.toggle('error', hasError);
+}
+
 function renderEquippedChips(leek) {
     const list = document.querySelector('.equipped-chips-list');
     const totalStats = leek.getTotalStats();
@@ -58,6 +63,7 @@ function renderEquippedChips(leek) {
     countEl.textContent = count.toString();
     maxEl.textContent = totalRam;
     counterEl.classList.toggle('overflow', count > totalRam);
+    setTabError('chips', count > totalRam);
 
     if (count === 0) {
         list.innerHTML = `<div class="chip-slot empty"><span class="slot-placeholder">${t('no_chips')}</span></div>`;

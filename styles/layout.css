@@ -151,6 +151,10 @@ html, body {
     color: var(--color-accent);
 }
 
+.recap-zone h3.error {
+    color: var(--color-danger);
+}
+
 /* Zone 1 - Always sacred, shares row with Zone 2 */
 .zone-1 {
     grid-column: 1;
@@ -478,6 +482,14 @@ html, body {
     color: var(--text-primary);
     background-color: var(--bg-editor);
     border-bottom: 3px solid var(--color-accent);
+}
+
+.tab.error span {
+    color: var(--color-danger);
+}
+
+.tab.active.error span {
+    color: var(--color-danger);
 }
 
 /* Tab Content */

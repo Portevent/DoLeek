@@ -48,6 +48,11 @@ function buildEmptySlot(index) {
     </div>`;
 }
 
+function setTabError(tabId, hasError) {
+    const tab = document.querySelector(`.tab[data-tab="${tabId}"]`);
+    if (tab) tab.classList.toggle('error', hasError);
+}
+
 function renderEquippedList(leek) {
     const equippedList = document.querySelector('.equipped-list');
     let html = '';
@@ -60,6 +65,7 @@ function renderEquippedList(leek) {
         }
     }
     equippedList.innerHTML = html;
+    setTabError('components', leek.components.length > MAX_COMPONENTS);
 }
 
 function buildComponentCard(component) {

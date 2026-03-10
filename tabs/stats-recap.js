@@ -2,6 +2,20 @@
 import { formatEffect, formatComputedEffect } from '../data/effects.js';
 import { settings } from '../model/settings.js';
 import { t } from '../model/i18n.js';
+import { isCapitalOverflow } from './stats-tab.js';
+
+const MAX_COMPONENTS = 8;
+
+function getMaxWeapons(level) {
+    if (level >= 200) return 4;
+    if (level >= 100) return 3;
+    return 2;
+}
+
+function setZoneError(zoneClass, hasError) {
+    const h3 = document.querySelector(`.${zoneClass} h3`);
+    if (h3) h3.classList.toggle('error', hasError);
+}
 
 function buildDetailForComponent(component) {
     const statsHtml = component.stats.map(([stat, value]) =>
@@ -65,6 +79,7 @@ function updateRecapComponents(leek) {
             slot.innerHTML = '';
         }
     }
+    setZoneError('zone-1', leek.components.length > MAX_COMPONENTS);
 }
 
 function updateRecapWeapons(leek) {
@@ -72,11 +87,12 @@ function updateRecapWeapons(leek) {
     if (!list) return;
     if (leek.weapons.length === 0) {
         list.innerHTML = '';
-        return;
+    } else {
+        list.innerHTML = leek.weapons.map((w, i) =>
+            `<div class="recap-item" data-type="weapon" data-index="${i}"><img src="public/image/weapon/${w.name}.png" alt="${w.name}"></div>`
+        ).join('');
     }
-    list.innerHTML = leek.weapons.map((w, i) =>
-        `<div class="recap-item" data-type="weapon" data-index="${i}"><img src="public/image/weapon/${w.name}.png" alt="${w.name}"></div>`
-    ).join('');
+    updateZone3Error(leek);
 }
 
 function updateRecapChips(leek) {
@@ -84,14 +100,22 @@ function updateRecapChips(leek) {
     if (!list) return;
     if (leek.chips.length === 0) {
         list.innerHTML = '';
-        return;
+    } else {
+        const sorted = leek.chips
+            .map((c, i) => ({ chip: c, index: i }))
+            .sort((a, b) => a.chip.type - b.chip.type || a.chip.level - b.chip.level);
+        list.innerHTML = sorted.map(({ chip, index }) =>
+            `<div class="recap-item" data-type="chip" data-index="${index}"><img src="public/image/chip/${chip.name}.png" alt="${chip.name}"></div>`
+        ).join('');
     }
-    const sorted = leek.chips
-        .map((c, i) => ({ chip: c, index: i }))
-        .sort((a, b) => a.chip.type - b.chip.type || a.chip.level - b.chip.level);
-    list.innerHTML = sorted.map(({ chip, index }) =>
-        `<div class="recap-item" data-type="chip" data-index="${index}"><img src="public/image/chip/${chip.name}.png" alt="${chip.name}"></div>`
-    ).join('');
+    updateZone3Error(leek);
+}
+
+function updateZone3Error(leek) {
+    const totalStats = leek.getTotalStats();
+    const chipsOverflow = leek.chips.length > totalStats.ram;
+    const weaponsOverflow = leek.weapons.length > getMaxWeapons(leek.level);
+    setZoneError('zone-3', chipsOverflow || weaponsOverflow);
 }
 
 export function updateRecapStats(leek) {
@@ -109,6 +133,9 @@ export function updateRecapStats(leek) {
 
     const leekImage = document.getElementById('leek-display');
     leekImage.src = "public/image/leek/leek" + (1 + Math.floor(leek.level / 32)) + "_front_green.png";
+
+    setZoneError('zone-2', isCapitalOverflow(leek));
+    updateZone3Error(leek);
 }
 
 export function initRecapStats(leek) {

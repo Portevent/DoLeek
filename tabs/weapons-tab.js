@@ -67,6 +67,11 @@ function buildEmptyWeaponSlot(index) {
     </div>`;
 }
 
+function setTabError(tabId, hasError) {
+    const tab = document.querySelector(`.tab[data-tab="${tabId}"]`);
+    if (tab) tab.classList.toggle('error', hasError);
+}
+
 function renderEquippedWeapons(leek) {
     const list = document.querySelector('.equipped-weapons-list');
     const count = leek.weapons.length;
@@ -80,6 +85,7 @@ function renderEquippedWeapons(leek) {
     countEl.textContent = count.toString();
     maxEl.textContent = maxWeapons.toString();
     counterEl.classList.toggle('overflow', count > maxWeapons);
+    setTabError('weapons', count > maxWeapons);
 
     let html = '';
     const slotCount = Math.max(maxWeapons, count);

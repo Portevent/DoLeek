@@ -147,6 +147,15 @@ function highlightCurrentTier(statName, bonusValue) {
     }
 }
 
+function setTabError(tabId, hasError) {
+    const tab = document.querySelector(`.tab[data-tab="${tabId}"]`);
+    if (tab) tab.classList.toggle('error', hasError);
+}
+
+export function isCapitalOverflow(leek) {
+    return getSpentCapital(leek) > leek.getCapital();
+}
+
 export function updateCapitalDisplay(leek) {
     const totalCapital = leek.getCapital();
     const spentCapital = getSpentCapital(leek);
@@ -165,6 +174,8 @@ export function updateCapitalDisplay(leek) {
             remainingEl.classList.remove('negative');
         }
     }
+
+    setTabError('stats', remainingCapital < 0);
 }
 
 function getStatLabels() {
