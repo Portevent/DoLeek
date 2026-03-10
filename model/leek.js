@@ -1,8 +1,14 @@
 import Stats from './stats.js';
+import { LEEK_TYPES } from '../data/leek-types.js';
+
+function interpolateStat(min, max, level) {
+    return Math.round(min + (max - min) * (level - 1) / 300);
+}
 
 class Leek {
     constructor(name = '') {
         this.name = name;
+        this.type = 1;
         this.level = 301;
         this.baseStats = new Stats();
         this.bonusStats = new Stats();
@@ -19,11 +25,6 @@ class Leek {
         this.updateBaseStats();
     }
 
-    // Base life: 100 at level 1, + 3 per level afterward
-    getBaseLife() {
-        return 100 + ((this.level - 1) * 3);
-    }
-
     // Capital: 50 at level 1, +5 per level afterward
     getCapital() {
         return 50 + ((this.level - 1) * 5)
@@ -35,12 +36,17 @@ class Leek {
 
     updateBaseStats() {
         this.baseStats.reset();
-        this.baseStats.life = this.getBaseLife();
-        this.baseStats.frequency = 100;
-        this.baseStats.tp = 10;
-        this.baseStats.mp = 3;
-        this.baseStats.ram = 6;
-        this.baseStats.cores = 1;
+        const typeDef = LEEK_TYPES[this.type] || LEEK_TYPES[1];
+        for (const stat of Object.keys(typeDef)) {
+            const [min, max] = typeDef[stat];
+            this.baseStats[stat] = interpolateStat(min, max, this.level);
+        }
+    }
+
+    setType(type) {
+        this.type = LEEK_TYPES[type] ? type : 1;
+        this.updateBaseStats();
+        this.emit('level');
     }
 
     on(event, callback) {

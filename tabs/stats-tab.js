@@ -286,9 +286,12 @@ function generateStatsTable() {
 export function initStatsTab(leek) {
     console.log('[stats-tab] initStatsTab called, COSTS:', COSTS);
 
+    const levelInput = document.getElementById('leek-level');
+
     // Register observers first so they work even if DOM setup fails
     leek.on('level', () => {
         console.log('[stats-tab] level event received');
+        if (levelInput) levelInput.value = leek.level;
         updateStatsTab(leek);
     });
 
@@ -366,6 +369,18 @@ export function initStatsTab(leek) {
             });
         });
     });
+
+    // Initialize level input
+    if (levelInput) {
+        levelInput.value = leek.level;
+        const onLevelChange = () => {
+            const level = parseInt(levelInput.value, 10) || 1;
+            leek.setLevel(level);
+            levelInput.value = leek.level;
+        };
+        levelInput.addEventListener('input', onLevelChange);
+        levelInput.addEventListener('change', onLevelChange);
+    }
 
     console.log('[stats-tab] initStatsTab complete');
 }

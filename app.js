@@ -9,11 +9,15 @@ import { initWeaponsTab } from './tabs/weapons-tab.js';
 import { initComboTab } from './tabs/combo-tab.js';
 import { initExportTab, importBuild } from './tabs/export-tab.js';
 import { initOptimizeTab } from './tabs/optimize-tab.js';
+import { initLeekManager } from './tabs/leek-manager.js';
 
 // Global Leek instance for the application
 const leek = new Leek('My Leek');
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Capture URL hash before any init can modify it
+    const originalHash = window.location.hash.slice(1);
+
     await initI18n();
     translateStaticHTML();
     initTheme();
@@ -30,12 +34,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     initComboTab(leek);
     initExportTab(leek);
     initOptimizeTab(leek);
+    initLeekManager(leek);
 
-    // Load build from URL hash if present
-    const hash = window.location.hash.slice(1);
-    if (hash) {
+    // Load build from URL hash if present (URL hash takes priority over localStorage)
+    if (originalHash) {
         try {
-            importBuild(hash, leek);
+            importBuild(originalHash, leek);
         } catch (e) {
             console.warn('Failed to load build from URL:', e.message);
         }

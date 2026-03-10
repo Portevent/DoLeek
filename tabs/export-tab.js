@@ -8,6 +8,7 @@ const STAT_KEYS = ['life', 'strength', 'wisdom', 'resistance', 'agility', 'scien
 export function exportBuild(leek) {
     const data = {
         l: leek.level,
+        ty: leek.type !== 1 ? leek.type : undefined,
         s: STAT_KEYS.map(k => leek.bonusStats[k]),
         co: leek.components.map(c => c.id),
         ch: leek.chips.map(c => c.id),
@@ -84,6 +85,8 @@ export function importBuild(base64, leek) {
     }));
 
     // Apply to leek
+    const type = Number(data.ty) || 1;
+    leek.setType(type);
     leek.setLevel(level);
 
     leek.bonusStats.setAll(statsObj);

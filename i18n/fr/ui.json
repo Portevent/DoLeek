@@ -103,5 +103,10 @@
 	"optimize_net_capital": "Capital net",
 	"optimize_apply": "Appliquer",
 	"optimize_no_components": "Aucun composant équipé — rien à optimiser.",
-	"optimize_result_count": "{n} échange(s) trouvé(s)"
+	"optimize_result_count": "{n} échange(s) trouvé(s)",
+
+	"leek_manager_title": "Mes Poireaux",
+	"leek_add": "Ajouter un Poireau",
+	"leek_delete": "Supprimer",
+	"leek_default_name": "Poireau"
 }

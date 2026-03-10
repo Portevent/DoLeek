@@ -138,22 +138,12 @@ export function updateRecapStats(leek) {
     updateZone3Error(leek);
 }
 
+function updateRecapLevel(leek) {
+    const el = document.querySelector('.recap-leek-level');
+    if (el) el.textContent = 'Niv. ' + leek.level;
+}
+
 export function initRecapStats(leek) {
-    // Initialize level input
-    const levelInput = document.getElementById('leek-level');
-
-    if (levelInput) {
-        levelInput.value = leek.level;
-
-        const onLevelChange = () => {
-            const level = parseInt(levelInput.value, 10) || 1;
-            leek.setLevel(level);
-            levelInput.value = leek.level;
-        };
-        levelInput.addEventListener('input', onLevelChange);
-        levelInput.addEventListener('change', onLevelChange);
-    }
-
     // Click on component slot to show detail
     document.querySelector('.leek-display').addEventListener('click', (e) => {
         const slot = e.target.closest('.component');
@@ -181,7 +171,10 @@ export function initRecapStats(leek) {
 
     // Observe model changes to update recap
     leek.on('stats', () => updateRecapStats(leek));
-    leek.on('level', () => updateRecapStats(leek));
+    leek.on('level', () => {
+        updateRecapLevel(leek);
+        updateRecapStats(leek);
+    });
     leek.on('components', () => {
         updateRecapComponents(leek);
         updateRecapStats(leek);
@@ -197,6 +190,7 @@ export function initRecapStats(leek) {
     });
 
     // Initial update
+    updateRecapLevel(leek);
     updateRecapStats(leek);
     updateRecapComponents(leek);
     updateRecapChips(leek);

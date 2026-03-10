@@ -117,10 +117,10 @@ html, body {
     width: 60px;
     padding: 4px 8px;
     font-size: 14px;
-    border: none;
+    border: 1px solid var(--border-default);
     border-radius: 4px;
-    background: var(--bg-recap-zone);
-    color: var(--text-recap);
+    background: var(--bg-input);
+    color: var(--text-primary);
     text-align: center;
 }
 
@@ -159,6 +159,24 @@ html, body {
 .zone-1 {
     grid-column: 1;
     grid-row: 1;
+}
+
+/* Zone-1 name + level header */
+.zone-1-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.zone-1-header h3 {
+    margin-bottom: 0;
+}
+
+.recap-leek-level {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: normal;
 }
 
 /* Leek Display - Central leek with 8 components in circle */
@@ -209,6 +227,12 @@ html, body {
     border-color: var(--color-accent);
     background-color: var(--leek-center-bg);
     border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.leek-center:hover {
+    background-color: var(--slot-hover);
 }
 
 /* Component slots - positioned in circle around leek */
@@ -662,7 +686,7 @@ body.show-range .item-range {
         padding: 8px;
     }
 
-    .zone-1 h3 { display: none; }
+    .zone-1 .zone-1-header { display: none; }
 
     .leek-display {
         width: 80px;
@@ -765,4 +789,158 @@ body.show-range .item-range {
     .tab-content {
         padding: 12px;
     }
+}
+
+/* Leek Manager Modal */
+.leek-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+}
+
+.leek-modal-overlay.open {
+    display: block;
+}
+
+.leek-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-editor);
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    padding: 20px;
+    z-index: 101;
+    min-width: 280px;
+    max-width: 400px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.leek-modal.open {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.leek-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.leek-modal-header h3 {
+    font-size: 18px;
+    color: var(--text-primary);
+}
+
+.leek-modal-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0 4px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.leek-modal-close:hover {
+    color: var(--text-primary);
+}
+
+.leek-manager-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.leek-list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: var(--bg-card);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.leek-list-item:hover {
+    background: var(--slot-hover);
+}
+
+.leek-list-item.active {
+    border-color: var(--color-accent);
+    cursor: default;
+}
+
+.leek-list-img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.leek-name-input {
+    flex: 1;
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 14px;
+    color: var(--text-primary);
+    cursor: text;
+}
+
+.leek-name-input:focus {
+    outline: 2px solid var(--color-accent);
+}
+
+.leek-delete-btn {
+    background: none;
+    border: 1px solid var(--border-default);
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 2px 8px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.leek-delete-btn:hover:not(:disabled) {
+    background: var(--bg-hover-remove);
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+}
+
+.leek-delete-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.leek-add-btn {
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: 2px dashed var(--border-default);
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.leek-add-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
 }
