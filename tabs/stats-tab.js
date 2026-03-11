@@ -89,15 +89,7 @@ function updateStatDisplay(statName, leek) {
     if (!statsPanel) return;
 
     const valueDisplay = statsPanel.querySelector(`.stat-value[data-stat="${statName}"]`);
-    const costDisplay = statsPanel.querySelector(`.stat-buttons[data-stat="${statName}"]`)
-        ?.closest('td')?.querySelector('.stat-cost-current');
-
     if (valueDisplay) valueDisplay.textContent = leek.bonusStats[statName];
-
-    if (costDisplay) {
-        const tier = getCurrentTier(statName, leek.bonusStats[statName]);
-        costDisplay.textContent = `${tier.capital} cap → +${tier.sup}`;
-    }
 
     highlightCurrentTier(statName, leek.bonusStats[statName]);
     updateInvestedState(statName, leek.bonusStats[statName]);
@@ -108,21 +100,6 @@ function updateStatDisplay(statName, leek) {
 function highlightCurrentTier(statName, bonusValue) {
     const tiers = COSTS[statName];
     if (!tiers) return;
-
-    const table = document.querySelector(`.cost-table[data-stat="${statName}"]`);
-    if (table) {
-        const rows = table.querySelectorAll(':scope > tbody > tr');
-        rows.forEach((row, i) => {
-            if (i >= tiers.length) return;
-            const tier = tiers[i];
-            const nextStep = (i + 1 < tiers.length) ? tiers[i + 1].step : Infinity;
-            if (bonusValue >= tier.step && bonusValue < nextStep) {
-                row.classList.add('active-tier');
-            } else {
-                row.classList.remove('active-tier');
-            }
-        });
-    }
 
     const indicators = document.querySelector(`.tier-indicators[data-stat="${statName}"]`);
     if (indicators) {
@@ -230,18 +207,6 @@ const STAT_LITE = {
     mp: true,
 };
 
-function buildCostTable(statName) {
-    const tiers = COSTS[statName];
-    let html = `<table class="cost-table" data-stat="${statName}">
-        <thead><tr><th>${t('cost_threshold')}</th><th>${t('cost_cost')}</th><th>${t('cost_bonus')}</th></tr></thead>
-        <tbody>`;
-    for (const tier of tiers) {
-        html += `<tr><td>${tier.step}+</td><td>${tier.capital} ${t('cost_cap')}</td><td>+${tier.sup}</td></tr>`;
-    }
-    html += `</tbody></table>`;
-    return html;
-}
-
 function buildTierIndicators(statName) {
     const tiers = COSTS[statName];
     let html = `<div class="tier-indicators color-${statName}" data-stat="${statName}">`;
@@ -260,7 +225,6 @@ function buildTierIndicators(statName) {
 
 function buildStatCell(statName) {
     const label = getStatLabels()[statName];
-    const tier = getCurrentTier(statName, 0);
 
     return `<td>
         <div class="stat-header">
@@ -276,11 +240,6 @@ function buildStatCell(statName) {
             <button data-delta="10">+10</button>
             ${STAT_LITE[statName]?'':'<button data-delta=\"100\">100</button>'}
         </div>
-        <div class="stat-cost-info">
-            <span class="stat-cost-label">${t('cost_next')}</span>
-            <span class="stat-cost-current">${tier.capital} ${t('cost_cap')} → +${tier.sup}</span>
-        </div>
-        ${buildCostTable(statName)}
     </td>`;
 }
 
@@ -323,15 +282,6 @@ export function initStatsTab(leek) {
         wrapper.innerHTML = generatedHTML;
         console.log('[stats-tab] wrapper.firstElementChild:', wrapper.firstElementChild);
         tableContainer.replaceWith(wrapper.firstElementChild);
-    }
-
-    // Initialize toggle button for cost tables
-    const toggleBtn = document.getElementById('toggle-cost-tables');
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            statsPanel.classList.toggle('show-cost-tables');
-            toggleBtn.classList.toggle('active');
-        });
     }
 
     // Initialize capital display
