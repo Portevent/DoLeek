@@ -73,9 +73,12 @@ function computeCooldowns(comboTurns, upToTurn) {
     for (let t = 0; t < upToTurn; t++) {
         for (const item of comboTurns[t]) {
             const cd = item.cooldown || 0;
-            if (cd > 0) {
+            if (cd === -1) {
                 const key = itemKey(item);
-                cooldownReady[key] = t + cd + 1; // available again at this turn index
+                cooldownReady[key] = 999; // infinite cooldown
+            }else if (cd > 0) {
+                const key = itemKey(item);
+                cooldownReady[key] = t + cd; // available again at this turn index
             }
         }
     }
@@ -131,7 +134,10 @@ function simulateCombo(comboTurns, comboCrits, baseStats) {
             // Register cooldown for this cast
             const cd = item.cooldown || 0;
             if (cd > 0) {
-                cooldownReady[key] = t + cd + 1;
+                cooldownReady[key] = t + cd;
+            }
+            if (cd === -1) {
+                cooldownReady[key] = 999;
             }
 
             // Apply buff effects to running stats for subsequent items in this turn
@@ -214,7 +220,7 @@ function buildPickerItem(item, currentTurn, totalStats, cooldownMap) {
     const disabled = atMax || onCooldown;
     const iconClass = type === 'weapon' ? 'combo-picker-icon weapon' : 'combo-picker-icon chip';
 
-    const cdLabel = onCooldown ? `<span class="combo-picker-cooldown">CD ${cdLeft}</span>` : '';
+    const cdLabel = onCooldown ? `<span class="combo-picker-cooldown">CD ${cdLeft > 900 ? '∞' : cdLeft}</span>` : '';
 
     const critMult = getCritMultiplier(totalStats.agility);
     const effects = item.effects.map(e => {
@@ -252,7 +258,7 @@ function buildComboEntry(step, index, total, turnIndex) {
         forceCrit ? 'force-crit' : '',
     ].filter(Boolean).join(' ');
     const cooldownBadge = onCooldown
-        ? `<span class="combo-entry-cooldown" title="${t('cooldown_title', { n: cooldownLeft })}">CD ${cooldownLeft}</span>`
+        ? `<span class="combo-entry-cooldown" title="${t('cooldown_title', { n: cooldownLeft })}">CD ${cooldownLeft > 900 ? '∞' : cooldownLeft}</span>`
         : '';
 
     return `<div class="${classes}" data-turn="${turnIndex}" data-index="${index}">
