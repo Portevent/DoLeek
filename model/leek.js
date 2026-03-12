@@ -1,8 +1,11 @@
 import Stats from './stats.js';
-import { LEEK_TYPES } from '../data/leek-types.js';
+import {LEEK_TYPES} from '../data/leek-types.js';
 
 function interpolateStat(min, max, level) {
     return Math.round(min + (max - min) * (level - 1) / 300);
+}
+function interpolateBulbStat(min, max, level) {
+    return Math.floor(min + (max - min) * min(300, level) / 300);
 }
 
 class Leek {
@@ -40,7 +43,8 @@ class Leek {
         const typeDef = LEEK_TYPES[this.type] || LEEK_TYPES[1];
         for (const stat of Object.keys(typeDef)) {
             const [min, max] = typeDef[stat];
-            this.baseStats[stat] = interpolateStat(min, max, this.level);
+            this.baseStats[stat] = (this.type === 1) ? interpolateStat    (min, max, this.level)
+                                                     : interpolateBulbStat(min, max, this.level)
         }
     }
 
