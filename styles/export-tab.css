@@ -1,4 +1,29 @@
-/* Export Tab */
+/* Options / Export Tab */
+.options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.option-row:last-child {
+    border-bottom: none;
+}
+
+.option-row span {
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+
 .export-layout {
     display: flex;
     flex-direction: column;

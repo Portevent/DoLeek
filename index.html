@@ -24,9 +24,6 @@
         <aside class="recap">
             <div class="recap-header">
                 <h2 data-i18n="app_title">DoLeek</h2>
-                <button class="theme-toggle" id="theme-toggle" data-i18n-title="toggle_theme" title="Toggle theme">🌙</button>
-                <button class="computed-toggle" id="computed-toggle" data-i18n="computed" data-i18n-title="show_computed" title="Show computed values">Computed</button>
-                <button class="range-toggle" id="range-toggle" data-i18n="range" data-i18n-title="show_range" title="Show range and area">Range</button>
                 <button class="lang-toggle" id="lang-toggle" title="Language">FR</button>
             </div>
             <div class="recap-content">
@@ -91,7 +88,7 @@
                 <button class="tab" data-tab="chips"><img src="public/image/chip/spark.png" alt=""><span data-i18n="tab_chips">Chips</span></button>
                 <button class="tab" data-tab="weapons"><img src="public/image/weapon/pistol.png" alt=""><span data-i18n="tab_weapons">Weapons</span></button>
                 <button class="tab" data-tab="combo"><span data-i18n="tab_combo">Combo</span></button>
-                <button class="tab" data-tab="export"><span data-i18n="tab_export">Export</span></button>
+                <button class="tab" data-tab="options"><span data-i18n="tab_options">Options</span></button>
                 <button class="tab" data-tab="optimize"><span data-i18n="tab_optimize">Optimize</span></button>
             </nav>
 
@@ -216,9 +213,26 @@
                     </div>
                 </section>
 
-                <section id="export" class="tab-panel">
+                <section id="options" class="tab-panel">
                     <h2 data-i18n="export_import">Export / Import</h2>
                     <div class="export-layout">
+                        <div class="export-section">
+                            <h3 data-i18n="tab_options">Options</h3>
+                            <div class="options-list">
+                                <div class="option-row">
+                                    <span data-i18n="toggle_theme">Toggle theme</span>
+                                    <button class="theme-toggle" id="theme-toggle" title="Toggle theme">🌙</button>
+                                </div>
+                                <div class="option-row">
+                                    <span data-i18n="show_computed">Show computed values</span>
+                                    <button class="computed-toggle" id="computed-toggle" data-i18n-title="show_computed" title="Show computed values">Computed</button>
+                                </div>
+                                <div class="option-row">
+                                    <span data-i18n="show_range">Show range and area</span>
+                                    <button class="range-toggle" id="range-toggle" data-i18n-title="show_range" title="Show range and area">Range</button>
+                                </div>
+                            </div>
+                        </div>
                         <div class="export-section">
                             <h3 data-i18n="export">Export</h3>
                             <textarea class="export-textarea" readonly data-i18n-placeholder="export_placeholder" placeholder="Build string will appear here..."></textarea>
