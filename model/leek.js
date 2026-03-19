@@ -5,7 +5,7 @@ function interpolateStat(min, max, level) {
     return Math.round(min + (max - min) * (level - 1) / 300);
 }
 function interpolateBulbStat(min, max, level) {
-    return Math.floor(min + (max - min) * min(300, level) / 300);
+    return Math.floor(min + (max - min) * (level > 300 ? level : 300) / 300);
 }
 
 class Leek {
