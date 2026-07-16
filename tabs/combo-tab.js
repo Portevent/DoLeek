@@ -1,6 +1,75 @@
 import { EFFECT_LABELS, EFFECT_STATS } from '../data/effects.js';
+import { TARGET_SELF, TARGET_ENEMY } from '../data/targets.js';
 import { settings } from '../model/settings.js';
 import { t } from '../model/i18n.js';
+
+// Editable target stats shown in the combo target panel.
+// key → { label i18n key, icon in public/image/charac }
+const TARGET_FIELDS = [
+    { key: 'life', labelKey: 'target_hp', icon: 'life' },
+    { key: 'tp', labelKey: 'target_tp', icon: 'tp' },
+    { key: 'mp', labelKey: 'target_mp', icon: 'mp' },
+    { key: 'absShield', labelKey: 'target_abs_shield', icon: 'resistance' },
+    { key: 'relShield', labelKey: 'target_rel_shield', icon: 'resistance' },
+];
+
+/**
+ * Damage actually dealt to the target after its shields:
+ * relative shield reduces by a percentage, then absolute shield subtracts a flat amount.
+ * A negative shield (vulnerability) increases the damage taken.
+ */
+function damageThroughShields(dmg, ts) {
+    const afterRel = dmg * (1 - ts.relShield / 100);
+    return Math.max(0, Math.round(afterRel) - ts.absShield);
+}
+
+/**
+ * Apply one computed effect to the enemy target state.
+ * `poisons` collects damage-over-time to apply at the end of each turn.
+ */
+function applyEffectToTarget(ce, effectDef, ts, poisons) {
+    const mid = ce.v1 + Math.round(ce.v2 / 2); // expected value of the effect range
+    switch (ce.id) {
+        case 1: case 30: // damage / nova damage
+            ts.life = Math.max(0, ts.life - damageThroughShields(mid, ts));
+            break;
+        case 13: // poison (damage over time, bypasses shields)
+            poisons.push({ damage: mid, turnsRemaining: effectDef.turns || 1 });
+            break;
+        case 2: case 57: // heal
+            ts.life = Math.min(ts.maxLife, ts.life + mid);
+            break;
+        case 6: // absolute shield
+            ts.absShield += mid; break;
+        case 5: case 54: // relative shield
+            ts.relShield += mid; break;
+        case 26: // % vulnerability (lowers relative shield)
+            ts.relShield -= mid; break;
+        case 27: // absolute vulnerability (lowers absolute shield)
+            ts.absShield -= mid; break;
+        case 7: case 31: // +MP
+            ts.mp += mid; break;
+        case 8: case 32: // +TP
+            ts.tp += mid; break;
+        case 17: // -MP
+            ts.mp -= mid; break;
+        case 18: // -TP
+            ts.tp -= mid; break;
+        case 12: case 45: // +max HP
+            ts.maxLife += mid; ts.life += mid; break;
+    }
+}
+
+/**
+ * Apply pending poison ticks to the target at the end of a turn.
+ */
+function applyPoisonTicks(ts, poisons) {
+    for (let i = poisons.length - 1; i >= 0; i--) {
+        ts.life = Math.max(0, ts.life - poisons[i].damage);
+        poisons[i].turnsRemaining--;
+        if (poisons[i].turnsRemaining <= 0) poisons.splice(i, 1);
+    }
+}
 
 // Buff effect id → stat they increase on the caster's side
 const BUFF_STAT_MAP = {
@@ -91,15 +160,27 @@ function computeCooldowns(comboTurns, upToTurn) {
     return result;
 }
 
-function simulateCombo(comboTurns, comboCrits, baseStats) {
+function simulateCombo(comboTurns, comboCrits, comboTargets, baseStats, targetStats) {
     const activeBuffs = []; // { stat, value, turnsRemaining }
     const turnResults = [];
     // cooldownReady[key] = next turn index where the item can be cast again
     const cooldownReady = {};
 
+    // Enemy target state, persisting across turns.
+    const targetState = {
+        life: targetStats.life,
+        maxLife: targetStats.life,
+        tp: targetStats.tp,
+        mp: targetStats.mp,
+        absShield: targetStats.absShield,
+        relShield: targetStats.relShield,
+    };
+    const targetPoisons = []; // { damage, turnsRemaining }
+
     for (let t = 0; t < comboTurns.length; t++) {
         const turn = comboTurns[t];
         const turnCrits = comboCrits[t] || [];
+        const turnTargets = comboTargets[t] || [];
 
         // Build running stats = base + active buffs
         const running = { ...baseStats };
@@ -115,6 +196,7 @@ function simulateCombo(comboTurns, comboCrits, baseStats) {
         for (let idx = 0; idx < turn.length; idx++) {
             const item = turn[idx];
             const forceCrit = turnCrits[idx] || false;
+            const target = turnTargets[idx] || TARGET_SELF;
             const critMult = getCritMultiplier(running.agility, forceCrit);
             const computed = [];
             for (const effect of item.effects) {
@@ -128,7 +210,7 @@ function simulateCombo(comboTurns, comboCrits, baseStats) {
             const onCooldown = t < readyAt;
             const cooldownLeft = onCooldown ? readyAt - t : 0;
 
-            steps.push({ item, effects: computed, boosted: hasDamageBuff, onCooldown, cooldownLeft, forceCrit });
+            steps.push({ item, effects: computed, boosted: hasDamageBuff, onCooldown, cooldownLeft, forceCrit, target });
             tpUsed += item.cost || 0;
 
             // Register cooldown for this cast
@@ -140,28 +222,38 @@ function simulateCombo(comboTurns, comboCrits, baseStats) {
                 cooldownReady[key] = 999;
             }
 
-            // Apply buff effects to running stats for subsequent items in this turn
-            for (let i = 0; i < computed.length; i++) {
-                const ce = computed[i];
-                const buffStat = BUFF_STAT_MAP[ce.id];
-                if (buffStat) {
-                    running[buffStat] = (running[buffStat] || 0) + ce.v1;
-                    if (BOOSTED_STATS.has(buffStat)) hasDamageBuff = true;
+            if (target === TARGET_ENEMY) {
+                // Effects hit the enemy target instead of buffing the leek.
+                for (let i = 0; i < computed.length; i++) {
+                    applyEffectToTarget(computed[i], item.effects[i], targetState, targetPoisons);
+                }
+            } else {
+                // Apply buff effects to running stats for subsequent items in this turn
+                for (let i = 0; i < computed.length; i++) {
+                    const ce = computed[i];
+                    const buffStat = BUFF_STAT_MAP[ce.id];
+                    if (buffStat) {
+                        running[buffStat] = (running[buffStat] || 0) + ce.v1;
+                        if (BOOSTED_STATS.has(buffStat)) hasDamageBuff = true;
 
-                    // Also register for cross-turn carry if turns > 0
-                    const effectDef = item.effects[i];
-                    if (effectDef && effectDef.turns > 0) {
-                        activeBuffs.push({
-                            stat: buffStat,
-                            value: ce.v1,
-                            turnsRemaining: effectDef.turns
-                        });
+                        // Also register for cross-turn carry if turns > 0
+                        const effectDef = item.effects[i];
+                        if (effectDef && effectDef.turns > 0) {
+                            activeBuffs.push({
+                                stat: buffStat,
+                                value: ce.v1,
+                                turnsRemaining: effectDef.turns
+                            });
+                        }
                     }
                 }
             }
         }
 
-        turnResults.push({ tpUsed, tpTotal: running.tp || 0, steps });
+        // End of turn: apply poison damage-over-time to the target.
+        applyPoisonTicks(targetState, targetPoisons);
+
+        turnResults.push({ tpUsed, tpTotal: running.tp || 0, steps, target: { ...targetState } });
 
         // End of turn: decrement buff durations, remove expired
         for (let i = activeBuffs.length - 1; i >= 0; i--) {
@@ -245,25 +337,29 @@ function buildPickerItem(item, currentTurn, totalStats, cooldownMap) {
 }
 
 function buildComboEntry(step, index, total, turnIndex) {
-    const { item, effects, boosted, onCooldown, cooldownLeft, forceCrit } = step;
+    const { item, effects, boosted, onCooldown, cooldownLeft, forceCrit, target } = step;
     const type = getItemType(item);
     const iconClass = type === 'weapon' ? 'combo-entry-icon weapon' : 'combo-entry-icon chip';
     const effectsHtml = effects.map(ce => buildSimEffectLine(ce)).join('');
     const isFirst = index === 0;
     const isLast = index === total - 1;
+    const onTarget = target === TARGET_ENEMY;
     const classes = [
         'combo-entry',
         boosted ? 'boosted' : '',
         onCooldown ? 'on-cooldown' : '',
         forceCrit ? 'force-crit' : '',
+        onTarget ? 'on-target' : 'on-self',
     ].filter(Boolean).join(' ');
     const cooldownBadge = onCooldown
         ? `<span class="combo-entry-cooldown" title="${t('cooldown_title', { n: cooldownLeft })}">CD ${cooldownLeft > 900 ? '∞' : cooldownLeft}</span>`
         : '';
+    const targetLabel = onTarget ? t('target_enemy') : t('target_self');
 
     return `<div class="${classes}" data-turn="${turnIndex}" data-index="${index}">
         <button class="combo-entry-remove" title="${t('remove')}">&times;</button>
         <button class="combo-entry-crit${forceCrit ? ' active' : ''}" title="${t('toggle_crit')}">Crit</button>
+        <button class="combo-entry-target${onTarget ? ' enemy' : ''}" title="${t('toggle_target')} (${targetLabel})">${onTarget ? '🎯' : '🛡'}</button>
         <div class="${iconClass}">
             <img src="${getItemIcon(item)}" alt="${item.name}">
         </div>
@@ -384,17 +480,76 @@ function renderTurns(leek, turnResults) {
     container.innerHTML = html;
 }
 
-function renderSummary(turnResults) {
-    const summaryList = document.querySelector('.combo-summary-list');
-    const allSteps = turnResults.flatMap(tr => tr.steps);
+function renderTargetPanel(leek) {
+    const panel = document.querySelector('.combo-target-panel');
+    if (!panel) return;
+    const ts = leek.targetStats;
+    const fields = TARGET_FIELDS.map(f => `
+        <label class="combo-target-field">
+            <img src="public/image/charac/${f.icon}.png" alt="${f.icon}">
+            <span class="combo-target-field-label">${t(f.labelKey)}</span>
+            <input type="number" class="combo-target-input" data-stat="${f.key}" value="${ts[f.key]}" min="0">
+        </label>`).join('');
+    panel.innerHTML = `
+        <div class="combo-target-panel-header">🎯 ${t('target_title')}</div>
+        <div class="combo-target-fields">${fields}</div>`;
+}
 
-    if (allSteps.length === 0) {
-        summaryList.innerHTML = '';
+function renderSelfSummary(turnResults) {
+    const summaryList = document.querySelector('.combo-summary-list');
+    const selfSteps = turnResults.flatMap(tr => tr.steps.filter(s => s.target !== TARGET_ENEMY));
+
+    if (selfSteps.length === 0) {
+        summaryList.innerHTML = `<p class="combo-empty">${t('combo_summary_none')}</p>`;
         return;
     }
 
-    const groups = aggregateSimulated(allSteps);
+    const groups = aggregateSimulated(selfSteps);
     summaryList.innerHTML = groups.map(g => buildSummaryLine(g)).join('');
+}
+
+function buildTargetTotalBox(kind, text, icon, remaining, max) {
+    return `<div class="combo-target-total combo-target-total-${kind}">
+        <span class="combo-target-total-text">${text}</span>
+        <span class="combo-target-total-left">
+            <img src="public/image/charac/${icon}.png" alt="${icon}">${remaining} / ${max}
+        </span>
+    </div>`;
+}
+
+function renderTargetSummary(turnResults, leek) {
+    const list = document.querySelector('.combo-target-summary-list');
+    if (!list) return;
+    const enemySteps = turnResults.flatMap(tr => tr.steps.filter(s => s.target === TARGET_ENEMY));
+
+    if (enemySteps.length === 0) {
+        list.innerHTML = `<p class="combo-empty">${t('combo_target_none')}</p>`;
+        return;
+    }
+
+    const last = turnResults[turnResults.length - 1]?.target;
+    const maxLife = last ? last.maxLife : leek.targetStats.life;
+    const finalLife = last ? last.life : leek.targetStats.life;
+    const dealt = Math.max(0, leek.targetStats.life - finalLife);
+    const tpShackled = last ? leek.targetStats.tp - last.tp : 0;
+    const mpShackled = last ? leek.targetStats.mp - last.mp : 0;
+
+    const headlineParts = [];
+    if (dealt > 0) {
+        headlineParts.push(buildTargetTotalBox('life', t('target_damage_dealt', { n: dealt }), 'life', finalLife, maxLife));
+    }
+    if (tpShackled > 0) {
+        headlineParts.push(buildTargetTotalBox('tp', t('target_tp_shackled', { n: tpShackled }), 'tp', last.tp, leek.targetStats.tp));
+    }
+    if (mpShackled > 0) {
+        headlineParts.push(buildTargetTotalBox('mp', t('target_mp_shackled', { n: mpShackled }), 'mp', last.mp, leek.targetStats.mp));
+    }
+    const headline = headlineParts.length
+        ? `<div class="combo-target-totals">${headlineParts.join('')}</div>`
+        : '';
+
+    const groups = aggregateSimulated(enemySteps);
+    list.innerHTML = headline + groups.map(g => buildSummaryLine(g)).join('');
 }
 
 const CRIT_MODES = ['never', 'average', 'always'];
@@ -419,13 +574,31 @@ export function initComboTab(leek) {
 
     function refresh() {
         const baseStats = flattenStats(leek.getTotalStats());
-        const turnResults = simulateCombo(leek.combo, leek.comboCrits, baseStats);
+        const turnResults = simulateCombo(leek.combo, leek.comboCrits, leek.comboTargets, baseStats, leek.targetStats);
         renderTurns(leek, turnResults);
-        renderSummary(turnResults);
+        renderSelfSummary(turnResults);
+        renderTargetSummary(turnResults, leek);
         renderPicker(leek);
     }
 
+    function refreshTargetPanel() {
+        renderTargetPanel(leek);
+    }
+
     refresh();
+    refreshTargetPanel();
+
+    // Target stat inputs
+    const targetPanel = document.querySelector('.combo-target-panel');
+    if (targetPanel) {
+        targetPanel.addEventListener('change', (e) => {
+            const input = e.target.closest('.combo-target-input');
+            if (!input) return;
+            const value = Math.max(0, Math.round(Number(input.value) || 0));
+            input.value = value;
+            leek.setTargetStat(input.dataset.stat, value);
+        });
+    }
 
     // Add item to combo (goes to selected turn)
     pickerList.addEventListener('click', (e) => {
@@ -466,6 +639,9 @@ export function initComboTab(leek) {
             } else if (e.target.closest('.combo-entry-crit')) {
                 leek.toggleComboCrit(turnIndex, index);
                 return;
+            } else if (e.target.closest('.combo-entry-target')) {
+                leek.toggleComboTarget(turnIndex, index);
+                return;
             } else if (e.target.closest('.combo-entry-up')) {
                 leek.moveComboItem(turnIndex, index, index - 1);
                 return;
@@ -493,5 +669,5 @@ export function initComboTab(leek) {
     leek.on('stats', refresh);
     leek.on('components', refresh);
     leek.on('level', refresh);
-    leek.on('computed', refresh);
+    leek.on('computed', () => { refresh(); refreshTargetPanel(); });
 }

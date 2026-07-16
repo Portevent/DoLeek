@@ -1,5 +1,11 @@
 import Stats from './stats.js';
 import {LEEK_TYPES} from '../data/leek-types.js';
+import {getDefaultTarget, TARGET_SELF, TARGET_ENEMY} from '../data/targets.js';
+
+// Default stats for the enemy target used in combo simulation.
+function defaultTargetStats() {
+    return { life: 1000, tp: 20, mp: 6, absShield: 0, relShield: 0 };
+}
 
 function interpolateStat(min, max, level) {
     return Math.round(min + (max - min) * (level - 1) / 300);
@@ -21,6 +27,8 @@ class Leek {
         this.weapons = [];
         this.combo = [[]];         // array of turns, each turn is array of items
         this.comboCrits = [[]];    // mirrors combo: per-item forced crit (true/false)
+        this.comboTargets = [[]];  // mirrors combo: per-item target ('self' | 'target')
+        this.targetStats = defaultTargetStats(); // enemy target stats for the combo
         this.selectedTurn = 0;
         this.comboStats = new Stats();
         this._listeners = {};
@@ -129,6 +137,7 @@ class Leek {
         if (turnIndex >= 0 && turnIndex < this.combo.length) {
             this.combo[turnIndex].push(item);
             this.comboCrits[turnIndex].push(false);
+            this.comboTargets[turnIndex].push(getDefaultTarget(item));
             this.emit('combo');
         }
     }
@@ -137,6 +146,7 @@ class Leek {
         if (turnIndex >= 0 && turnIndex < this.combo.length) {
             this.combo[turnIndex].splice(itemIndex, 1);
             this.comboCrits[turnIndex].splice(itemIndex, 1);
+            this.comboTargets[turnIndex].splice(itemIndex, 1);
             this.emit('combo');
         }
     }
@@ -149,6 +159,8 @@ class Leek {
         turn.splice(to, 0, item);
         const [crit] = this.comboCrits[turnIndex].splice(from, 1);
         this.comboCrits[turnIndex].splice(to, 0, crit);
+        const [target] = this.comboTargets[turnIndex].splice(from, 1);
+        this.comboTargets[turnIndex].splice(to, 0, target);
         this.emit('combo');
     }
 
@@ -159,9 +171,25 @@ class Leek {
         }
     }
 
+    toggleComboTarget(turnIndex, itemIndex) {
+        const targets = this.comboTargets[turnIndex];
+        if (targets && itemIndex >= 0 && itemIndex < targets.length) {
+            targets[itemIndex] = targets[itemIndex] === TARGET_ENEMY ? TARGET_SELF : TARGET_ENEMY;
+            this.emit('combo');
+        }
+    }
+
+    setTargetStat(key, value) {
+        if (key in this.targetStats) {
+            this.targetStats[key] = value;
+            this.emit('combo');
+        }
+    }
+
     clearCombo() {
         this.combo = [[]];
         this.comboCrits = [[]];
+        this.comboTargets = [[]];
         this.selectedTurn = 0;
         this.comboStats.reset();
         this.emit('combo');
@@ -170,6 +198,7 @@ class Leek {
     addTurn() {
         this.combo.push([]);
         this.comboCrits.push([]);
+        this.comboTargets.push([]);
         this.selectedTurn = this.combo.length - 1;
         this.emit('combo');
     }
@@ -178,6 +207,7 @@ class Leek {
         if (this.combo.length <= 1) return;
         this.combo.splice(turnIndex, 1);
         this.comboCrits.splice(turnIndex, 1);
+        this.comboTargets.splice(turnIndex, 1);
         if (this.selectedTurn >= this.combo.length) {
             this.selectedTurn = this.combo.length - 1;
         }
