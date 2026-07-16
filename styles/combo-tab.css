@@ -324,6 +324,17 @@
     color: var(--text-muted);
 }
 
+/* Effect that lands on the caster although the item is aimed at the enemy */
+.combo-effect-line.on-caster {
+    color: var(--color-accent);
+    cursor: help;
+}
+
+.combo-effect-caster {
+    font-size: 9px;
+    flex-shrink: 0;
+}
+
 .combo-entry.boosted {
     border-color: #f39c12;
     border-style: solid;
@@ -418,6 +429,51 @@
 
 .combo-entry.force-crit {
     box-shadow: 0 0 0 1px var(--color-danger);
+}
+
+/* Multiplier stepper: effects multiplied by the number of entities hit */
+.combo-entry-mult {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 1px 2px;
+    border: 1px solid var(--border-default);
+    border-radius: 3px;
+    color: var(--text-muted);
+    cursor: help;
+    transition: all 0.2s;
+}
+
+.combo-entry-mult.active {
+    border-color: #f39c12;
+    color: #f39c12;
+}
+
+.combo-entry-mult-value {
+    min-width: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.combo-entry-mult button {
+    width: 14px;
+    height: 14px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 2px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    color: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.combo-entry-mult button:hover {
+    background: var(--color-accent);
+    color: #fff;
 }
 
 /* Summary (3-part: self boost / target edition / target summary) */

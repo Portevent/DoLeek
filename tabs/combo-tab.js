@@ -28,6 +28,25 @@ function damageThroughShields(dmg, ts) {
     return Math.max(0, Math.round(afterRel) - ts.absShield);
 }
 
+// Effect modifier bitfield: bit 4 means the effect lands on the caster whatever
+// the item is aimed at (so modifiers 4 and 5 both carry it).
+const MODIFIER_ON_CASTER = 4;
+// Bit 2: the effect is multiplied by the number of entities hit (Plasma)
+const MODIFIER_MULTIPLIED_BY_TARGETS = 2;
+
+function affectsCaster(effectDef) {
+    return ((effectDef?.modifiers || 0) & MODIFIER_ON_CASTER) !== 0;
+}
+
+function isMultipliedByTargets(effectDef) {
+    return ((effectDef?.modifiers || 0) & MODIFIER_MULTIPLIED_BY_TARGETS) !== 0;
+}
+
+// Whether the item has any effect worth setting a multiplier on
+function hasMultipliedEffect(item) {
+    return item.effects.some(isMultipliedByTargets);
+}
+
 // Effects whose value is reduced by the target's shields
 const SHIELDED_EFFECTS = new Set([1, 30]); // damage, nova damage
 
@@ -125,18 +144,21 @@ function getCritMultiplier(agility, forceCrit) {
 /**
  * Compute a single effect's min/max values using running stats.
  * Returns { v1, v2 } where the result range is [v1, v1+v2].
+ * `mult` multiplies effects flagged as multiplied by the number of targets hit;
+ * it applies after the stat bonus, on the rounded value, as the game does.
  */
-function computeEffect(effect, runningStats, critMult) {
+function computeEffect(effect, runningStats, critMult, mult = 1) {
+    const targetMult = isMultipliedByTargets(effect) ? mult : 1;
     const stat = EFFECT_STATS[effect.id];
     if (!stat) {
         const v1 = Math.round(effect.value1 * critMult);
         const v2 = effect.value2 ? Math.round((effect.value1 + effect.value2) * critMult) - v1 : 0;
-        return { v1, v2 };
+        return { v1: v1 * targetMult, v2: v2 * targetMult };
     }
     const multiplier = (1 + (runningStats[stat] || 0) / 100) * critMult;
     const v1 = Math.round(effect.value1 * multiplier);
     const v2 = effect.value2 ? Math.round((effect.value1 + effect.value2) * multiplier) - v1 : 0;
-    return { v1, v2 };
+    return { v1: v1 * targetMult, v2: v2 * targetMult };
 }
 
 /**
@@ -179,7 +201,7 @@ function computeCooldowns(comboTurns, upToTurn) {
     return result;
 }
 
-function simulateCombo(comboTurns, comboCrits, comboTargets, baseStats, targetStats) {
+function simulateCombo(comboTurns, comboCrits, comboTargets, comboMults, baseStats, targetStats) {
     const activeBuffs = []; // { stat, value, turnsRemaining }
     const turnResults = [];
     // cooldownReady[key] = next turn index where the item can be cast again
@@ -200,6 +222,7 @@ function simulateCombo(comboTurns, comboCrits, comboTargets, baseStats, targetSt
         const turn = comboTurns[t];
         const turnCrits = comboCrits[t] || [];
         const turnTargets = comboTargets[t] || [];
+        const turnMults = comboMults[t] || [];
 
         // Build running stats = base + active buffs
         const running = { ...baseStats };
@@ -216,10 +239,11 @@ function simulateCombo(comboTurns, comboCrits, comboTargets, baseStats, targetSt
             const item = turn[idx];
             const forceCrit = turnCrits[idx] || false;
             const target = turnTargets[idx] || TARGET_SELF;
+            const mult = turnMults[idx] || 1;
             const critMult = getCritMultiplier(running.agility, forceCrit);
             const computed = [];
             for (const effect of item.effects) {
-                const { v1, v2 } = computeEffect(effect, running, critMult);
+                const { v1, v2 } = computeEffect(effect, running, critMult, mult);
                 computed.push({ id: effect.id, v1, v2 });
             }
 
@@ -229,7 +253,7 @@ function simulateCombo(comboTurns, comboCrits, comboTargets, baseStats, targetSt
             const onCooldown = t < readyAt;
             const cooldownLeft = onCooldown ? readyAt - t : 0;
 
-            steps.push({ item, effects: computed, boosted: hasDamageBuff, onCooldown, cooldownLeft, forceCrit, target });
+            steps.push({ item, effects: computed, boosted: hasDamageBuff, onCooldown, cooldownLeft, forceCrit, target, mult });
             tpUsed += item.cost || 0;
 
             // Register cooldown for this cast
@@ -241,32 +265,34 @@ function simulateCombo(comboTurns, comboCrits, comboTargets, baseStats, targetSt
                 cooldownReady[key] = 999;
             }
 
-            if (target === TARGET_ENEMY) {
-                // Effects hit the enemy target instead of buffing the leek.
-                for (let i = 0; i < computed.length; i++) {
+            // Each effect is routed on its own: an item aimed at the enemy still
+            // applies its on-caster effects to the leek.
+            for (let i = 0; i < computed.length; i++) {
+                const ce = computed[i];
+                const effectDef = item.effects[i];
+                ce.onCaster = target !== TARGET_ENEMY || affectsCaster(effectDef);
+
+                if (!ce.onCaster) {
                     // Shields are read before the effect lands, so a shield cast
                     // earlier in the combo is already reflected here.
-                    storeShieldedDamage(computed[i], targetState);
-                    applyEffectToTarget(computed[i], item.effects[i], targetState, targetPoisons);
+                    storeShieldedDamage(ce, targetState);
+                    applyEffectToTarget(ce, effectDef, targetState, targetPoisons);
+                    continue;
                 }
-            } else {
-                // Apply buff effects to running stats for subsequent items in this turn
-                for (let i = 0; i < computed.length; i++) {
-                    const ce = computed[i];
-                    const buffStat = BUFF_STAT_MAP[ce.id];
-                    if (buffStat) {
-                        running[buffStat] = (running[buffStat] || 0) + ce.v1;
-                        if (BOOSTED_STATS.has(buffStat)) hasDamageBuff = true;
 
-                        // Also register for cross-turn carry if turns > 0
-                        const effectDef = item.effects[i];
-                        if (effectDef && effectDef.turns > 0) {
-                            activeBuffs.push({
-                                stat: buffStat,
-                                value: ce.v1,
-                                turnsRemaining: effectDef.turns
-                            });
-                        }
+                // Buff effects raise running stats for the next items of this turn
+                const buffStat = BUFF_STAT_MAP[ce.id];
+                if (buffStat) {
+                    running[buffStat] = (running[buffStat] || 0) + ce.v1;
+                    if (BOOSTED_STATS.has(buffStat)) hasDamageBuff = true;
+
+                    // Also register for cross-turn carry if turns > 0
+                    if (effectDef && effectDef.turns > 0) {
+                        activeBuffs.push({
+                            stat: buffStat,
+                            value: ce.v1,
+                            turnsRemaining: effectDef.turns
+                        });
                     }
                 }
             }
@@ -311,8 +337,10 @@ function formatSimEffect(id, v1, v2, divisor = 1) {
  * Render one effect line.
  * `shielded`: show the damage left after the target's shields (dv1/dv2).
  * `cost`: TP cost of the item, used when per-TP display is on.
+ * `onEnemyItem`: the item is aimed at the enemy, so an on-caster effect is
+ * flagged as landing on the leek instead.
  */
-function buildSimEffectLine(ce, { shielded = false, cost = 0 } = {}) {
+function buildSimEffectLine(ce, { shielded = false, cost = 0, onEnemyItem = false } = {}) {
     const useShielded = shielded && settings.computedMode && ce.dv1 !== undefined;
     const v1 = useShielded ? ce.dv1 : ce.v1;
     const v2 = useShielded ? ce.dv2 : ce.v2;
@@ -324,14 +352,22 @@ function buildSimEffectLine(ce, { shielded = false, cost = 0 } = {}) {
         ? `<img class="effect-stat-icon" src="public/image/charac/${stat}.png" alt="${stat}">`
         : '';
     const isBuff = BUFF_STAT_MAP[ce.id] !== undefined;
+    // An on-caster effect on an enemy-aimed item goes against the item's arrow
+    const backOnCaster = onEnemyItem && ce.onCaster;
     const classes = [
         'combo-effect-line',
         isBuff ? 'buff' : '',
         useShielded ? 'shielded' : '',
+        backOnCaster ? 'on-caster' : '',
     ].filter(Boolean).join(' ');
-    const title = useShielded ? ` title="${t('shielded_hint', { n: formatSimEffect(ce.id, ce.v1, ce.v2) })}"` : '';
+
+    let title = '';
+    if (useShielded) title = ` title="${t('shielded_hint', { n: formatSimEffect(ce.id, ce.v1, ce.v2) })}"`;
+    else if (backOnCaster) title = ` title="${t('caster_hint')}"`;
+
+    const casterMark = backOnCaster ? `<span class="combo-effect-caster">🛡</span>` : '';
     const suffix = perTp ? `<span class="combo-effect-per-tp">${t('per_tp_suffix')}</span>` : '';
-    return `<div class="${classes}"${title}>${statIcon}<span>${text}</span>${suffix}</div>`;
+    return `<div class="${classes}"${title}>${casterMark}${statIcon}<span>${text}</span>${suffix}</div>`;
 }
 
 function getMaxUses(item) {
@@ -368,10 +404,12 @@ function buildPickerItem(item, currentTurn, totalStats, cooldownMap, targetStats
     const critMult = getCritMultiplier(totalStats.agility);
     const effects = item.effects.map(e => {
         const { v1, v2 } = computeEffect(e, totalStats, critMult);
-        const ce = { id: e.id, v1, v2 };
-        // Shields of the target as configured, before any combo step alters them
-        storeShieldedDamage(ce, targetStats);
-        return buildSimEffectLine(ce, { shielded: true, cost: item.cost });
+        const ce = { id: e.id, v1, v2, onCaster: affectsCaster(e) };
+        if (!ce.onCaster) {
+            // Shields of the target as configured, before any combo step alters them
+            storeShieldedDamage(ce, targetStats);
+        }
+        return buildSimEffectLine(ce, { shielded: true, cost: item.cost, onEnemyItem: true });
     }).join('');
 
     return `<div class="combo-picker-item${disabled ? ' disabled' : ''}" data-id="${item.id}" data-item-type="${type}">
@@ -391,14 +429,14 @@ function buildPickerItem(item, currentTurn, totalStats, cooldownMap, targetStats
 }
 
 function buildComboEntry(step, index, total, turnIndex) {
-    const { item, effects, boosted, onCooldown, cooldownLeft, forceCrit, target } = step;
+    const { item, effects, boosted, onCooldown, cooldownLeft, forceCrit, target, mult } = step;
     const type = getItemType(item);
     const iconClass = type === 'weapon' ? 'combo-entry-icon weapon' : 'combo-entry-icon chip';
     const isFirst = index === 0;
     const isLast = index === total - 1;
     const onTarget = target === TARGET_ENEMY;
     const effectsHtml = effects
-        .map(ce => buildSimEffectLine(ce, { shielded: onTarget, cost: item.cost }))
+        .map(ce => buildSimEffectLine(ce, { shielded: onTarget, cost: item.cost, onEnemyItem: onTarget }))
         .join('');
     const classes = [
         'combo-entry',
@@ -412,6 +450,15 @@ function buildComboEntry(step, index, total, turnIndex) {
         : '';
     const targetLabel = onTarget ? t('target_enemy') : t('target_self');
 
+    // Only items whose effects scale with the number of entities hit get the stepper
+    const multControl = hasMultipliedEffect(item)
+        ? `<span class="combo-entry-mult${mult > 1 ? ' active' : ''}" title="${t('mult_title')}">
+            <button class="combo-entry-mult-down" title="${t('mult_less')}">&minus;</button>
+            <span class="combo-entry-mult-value">&times;${mult}</span>
+            <button class="combo-entry-mult-up" title="${t('mult_more')}">+</button>
+        </span>`
+        : '';
+
     return `<div class="${classes}" data-turn="${turnIndex}" data-index="${index}">
         <button class="combo-entry-remove" title="${t('remove')}">&times;</button>
         <button class="combo-entry-crit${forceCrit ? ' active' : ''}" title="${t('toggle_crit')}">Crit</button>
@@ -422,6 +469,7 @@ function buildComboEntry(step, index, total, turnIndex) {
         <div class="combo-entry-info">
             <span class="combo-entry-name">${item.name.replace(/_/g, ' ')}</span>
             <span class="combo-entry-cost"><img src="public/image/charac/tp.png" alt="TP">${item.cost} TP${cooldownBadge}</span>
+            ${multControl}
             <div class="combo-entry-effects">${effectsHtml}</div>
         </div>
         <div class="combo-entry-order">
@@ -432,11 +480,16 @@ function buildComboEntry(step, index, total, turnIndex) {
     </div>`;
 }
 
-// `shielded`: total the damage left after the target's shields rather than the raw damage
-function aggregateSimulated(allSteps, shielded = false) {
+/**
+ * Total the effects of every step, one group per effect id.
+ * `onCaster`: keep the effects landing on the leek (true) or on the enemy (false).
+ * `shielded`: total the damage left after the target's shields, not the raw damage.
+ */
+function aggregateSimulated(allSteps, { onCaster, shielded = false } = {}) {
     const groups = {};
     for (const step of allSteps) {
         for (const ce of step.effects) {
+            if (ce.onCaster !== onCaster) continue;
             if (!groups[ce.id]) {
                 groups[ce.id] = { id: ce.id, value1: 0, value2: 0, count: 0 };
             }
@@ -555,14 +608,14 @@ function renderTargetPanel(leek) {
 
 function renderSelfSummary(turnResults) {
     const summaryList = document.querySelector('.combo-summary-list');
-    const selfSteps = turnResults.flatMap(tr => tr.steps.filter(s => s.target !== TARGET_ENEMY));
+    const allSteps = turnResults.flatMap(tr => tr.steps);
+    const groups = aggregateSimulated(allSteps, { onCaster: true });
 
-    if (selfSteps.length === 0) {
+    if (groups.length === 0) {
         summaryList.innerHTML = `<p class="combo-empty">${t('combo_summary_none')}</p>`;
         return;
     }
 
-    const groups = aggregateSimulated(selfSteps);
     summaryList.innerHTML = groups.map(g => buildSummaryLine(g)).join('');
 }
 
@@ -578,9 +631,10 @@ function buildTargetTotalBox(kind, text, icon, remaining, max) {
 function renderTargetSummary(turnResults, leek) {
     const list = document.querySelector('.combo-target-summary-list');
     if (!list) return;
-    const enemySteps = turnResults.flatMap(tr => tr.steps.filter(s => s.target === TARGET_ENEMY));
+    const allSteps = turnResults.flatMap(tr => tr.steps);
+    const groups = aggregateSimulated(allSteps, { onCaster: false, shielded: true });
 
-    if (enemySteps.length === 0) {
+    if (groups.length === 0) {
         list.innerHTML = `<p class="combo-empty">${t('combo_target_none')}</p>`;
         return;
     }
@@ -606,7 +660,6 @@ function renderTargetSummary(turnResults, leek) {
         ? `<div class="combo-target-totals">${headlineParts.join('')}</div>`
         : '';
 
-    const groups = aggregateSimulated(enemySteps, true);
     list.innerHTML = headline + groups.map(g => buildSummaryLine(g)).join('');
 }
 
@@ -640,7 +693,7 @@ export function initComboTab(leek) {
 
     function refresh() {
         const baseStats = flattenStats(leek.getTotalStats());
-        const turnResults = simulateCombo(leek.combo, leek.comboCrits, leek.comboTargets, baseStats, leek.targetStats);
+        const turnResults = simulateCombo(leek.combo, leek.comboCrits, leek.comboTargets, leek.comboMults, baseStats, leek.targetStats);
         renderTurns(leek, turnResults);
         renderSelfSummary(turnResults);
         renderTargetSummary(turnResults, leek);
@@ -709,6 +762,12 @@ export function initComboTab(leek) {
                 return;
             } else if (e.target.closest('.combo-entry-target')) {
                 leek.toggleComboTarget(turnIndex, index);
+                return;
+            } else if (e.target.closest('.combo-entry-mult-up')) {
+                leek.setComboMult(turnIndex, index, (leek.comboMults[turnIndex][index] || 1) + 1);
+                return;
+            } else if (e.target.closest('.combo-entry-mult-down')) {
+                leek.setComboMult(turnIndex, index, (leek.comboMults[turnIndex][index] || 1) - 1);
                 return;
             } else if (e.target.closest('.combo-entry-up')) {
                 leek.moveComboItem(turnIndex, index, index - 1);

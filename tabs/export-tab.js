@@ -18,7 +18,8 @@ export function exportBuild(leek) {
             id: item.id,
             type: item.item !== undefined ? 'w' : 'c',
             ...(leek.comboCrits[t]?.[i] ? { cr: 1 } : {}),
-            ...(leek.comboTargets[t]?.[i] === 'target' ? { tg: 1 } : {})
+            ...(leek.comboTargets[t]?.[i] === 'target' ? { tg: 1 } : {}),
+            ...(leek.comboMults[t]?.[i] > 1 ? { m: leek.comboMults[t][i] } : {})
         }))),
         ts: leek.targetStats
     };
@@ -92,7 +93,7 @@ export function importBuild(base64, leek) {
             item = CHIPS[String(entry.id)];
             if (!item) throw new Error(`Unknown chip ID in combo: ${entry.id}`);
         }
-        return { item, crit: !!entry.cr, target: entry.tg ? 'target' : undefined };
+        return { item, crit: !!entry.cr, target: entry.tg ? 'target' : undefined, mult: Number(entry.m) || 1 };
     }));
 
     // Apply to leek
@@ -129,10 +130,11 @@ export function importBuild(base64, leek) {
     for (let t = 0; t < resolvedTurns.length; t++) {
         if (t > 0) leek.addTurn();
         for (let i = 0; i < resolvedTurns[t].length; i++) {
-            const { item, crit, target } = resolvedTurns[t][i];
+            const { item, crit, target, mult } = resolvedTurns[t][i];
             leek.addComboItem(item, t);
             if (crit) leek.comboCrits[t][i] = true;
             if (target) leek.comboTargets[t][i] = target;
+            if (mult > 1) leek.setComboMult(t, i, mult);
         }
     }
 }

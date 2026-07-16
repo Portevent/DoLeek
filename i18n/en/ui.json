@@ -9,6 +9,10 @@
 	"per_tp_toggle": "/TP",
 	"per_tp_suffix": "/TP",
 	"shielded_hint": "After target shields (raw: {n})",
+	"caster_hint": "Lands on you, even though the item is aimed at the target",
+	"mult_title": "Number of entities hit — multiplies the effect",
+	"mult_more": "One more entity hit",
+	"mult_less": "One less entity hit",
 	"level_label": "Lvl",
 
 	"recap_leek": "Leek",

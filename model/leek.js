@@ -7,6 +7,9 @@ function defaultTargetStats() {
     return { life: 1000, tp: 20, mp: 6, absShield: 0, relShield: 0 };
 }
 
+// A cast can hit at most a full enemy team
+export const MAX_COMBO_MULT = 8;
+
 function interpolateStat(min, max, level) {
     return Math.round(min + (max - min) * (level - 1) / 300);
 }
@@ -29,6 +32,7 @@ class Leek {
         this.combo = [[]];         // array of turns, each turn is array of items
         this.comboCrits = [[]];    // mirrors combo: per-item forced crit (true/false)
         this.comboTargets = [[]];  // mirrors combo: per-item target ('self' | 'target')
+        this.comboMults = [[]];    // mirrors combo: per-item multiplier, for effects multiplied by the number of targets hit
         this.targetStats = defaultTargetStats(); // enemy target stats for the combo
         this.selectedTurn = 0;
         this.comboStats = new Stats();
@@ -140,6 +144,7 @@ class Leek {
             this.combo[turnIndex].push(item);
             this.comboCrits[turnIndex].push(false);
             this.comboTargets[turnIndex].push(getDefaultTarget(item));
+            this.comboMults[turnIndex].push(1);
             this.emit('combo');
         }
     }
@@ -149,6 +154,7 @@ class Leek {
             this.combo[turnIndex].splice(itemIndex, 1);
             this.comboCrits[turnIndex].splice(itemIndex, 1);
             this.comboTargets[turnIndex].splice(itemIndex, 1);
+            this.comboMults[turnIndex].splice(itemIndex, 1);
             this.emit('combo');
         }
     }
@@ -163,6 +169,8 @@ class Leek {
         this.comboCrits[turnIndex].splice(to, 0, crit);
         const [target] = this.comboTargets[turnIndex].splice(from, 1);
         this.comboTargets[turnIndex].splice(to, 0, target);
+        const [mult] = this.comboMults[turnIndex].splice(from, 1);
+        this.comboMults[turnIndex].splice(to, 0, mult);
         this.emit('combo');
     }
 
@@ -181,6 +189,15 @@ class Leek {
         }
     }
 
+    // Multiplier for effects multiplied by the number of targets hit (Plasma).
+    setComboMult(turnIndex, itemIndex, value) {
+        const mults = this.comboMults[turnIndex];
+        if (mults && itemIndex >= 0 && itemIndex < mults.length) {
+            mults[itemIndex] = Math.max(1, Math.min(MAX_COMBO_MULT, value));
+            this.emit('combo');
+        }
+    }
+
     setTargetStat(key, value) {
         if (key in this.targetStats) {
             this.targetStats[key] = value;
@@ -192,6 +209,7 @@ class Leek {
         this.combo = [[]];
         this.comboCrits = [[]];
         this.comboTargets = [[]];
+        this.comboMults = [[]];
         this.selectedTurn = 0;
         this.comboStats.reset();
         this.emit('combo');
@@ -201,6 +219,7 @@ class Leek {
         this.combo.push([]);
         this.comboCrits.push([]);
         this.comboTargets.push([]);
+        this.comboMults.push([]);
         this.selectedTurn = this.combo.length - 1;
         this.emit('combo');
     }
@@ -210,6 +229,7 @@ class Leek {
         this.combo.splice(turnIndex, 1);
         this.comboCrits.splice(turnIndex, 1);
         this.comboTargets.splice(turnIndex, 1);
+        this.comboMults.splice(turnIndex, 1);
         if (this.selectedTurn >= this.combo.length) {
             this.selectedTurn = this.combo.length - 1;
         }

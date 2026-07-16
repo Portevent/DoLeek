@@ -9,6 +9,10 @@
 	"per_tp_toggle": "/PT",
 	"per_tp_suffix": "/PT",
 	"shielded_hint": "Après les boucliers de la cible (brut : {n})",
+	"caster_hint": "S'applique sur vous, même si l'objet vise la cible",
+	"mult_title": "Nombre d'entités touchées — multiplie l'effet",
+	"mult_more": "Une entité touchée de plus",
+	"mult_less": "Une entité touchée de moins",
 	"level_label": "Niv",
 
 	"recap_leek": "Poireau",
