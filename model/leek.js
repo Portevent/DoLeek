@@ -22,6 +22,7 @@ class Leek {
         this.level = 301;
         this.baseStats = new Stats();
         this.bonusStats = new Stats();
+        this.boostStats = new Stats(); // buffs granted by other leeks, no capital cost
         this.components = [];
         this.chips = [];
         this.weapons = [];
@@ -96,6 +97,7 @@ class Leek {
                 total[stat] += value;
             }
         }
+        total.add(this.boostStats);
         return total;
     }
 

@@ -59,6 +59,29 @@
     color: var(--color-danger);
 }
 
+.combo-per-tp-toggle {
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--border-default);
+    background: var(--bg-input);
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+}
+
+.combo-per-tp-toggle:hover {
+    border-color: var(--color-accent);
+    color: var(--text-primary);
+}
+
+.combo-per-tp-toggle.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: white;
+}
+
 /* Turn containers */
 .combo-turns-container {
     display: flex;
@@ -289,6 +312,18 @@
     font-style: italic;
 }
 
+/* Damage shown after the target's shields */
+.combo-effect-line.shielded {
+    text-decoration: underline dotted color-mix(in srgb, var(--color-danger) 60%, transparent);
+    text-underline-offset: 2px;
+    cursor: help;
+}
+
+.combo-effect-per-tp {
+    font-size: 9px;
+    color: var(--text-muted);
+}
+
 .combo-entry.boosted {
     border-color: #f39c12;
     border-style: solid;
@@ -412,6 +447,13 @@
 }
 
 /* Target edition panel */
+.combo-target-panel {
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: var(--bg-card);
+}
+
 .combo-target-panel-header {
     font-size: 14px;
     color: var(--text-secondary);
@@ -454,6 +496,14 @@
     background: var(--bg-input);
     color: var(--text-primary);
     border-radius: 4px;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.combo-target-input::-webkit-outer-spin-button,
+.combo-target-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 /* Target summary headline */

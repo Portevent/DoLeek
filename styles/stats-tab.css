@@ -141,6 +141,86 @@
     flex-shrink: 0;
 }
 
+/* Boost box: stats granted by other leeks, outside of capital */
+.boost-section {
+    margin-top: 20px;
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    background: var(--bg-card);
+}
+
+.boost-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+}
+
+.boost-summary:hover {
+    color: var(--text-primary);
+}
+
+.boost-summary-count {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-success);
+}
+
+.boost-note {
+    margin: 0 12px 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.boost-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 6px 16px;
+    padding: 0 12px 12px;
+}
+
+.boost-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.boost-field-label {
+    flex: 1;
+    min-width: 0;
+}
+
+.stat-boost-input {
+    width: 72px;
+    padding: 3px 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: right;
+    border: 1px solid var(--border-default);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border-radius: 4px;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.stat-boost-input::-webkit-outer-spin-button,
+.stat-boost-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.boost-field.boosted .stat-boost-input {
+    border-color: var(--color-success);
+    color: var(--color-success);
+}
+
 /* Stat increment/decrement buttons */
 .stat-buttons {
     display: flex;

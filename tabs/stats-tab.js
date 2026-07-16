@@ -84,6 +84,11 @@ function updateInvestedState(statName, bonusValue) {
     if (td) td.classList.toggle('invested', bonusValue > 0);
 }
 
+function updateBoostState(statName, boostValue) {
+    const field = document.querySelector(`.boost-field[data-stat="${statName}"]`);
+    if (field) field.classList.toggle('boosted', boostValue !== 0);
+}
+
 function updateStatDisplay(statName, leek) {
     const statsPanel = document.getElementById('stats');
     if (!statsPanel) return;
@@ -252,6 +257,35 @@ function generateStatsTable() {
     return html;
 }
 
+// Boosts granted by other leeks: free of capital, so they live outside the
+// capital-spending table.
+function buildBoostField(statName) {
+    return `<label class="boost-field" data-stat="${statName}">
+        <img src="public/image/charac/${statName}.png" alt="" class="stat-icon">
+        <span class="boost-field-label color-${statName}">${getStatLabels()[statName]}</span>
+        <input type="number" class="stat-boost-input" data-stat="${statName}" value="0" step="1">
+    </label>`;
+}
+
+function generateBoostSection() {
+    const fields = STAT_PAIRS.flat().map(buildBoostField).join('');
+    return `<details class="boost-section">
+        <summary class="boost-summary">
+            <span class="boost-summary-title">${t('boost_section')}</span>
+            <span class="boost-summary-count"></span>
+        </summary>
+        <p class="boost-note">${t('boost_hint')}</p>
+        <div class="boost-grid">${fields}</div>
+    </details>`;
+}
+
+function updateBoostSummary(leek) {
+    const count = document.querySelector('.boost-summary-count');
+    if (!count) return;
+    const boosted = STAT_PAIRS.flat().filter(s => leek.boostStats[s]).length;
+    count.textContent = boosted > 0 ? t('boost_count', { n: boosted }) : '';
+}
+
 export function initStatsTab(leek) {
     console.log('[stats-tab] initStatsTab called, COSTS:', COSTS);
 
@@ -283,6 +317,11 @@ export function initStatsTab(leek) {
         console.log('[stats-tab] wrapper.firstElementChild:', wrapper.firstElementChild);
         tableContainer.replaceWith(wrapper.firstElementChild);
     }
+
+    // Boost box, folded, below the capital stats
+    const boostWrapper = document.createElement('div');
+    boostWrapper.innerHTML = generateBoostSection();
+    statsPanel.appendChild(boostWrapper.firstElementChild);
 
     // Initialize capital display
     updateCapitalDisplay(leek);
@@ -330,6 +369,19 @@ export function initStatsTab(leek) {
         });
     });
 
+    // Initialize boost inputs (buffs from other leeks, free of capital)
+    statsPanel.querySelectorAll('.stat-boost-input').forEach(input => {
+        const statName = input.dataset.stat;
+        input.value = leek.boostStats[statName] || 0;
+        input.addEventListener('input', () => {
+            leek.boostStats[statName] = parseInt(input.value, 10) || 0;
+            updateBoostState(statName, leek.boostStats[statName]);
+            leek.emit('stats');
+        });
+        updateBoostState(statName, leek.boostStats[statName] || 0);
+    });
+    updateBoostSummary(leek);
+
     // Initialize critical toggle
     const criticalToggle = document.getElementById('critical-toggle');
     if (criticalToggle) {
@@ -366,6 +418,15 @@ export function updateStatsTab(leek) {
         highlightCurrentTier(statName, bonus);
         updateInvestedState(statName, bonus);
     });
+
+    statsPanel.querySelectorAll('.stat-boost-input').forEach(input => {
+        const statName = input.dataset.stat;
+        const boost = leek.boostStats[statName] || 0;
+        // Leave the field alone while it is being typed into
+        if (document.activeElement !== input) input.value = boost;
+        updateBoostState(statName, boost);
+    });
+    updateBoostSummary(leek);
 
     updateCapitalDisplay(leek);
 }

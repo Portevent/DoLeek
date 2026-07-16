@@ -5,13 +5,18 @@ import { t } from '../model/i18n.js';
 
 // Editable target stats shown in the combo target panel.
 // key → { label i18n key, icon in public/image/charac }
+// Shields accept negative values: they then act as a vulnerability.
 const TARGET_FIELDS = [
     { key: 'life', labelKey: 'target_hp', icon: 'life' },
     { key: 'tp', labelKey: 'target_tp', icon: 'tp' },
     { key: 'mp', labelKey: 'target_mp', icon: 'mp' },
-    { key: 'absShield', labelKey: 'target_abs_shield', icon: 'resistance' },
-    { key: 'relShield', labelKey: 'target_rel_shield', icon: 'resistance' },
+    { key: 'absShield', labelKey: 'target_abs_shield', icon: 'resistance', allowNegative: true },
+    { key: 'relShield', labelKey: 'target_rel_shield', icon: 'resistance', allowNegative: true },
 ];
+
+function allowsNegative(key) {
+    return TARGET_FIELDS.find(f => f.key === key)?.allowNegative === true;
+}
 
 /**
  * Damage actually dealt to the target after its shields:
@@ -21,6 +26,20 @@ const TARGET_FIELDS = [
 function damageThroughShields(dmg, ts) {
     const afterRel = dmg * (1 - ts.relShield / 100);
     return Math.max(0, Math.round(afterRel) - ts.absShield);
+}
+
+// Effects whose value is reduced by the target's shields
+const SHIELDED_EFFECTS = new Set([1, 30]); // damage, nova damage
+
+/**
+ * Record on a computed effect the damage range that survives the target's
+ * current shields, as dv1/dv2 (range [dv1, dv1+dv2]). Left undefined for
+ * effects shields do not apply to (poison, buffs, shackles...).
+ */
+function storeShieldedDamage(ce, ts) {
+    if (!SHIELDED_EFFECTS.has(ce.id)) return;
+    ce.dv1 = damageThroughShields(ce.v1, ts);
+    ce.dv2 = ce.v2 ? damageThroughShields(ce.v1 + ce.v2, ts) - ce.dv1 : 0;
 }
 
 /**
@@ -225,6 +244,9 @@ function simulateCombo(comboTurns, comboCrits, comboTargets, baseStats, targetSt
             if (target === TARGET_ENEMY) {
                 // Effects hit the enemy target instead of buffing the leek.
                 for (let i = 0; i < computed.length; i++) {
+                    // Shields are read before the effect lands, so a shield cast
+                    // earlier in the combo is already reflected here.
+                    storeShieldedDamage(computed[i], targetState);
                     applyEffectToTarget(computed[i], item.effects[i], targetState, targetPoisons);
                 }
             } else {
@@ -267,20 +289,49 @@ function simulateCombo(comboTurns, comboCrits, comboTargets, baseStats, targetSt
     return turnResults;
 }
 
-function formatSimEffect(id, v1, v2) {
-    const fn = EFFECT_LABELS[id];
-    if (!fn) return `Effect #${id}`;
-    return fn(v1, v2);
+function round1(x) {
+    return Math.round(x * 10) / 10;
 }
 
-function buildSimEffectLine(ce) {
-    const text = formatSimEffect(ce.id, ce.v1, ce.v2);
+/**
+ * Format an effect, optionally divided by a TP cost.
+ * Labels rebuild the top of the range as v1 + v2, which reintroduces float
+ * noise (4.2 + 3.3 → 7.500000000000001), so long decimals are trimmed back.
+ */
+function formatSimEffect(id, v1, v2, divisor = 1) {
+    const fn = EFFECT_LABELS[id];
+    if (!fn) return `Effect #${id}`;
+    if (divisor === 1) return fn(v1, v2);
+    const low = round1(v1 / divisor);
+    const high = round1((v1 + v2) / divisor);
+    return fn(low, round1(high - low)).replace(/\d+\.\d{2,}/g, m => String(round1(Number(m))));
+}
+
+/**
+ * Render one effect line.
+ * `shielded`: show the damage left after the target's shields (dv1/dv2).
+ * `cost`: TP cost of the item, used when per-TP display is on.
+ */
+function buildSimEffectLine(ce, { shielded = false, cost = 0 } = {}) {
+    const useShielded = shielded && settings.computedMode && ce.dv1 !== undefined;
+    const v1 = useShielded ? ce.dv1 : ce.v1;
+    const v2 = useShielded ? ce.dv2 : ce.v2;
+
+    const perTp = settings.perTpMode && cost > 0;
+    const text = formatSimEffect(ce.id, v1, v2, perTp ? cost : 1);
     const stat = EFFECT_STATS[ce.id];
     const statIcon = stat
         ? `<img class="effect-stat-icon" src="public/image/charac/${stat}.png" alt="${stat}">`
         : '';
     const isBuff = BUFF_STAT_MAP[ce.id] !== undefined;
-    return `<div class="combo-effect-line${isBuff ? ' buff' : ''}">${statIcon}<span>${text}</span></div>`;
+    const classes = [
+        'combo-effect-line',
+        isBuff ? 'buff' : '',
+        useShielded ? 'shielded' : '',
+    ].filter(Boolean).join(' ');
+    const title = useShielded ? ` title="${t('shielded_hint', { n: formatSimEffect(ce.id, ce.v1, ce.v2) })}"` : '';
+    const suffix = perTp ? `<span class="combo-effect-per-tp">${t('per_tp_suffix')}</span>` : '';
+    return `<div class="${classes}"${title}>${statIcon}<span>${text}</span>${suffix}</div>`;
 }
 
 function getMaxUses(item) {
@@ -302,7 +353,7 @@ function countInTurn(turn, item) {
     return turn.filter(c => c.id === item.id && getItemType(c) === getItemType(item)).length;
 }
 
-function buildPickerItem(item, currentTurn, totalStats, cooldownMap) {
+function buildPickerItem(item, currentTurn, totalStats, cooldownMap, targetStats) {
     const type = getItemType(item);
     const used = countInTurn(currentTurn, item);
     const max = getMaxUses(item);
@@ -317,7 +368,10 @@ function buildPickerItem(item, currentTurn, totalStats, cooldownMap) {
     const critMult = getCritMultiplier(totalStats.agility);
     const effects = item.effects.map(e => {
         const { v1, v2 } = computeEffect(e, totalStats, critMult);
-        return buildSimEffectLine({ id: e.id, v1, v2 });
+        const ce = { id: e.id, v1, v2 };
+        // Shields of the target as configured, before any combo step alters them
+        storeShieldedDamage(ce, targetStats);
+        return buildSimEffectLine(ce, { shielded: true, cost: item.cost });
     }).join('');
 
     return `<div class="combo-picker-item${disabled ? ' disabled' : ''}" data-id="${item.id}" data-item-type="${type}">
@@ -340,10 +394,12 @@ function buildComboEntry(step, index, total, turnIndex) {
     const { item, effects, boosted, onCooldown, cooldownLeft, forceCrit, target } = step;
     const type = getItemType(item);
     const iconClass = type === 'weapon' ? 'combo-entry-icon weapon' : 'combo-entry-icon chip';
-    const effectsHtml = effects.map(ce => buildSimEffectLine(ce)).join('');
     const isFirst = index === 0;
     const isLast = index === total - 1;
     const onTarget = target === TARGET_ENEMY;
+    const effectsHtml = effects
+        .map(ce => buildSimEffectLine(ce, { shielded: onTarget, cost: item.cost }))
+        .join('');
     const classes = [
         'combo-entry',
         boosted ? 'boosted' : '',
@@ -376,16 +432,18 @@ function buildComboEntry(step, index, total, turnIndex) {
     </div>`;
 }
 
-function aggregateSimulated(allSteps) {
+// `shielded`: total the damage left after the target's shields rather than the raw damage
+function aggregateSimulated(allSteps, shielded = false) {
     const groups = {};
     for (const step of allSteps) {
         for (const ce of step.effects) {
             if (!groups[ce.id]) {
                 groups[ce.id] = { id: ce.id, value1: 0, value2: 0, count: 0 };
             }
+            const useShielded = shielded && settings.computedMode && ce.dv1 !== undefined;
             const g = groups[ce.id];
-            g.value1 += ce.v1;
-            g.value2 += ce.v2;
+            g.value1 += useShielded ? ce.dv1 : ce.v1;
+            g.value2 += useShielded ? ce.dv2 : ce.v2;
             g.count++;
         }
     }
@@ -440,7 +498,7 @@ function renderPicker(leek) {
         return;
     }
 
-    pickerList.innerHTML = items.map(item => buildPickerItem(item, currentTurn, totalStats, cooldownMap)).join('');
+    pickerList.innerHTML = items.map(item => buildPickerItem(item, currentTurn, totalStats, cooldownMap, leek.targetStats)).join('');
 }
 
 function renderTurns(leek, turnResults) {
@@ -488,7 +546,7 @@ function renderTargetPanel(leek) {
         <label class="combo-target-field">
             <img src="public/image/charac/${f.icon}.png" alt="${f.icon}">
             <span class="combo-target-field-label">${t(f.labelKey)}</span>
-            <input type="number" class="combo-target-input" data-stat="${f.key}" value="${ts[f.key]}" min="0">
+            <input type="number" class="combo-target-input" data-stat="${f.key}" value="${ts[f.key]}"${f.allowNegative ? '' : ' min="0"'}>
         </label>`).join('');
     panel.innerHTML = `
         <div class="combo-target-panel-header">🎯 ${t('target_title')}</div>
@@ -548,7 +606,7 @@ function renderTargetSummary(turnResults, leek) {
         ? `<div class="combo-target-totals">${headlineParts.join('')}</div>`
         : '';
 
-    const groups = aggregateSimulated(enemySteps);
+    const groups = aggregateSimulated(enemySteps, true);
     list.innerHTML = headline + groups.map(g => buildSummaryLine(g)).join('');
 }
 
@@ -561,6 +619,7 @@ export function initComboTab(leek) {
     const pickerList = document.querySelector('.combo-picker-list');
     const clearBtn = document.querySelector('.combo-clear-btn');
     const critToggle = document.querySelector('.combo-crit-toggle');
+    const perTpToggle = document.querySelector('.combo-per-tp-toggle');
 
     // Crit toggle: cycles never → average → always → never
     critToggle.addEventListener('click', () => {
@@ -569,6 +628,13 @@ export function initComboTab(leek) {
         critToggle.textContent = t(CRIT_LABEL_KEYS[settings.critMode]);
         critToggle.title = t(CRIT_TOOLTIP_KEYS[settings.critMode]);
         critToggle.dataset.mode = settings.critMode;
+        refresh();
+    });
+
+    // Per-TP toggle: divide effect values by the item's TP cost
+    perTpToggle.addEventListener('click', () => {
+        settings.perTpMode = !settings.perTpMode;
+        perTpToggle.classList.toggle('active', settings.perTpMode);
         refresh();
     });
 
@@ -594,9 +660,11 @@ export function initComboTab(leek) {
         targetPanel.addEventListener('change', (e) => {
             const input = e.target.closest('.combo-target-input');
             if (!input) return;
-            const value = Math.max(0, Math.round(Number(input.value) || 0));
+            const stat = input.dataset.stat;
+            const rounded = Math.round(Number(input.value) || 0);
+            const value = allowsNegative(stat) ? rounded : Math.max(0, rounded);
             input.value = value;
-            leek.setTargetStat(input.dataset.stat, value);
+            leek.setTargetStat(stat, value);
         });
     }
 

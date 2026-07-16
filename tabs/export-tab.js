@@ -10,6 +10,7 @@ export function exportBuild(leek) {
         l: leek.level,
         ty: leek.type !== 1 ? leek.type : undefined,
         s: STAT_KEYS.map(k => leek.bonusStats[k]),
+        b: STAT_KEYS.some(k => leek.boostStats[k]) ? STAT_KEYS.map(k => leek.boostStats[k]) : undefined,
         co: leek.components.map(c => c.id),
         ch: leek.chips.map(c => c.id),
         w: leek.weapons.map(w => w.id),
@@ -47,6 +48,14 @@ export function importBuild(base64, leek) {
         const v = Number(data.s[i]);
         if (isNaN(v)) throw new Error(`Invalid stat value for ${STAT_KEYS[i]}.`);
         statsObj[STAT_KEYS[i]] = v;
+    }
+
+    // Validate boost stats (absent in builds exported before boosts existed)
+    const boostObj = {};
+    for (let i = 0; i < STAT_KEYS.length; i++) {
+        const v = Array.isArray(data.b) ? Number(data.b[i]) : 0;
+        if (isNaN(v)) throw new Error(`Invalid boost value for ${STAT_KEYS[i]}.`);
+        boostObj[STAT_KEYS[i]] = v;
     }
 
     // Validate components
@@ -92,6 +101,7 @@ export function importBuild(base64, leek) {
     leek.setLevel(level);
 
     leek.bonusStats.setAll(statsObj);
+    leek.boostStats.setAll(boostObj);
     leek.emit('stats');
 
     // Clear and re-add components

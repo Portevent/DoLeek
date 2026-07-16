@@ -53,6 +53,7 @@ function resetLeek(leek, type = 1) {
     leek.setType(type);
     leek.setLevel(301);
     leek.bonusStats.reset();
+    leek.boostStats.reset();
     leek.emit('stats');
     while (leek.components.length > 0) leek.removeComponent(0);
     while (leek.chips.length > 0) leek.removeChip(0);

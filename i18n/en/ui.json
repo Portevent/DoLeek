@@ -5,6 +5,10 @@
 	"show_computed": "Show computed values",
 	"range": "Range",
 	"show_range": "Show range and area",
+	"show_per_tp": "Show effects per TP",
+	"per_tp_toggle": "/TP",
+	"per_tp_suffix": "/TP",
+	"shielded_hint": "After target shields (raw: {n})",
 	"level_label": "Lvl",
 
 	"recap_leek": "Leek",
@@ -126,5 +130,8 @@
 	"leek_add": "Add Leek",
 	"leek_delete": "Delete",
 	"leek_default_name": "Leek",
-	"critical_toggle": "Critical"
+	"critical_toggle": "Critical",
+	"boost_hint": "Boost granted by another leek (costs no capital)",
+	"boost_section": "Boost from other leeks",
+	"boost_count": "{n} boosted"
 }
