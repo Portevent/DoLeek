@@ -314,9 +314,11 @@
 
 /* Damage shown after the target's shields */
 .combo-effect-line.shielded {
+    /*
     text-decoration: underline dotted color-mix(in srgb, var(--color-danger) 60%, transparent);
     text-underline-offset: 2px;
     cursor: help;
+    */
 }
 
 .combo-effect-per-tp {
@@ -327,6 +329,12 @@
 /* Effect that lands on the caster although the item is aimed at the enemy */
 .combo-effect-line.on-caster {
     color: var(--color-accent);
+    cursor: help;
+}
+
+.combo-effect-line.not-applied {
+    opacity: 0.4;
+    text-decoration: line-through;
     cursor: help;
 }
 

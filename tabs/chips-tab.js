@@ -1,11 +1,10 @@
 import { CHIPS } from '../data/chips.js';
-import { EFFECT_STATS, formatEffect, formatComputedEffect } from '../data/effects.js';
+import { EFFECT_STATS, formatComputedEffect } from '../data/effects.js';
 import { buildRangeHtml } from '../data/range.js';
-import { settings } from '../model/settings.js';
 import { t } from '../model/i18n.js';
 
 function buildEffectLine(effect, totalStats) {
-    const text = settings.computedMode ? formatComputedEffect(effect, totalStats) : formatEffect(effect);
+    const text = formatComputedEffect(effect, totalStats);
     const stat = EFFECT_STATS[effect.id];
     const statIcon = stat
         ? `<img class="effect-stat-icon" src="public/image/charac/${stat}.png" alt="${stat}">`
@@ -187,11 +186,11 @@ export function initChipsTab(leek) {
     });
     leek.on('stats', () => {
         renderEquippedChips(leek);
-        if (settings.computedMode) renderChipsList(chipsList, sortChips(allChips, sortMode), leek);
+        renderChipsList(chipsList, sortChips(allChips, sortMode), leek);
     });
     leek.on('components', () => {
         renderEquippedChips(leek);
-        if (settings.computedMode) renderChipsList(chipsList, sortChips(allChips, sortMode), leek);
+        renderChipsList(chipsList, sortChips(allChips, sortMode), leek);
     });
     leek.on('computed', () => {
         renderEquippedChips(leek);

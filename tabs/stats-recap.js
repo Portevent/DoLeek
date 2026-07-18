@@ -1,6 +1,5 @@
 // Updates the recap zone stats display with current leek stats
-import { formatEffect, formatComputedEffect } from '../data/effects.js';
-import { settings } from '../model/settings.js';
+import { formatComputedEffect } from '../data/effects.js';
 import { t } from '../model/i18n.js';
 import { isCapitalOverflow } from './stats-tab.js';
 import { LEEK_TYPE_META } from '../data/leek-types.js';
@@ -40,7 +39,7 @@ function buildDetailForItem(item, type, totalStats) {
     if (item.max_uses > 0) meta.push(`<span class="detail-meta-entry">${item.max_uses}${t('per_turn')}</span>`);
 
     const effectsHtml = item.effects.map(e => {
-        const text = settings.computedMode ? formatComputedEffect(e, totalStats) : formatEffect(e);
+        const text = formatComputedEffect(e, totalStats);
         return `<div class="detail-stat"><span>${text}</span></div>`;
     }).join('');
 

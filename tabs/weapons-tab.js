@@ -1,7 +1,6 @@
 import { WEAPONS } from '../data/weapons.js';
-import { EFFECT_STATS, formatEffect, formatComputedEffect } from '../data/effects.js';
+import { EFFECT_STATS, formatComputedEffect } from '../data/effects.js';
 import { buildRangeHtml } from '../data/range.js';
-import { settings } from '../model/settings.js';
 import { t } from '../model/i18n.js';
 
 function getMaxWeapons(level) {
@@ -21,7 +20,7 @@ function getWeaponFilters() {
 }
 
 function buildEffectLine(effect, totalStats) {
-    const text = settings.computedMode ? formatComputedEffect(effect, totalStats) : formatEffect(effect);
+    const text = formatComputedEffect(effect, totalStats);
     const stat = EFFECT_STATS[effect.id];
     const statIcon = stat
         ? `<img class="effect-stat-icon" src="public/image/charac/${stat}.png" alt="${stat}">`
@@ -262,20 +261,16 @@ export function initWeaponsTab(leek) {
         applyLevelFilter(leek.level, showAll);
     });
     leek.on('stats', () => {
-        if (settings.computedMode) {
-            renderEquippedWeapons(leek);
-            renderWeaponsList(weaponsList, sortWeapons(allWeapons, sortMode), leek);
-            applyFilters(activeEffects);
-            applyLevelFilter(leek.level, showAll);
-        }
+        renderEquippedWeapons(leek);
+        renderWeaponsList(weaponsList, sortWeapons(allWeapons, sortMode), leek);
+        applyFilters(activeEffects);
+        applyLevelFilter(leek.level, showAll);
     });
     leek.on('components', () => {
-        if (settings.computedMode) {
-            renderEquippedWeapons(leek);
-            renderWeaponsList(weaponsList, sortWeapons(allWeapons, sortMode), leek);
-            applyFilters(activeEffects);
-            applyLevelFilter(leek.level, showAll);
-        }
+        renderEquippedWeapons(leek);
+        renderWeaponsList(weaponsList, sortWeapons(allWeapons, sortMode), leek);
+        applyFilters(activeEffects);
+        applyLevelFilter(leek.level, showAll);
     });
     leek.on('computed', () => {
         renderEquippedWeapons(leek);

@@ -1,5 +1,5 @@
 import { EFFECT_LABELS, EFFECT_STATS } from '../data/effects.js';
-import { TARGET_SELF, TARGET_ENEMY } from '../data/targets.js';
+import { TARGET_SELF, TARGET_ENEMY, getDefaultTarget } from '../data/targets.js';
 import { settings } from '../model/settings.js';
 import { t } from '../model/i18n.js';
 
@@ -45,6 +45,43 @@ function isMultipliedByTargets(effectDef) {
 // Whether the item has any effect worth setting a multiplier on
 function hasMultipliedEffect(item) {
     return item.effects.some(isMultipliedByTargets);
+}
+
+// Target bitfield: which entity types an effect is allowed to affect.
+// The combo only models two entities — the leek (caster) and one enemy — so
+// allies (a third side) are not represented: an allies-only buff never lands
+// on the caster. Effects default to "everyone" when the flag is absent.
+const EFFECT_TARGET_ENEMIES = 1;
+const EFFECT_TARGET_CASTER = 4;
+
+function effectTargets(effectDef) {
+    return effectDef?.targets ?? 31;
+}
+
+function canHitEnemy(effectDef) {
+    return (effectTargets(effectDef) & EFFECT_TARGET_ENEMIES) !== 0;
+}
+
+function canHitCaster(effectDef) {
+    return (effectTargets(effectDef) & EFFECT_TARGET_CASTER) !== 0;
+}
+
+/**
+ * Decide which side an effect lands on given the item's aim, its on-caster
+ * modifier and its target flags. Returns 'enemy', 'caster' or 'none' — 'none'
+ * meaning the effect cannot touch either modelled entity and so must not apply.
+ *
+ * Only the "affect launcher" modifier folds an effect back onto the leek when
+ * the item is aimed at the enemy; an ally/self boost without it does nothing to
+ * the caster in that case.
+ */
+function resolveRecipient(effectDef, itemAim) {
+    if (affectsCaster(effectDef)) return 'caster';
+    if (itemAim === TARGET_ENEMY) {
+        return canHitEnemy(effectDef) ? 'enemy' : 'none';
+    }
+    // Aimed at the caster: only effects allowed on the caster itself land.
+    return canHitCaster(effectDef) ? 'caster' : 'none';
 }
 
 // Effects whose value is reduced by the target's shields
@@ -266,13 +303,19 @@ function simulateCombo(comboTurns, comboCrits, comboTargets, comboMults, baseSta
             }
 
             // Each effect is routed on its own: an item aimed at the enemy still
-            // applies its on-caster effects to the leek.
+            // applies its on-caster effects to the leek, and its target flags
+            // decide whether it may land on the enemy, the caster, or nobody.
             for (let i = 0; i < computed.length; i++) {
                 const ce = computed[i];
                 const effectDef = item.effects[i];
-                ce.onCaster = target !== TARGET_ENEMY || affectsCaster(effectDef);
+                const recipient = resolveRecipient(effectDef, target);
+                ce.onCaster = recipient === 'caster';
+                ce.applies = recipient !== 'none';
 
-                if (!ce.onCaster) {
+                // Effect that cannot legally touch either entity: skip it.
+                if (!ce.applies) continue;
+
+                if (recipient === 'enemy') {
                     // Shields are read before the effect lands, so a shield cast
                     // earlier in the combo is already reflected here.
                     storeShieldedDamage(ce, targetState);
@@ -341,7 +384,7 @@ function formatSimEffect(id, v1, v2, divisor = 1) {
  * flagged as landing on the leek instead.
  */
 function buildSimEffectLine(ce, { shielded = false, cost = 0, onEnemyItem = false } = {}) {
-    const useShielded = shielded && settings.computedMode && ce.dv1 !== undefined;
+    const useShielded = shielded && ce.dv1 !== undefined;
     const v1 = useShielded ? ce.dv1 : ce.v1;
     const v2 = useShielded ? ce.dv2 : ce.v2;
 
@@ -354,15 +397,19 @@ function buildSimEffectLine(ce, { shielded = false, cost = 0, onEnemyItem = fals
     const isBuff = BUFF_STAT_MAP[ce.id] !== undefined;
     // An on-caster effect on an enemy-aimed item goes against the item's arrow
     const backOnCaster = onEnemyItem && ce.onCaster;
+    // An effect the target flags forbid on this aim is shown but never applied
+    const notApplied = ce.applies === false;
     const classes = [
         'combo-effect-line',
         isBuff ? 'buff' : '',
         useShielded ? 'shielded' : '',
         backOnCaster ? 'on-caster' : '',
+        notApplied ? 'not-applied' : '',
     ].filter(Boolean).join(' ');
 
     let title = '';
-    if (useShielded) title = ` title="${t('shielded_hint', { n: formatSimEffect(ce.id, ce.v1, ce.v2) })}"`;
+    if (notApplied) title = ` title="${t('not_applied_hint')}"`;
+    else if (useShielded) title = ` title="${t('shielded_hint', { n: formatSimEffect(ce.id, ce.v1, ce.v2) })}"`;
     else if (backOnCaster) title = ` title="${t('caster_hint')}"`;
 
     const casterMark = backOnCaster ? `<span class="combo-effect-caster">🛡</span>` : '';
@@ -402,14 +449,19 @@ function buildPickerItem(item, currentTurn, totalStats, cooldownMap, targetStats
     const cdLabel = onCooldown ? `<span class="combo-picker-cooldown">CD ${cdLeft > 900 ? '∞' : cdLeft}</span>` : '';
 
     const critMult = getCritMultiplier(totalStats.agility);
+    // The picker previews adding the item with its default aim.
+    const aim = getDefaultTarget(item);
+    const onEnemyItem = aim === TARGET_ENEMY;
     const effects = item.effects.map(e => {
         const { v1, v2 } = computeEffect(e, totalStats, critMult);
-        const ce = { id: e.id, v1, v2, onCaster: affectsCaster(e) };
-        if (!ce.onCaster) {
-            // Shields of the target as configured, before any combo step alters them
+        const recipient = resolveRecipient(e, aim);
+        const ce = { id: e.id, v1, v2, onCaster: recipient === 'caster', applies: recipient !== 'none' };
+        if (recipient === 'enemy') {
+            // Shields of the target as it stands after the selected turn's steps,
+            // so vulnerabilities applied earlier in the combo lower them here too.
             storeShieldedDamage(ce, targetStats);
         }
-        return buildSimEffectLine(ce, { shielded: true, cost: item.cost, onEnemyItem: true });
+        return buildSimEffectLine(ce, { shielded: onEnemyItem, cost: item.cost, onEnemyItem });
     }).join('');
 
     return `<div class="combo-picker-item${disabled ? ' disabled' : ''}" data-id="${item.id}" data-item-type="${type}">
@@ -489,11 +541,12 @@ function aggregateSimulated(allSteps, { onCaster, shielded = false } = {}) {
     const groups = {};
     for (const step of allSteps) {
         for (const ce of step.effects) {
+            if (ce.applies === false) continue;
             if (ce.onCaster !== onCaster) continue;
             if (!groups[ce.id]) {
                 groups[ce.id] = { id: ce.id, value1: 0, value2: 0, count: 0 };
             }
-            const useShielded = shielded && settings.computedMode && ce.dv1 !== undefined;
+            const useShielded = shielded && ce.dv1 !== undefined;
             const g = groups[ce.id];
             g.value1 += useShielded ? ce.dv1 : ce.v1;
             g.value2 += useShielded ? ce.dv2 : ce.v2;
@@ -539,19 +592,22 @@ function flattenStats(statsObj) {
     };
 }
 
-function renderPicker(leek) {
+function renderPicker(leek, targetState) {
     const pickerList = document.querySelector('.combo-picker-list');
     const items = getEquippedItems(leek);
     const totalStats = flattenStats(leek.getTotalStats());
     const currentTurn = leek.combo[leek.selectedTurn] || [];
     const cooldownMap = computeCooldowns(leek.combo, leek.selectedTurn);
+    // Preview damage against the target as it stands at the end of the selected
+    // turn, so vulnerabilities already applied by the combo are reflected.
+    const target = targetState || leek.targetStats;
 
     if (items.length === 0) {
         pickerList.innerHTML = `<p class="combo-empty">${t('combo_empty_picker')}</p>`;
         return;
     }
 
-    pickerList.innerHTML = items.map(item => buildPickerItem(item, currentTurn, totalStats, cooldownMap, leek.targetStats)).join('');
+    pickerList.innerHTML = items.map(item => buildPickerItem(item, currentTurn, totalStats, cooldownMap, target)).join('');
 }
 
 function renderTurns(leek, turnResults) {
@@ -697,7 +753,7 @@ export function initComboTab(leek) {
         renderTurns(leek, turnResults);
         renderSelfSummary(turnResults);
         renderTargetSummary(turnResults, leek);
-        renderPicker(leek);
+        renderPicker(leek, turnResults[leek.selectedTurn]?.target);
     }
 
     function refreshTargetPanel() {

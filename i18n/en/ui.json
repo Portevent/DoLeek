@@ -10,6 +10,7 @@
 	"per_tp_suffix": "/TP",
 	"shielded_hint": "After target shields (raw: {n})",
 	"caster_hint": "Lands on you, even though the item is aimed at the target",
+	"not_applied_hint": "Not applied: this effect cannot reach the aimed entity",
 	"mult_title": "Number of entities hit — multiplies the effect",
 	"mult_more": "One more entity hit",
 	"mult_less": "One less entity hit",

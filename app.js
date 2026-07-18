@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initI18n();
     translateStaticHTML();
     initTheme();
-    initComputedToggle();
     initRangeToggle();
     initLangToggle();
     initTabs();
@@ -99,15 +98,6 @@ function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     const toggle = document.getElementById('theme-toggle');
     toggle.textContent = theme === 'dark' ? '☀️' : '🌙';
-}
-
-function initComputedToggle() {
-    const toggle = document.getElementById('computed-toggle');
-    toggle.addEventListener('click', () => {
-        settings.computedMode = !settings.computedMode;
-        toggle.classList.toggle('active', settings.computedMode);
-        leek.emit('computed');
-    });
 }
 
 function initRangeToggle() {
