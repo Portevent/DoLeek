@@ -2,6 +2,7 @@
 // while keeping user-selected stats at their current levels.
 
 import { COMPONENTS } from '../data/components.js';
+import { ITEMS } from '../data/items.js';
 import { COSTS } from '../model/stats.js';
 import { t } from '../model/i18n.js';
 
@@ -48,7 +49,12 @@ function runOptimization(leek, keptStats) {
     if (leek.components.length === 0) return [];
 
     const equippedIds = new Set(leek.components.map(c => String(c.id)));
-    const candidates = Object.values(COMPONENTS).filter(c => !equippedIds.has(String(c.id)));
+    const candidates = Object.values(COMPONENTS).filter(c => {
+        if (equippedIds.has(String(c.id))) return false;
+        // Only consider components whose item level is at or below the leek's level
+        const item = ITEMS[String(c.template)];
+        return !item || item.level <= leek.level;
+    });
 
     const results = [];
 

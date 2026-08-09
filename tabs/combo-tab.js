@@ -85,7 +85,7 @@ function resolveRecipient(effectDef, itemAim) {
 }
 
 // Effects whose value is reduced by the target's shields
-const SHIELDED_EFFECTS = new Set([1, 30]); // damage, nova damage
+const SHIELDED_EFFECTS = new Set([1, 28, 30]); // damage, % life damage, nova damage
 
 /**
  * Record on a computed effect the damage range that survives the target's
@@ -105,7 +105,7 @@ function storeShieldedDamage(ce, ts) {
 function applyEffectToTarget(ce, effectDef, ts, poisons) {
     const mid = ce.v1 + Math.round(ce.v2 / 2); // expected value of the effect range
     switch (ce.id) {
-        case 1: case 30: // damage / nova damage
+        case 1: case 28: case 30: // damage / % life damage / nova damage
             ts.life = Math.max(0, ts.life - damageThroughShields(mid, ts));
             break;
         case 13: // poison (damage over time, bypasses shields)
@@ -186,6 +186,13 @@ function getCritMultiplier(agility, forceCrit) {
  */
 function computeEffect(effect, runningStats, critMult, mult = 1) {
     const targetMult = isMultipliedByTargets(effect) ? mult : 1;
+    if (effect.id === 28) {
+        // % life damage: value1 is a percentage of the caster's max HP, dealt as flat damage
+        const casterLife = runningStats.life || 0;
+        const v1 = Math.round(effect.value1 / 100 * casterLife * critMult);
+        const v2 = effect.value2 ? Math.round((effect.value1 + effect.value2) / 100 * casterLife * critMult) - v1 : 0;
+        return { v1: v1 * targetMult, v2: v2 * targetMult };
+    }
     const stat = EFFECT_STATS[effect.id];
     if (!stat) {
         const v1 = Math.round(effect.value1 * critMult);
@@ -368,7 +375,8 @@ function round1(x) {
  * noise (4.2 + 3.3 → 7.500000000000001), so long decimals are trimmed back.
  */
 function formatSimEffect(id, v1, v2, divisor = 1) {
-    const fn = EFFECT_LABELS[id];
+    // % life damage is computed into a flat damage value, so display it like regular damage
+    const fn = EFFECT_LABELS[id === 28 ? 1 : id];
     if (!fn) return `Effect #${id}`;
     if (divisor === 1) return fn(v1, v2);
     const low = round1(v1 / divisor);
